@@ -21,6 +21,9 @@ use LaqiUnitStockManager\Unit\UnitRegistry;
  */
 final class SetupSection implements ScreenSectionInterface {
 
+	/** Active mappings displayed per page. */
+	const PER_PAGE = 25;
+
 	/**
 	 * Pool persistence.
 	 *
@@ -57,6 +60,13 @@ final class SetupSection implements ScreenSectionInterface {
 	private $formatter;
 
 	/**
+	 * Shared admin pagination.
+	 *
+	 * @var PaginationRenderer
+	 */
+	private $pagination;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param PoolRepository       $pools Pool repository.
@@ -64,13 +74,15 @@ final class SetupSection implements ScreenSectionInterface {
 	 * @param CustomUnitRepository $custom_units Custom-unit persistence.
 	 * @param MappingRepository    $mappings Product mapping persistence.
 	 * @param QuantityFormatter    $formatter Exact quantity formatting.
+	 * @param PaginationRenderer   $pagination Shared admin pagination.
 	 */
-	public function __construct( PoolRepository $pools, UnitRegistry $units, CustomUnitRepository $custom_units, MappingRepository $mappings, QuantityFormatter $formatter ) {
+	public function __construct( PoolRepository $pools, UnitRegistry $units, CustomUnitRepository $custom_units, MappingRepository $mappings, QuantityFormatter $formatter, PaginationRenderer $pagination ) {
 		$this->pools        = $pools;
 		$this->units        = $units;
 		$this->custom_units = $custom_units;
 		$this->mappings     = $mappings;
 		$this->formatter    = $formatter;
+		$this->pagination   = $pagination;
 	}
 
 	/** Get the section ID. @return string */
@@ -131,7 +143,12 @@ final class SetupSection implements ScreenSectionInterface {
 
 	/** Render active product mappings. @return void */
 	private function render_mappings(): void {
-		$mappings = $this->mappings->active();
+		$total       = $this->mappings->count_active();
+		$total_pages = max( 1, intdiv( $total + self::PER_PAGE - 1, self::PER_PAGE ) );
+		$page        = isset( $_GET['mapping_page'] ) ? absint( $_GET['mapping_page'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$page        = max( 1, min( $total_pages, $page ) );
+		$offset      = ( $page - 1 ) * self::PER_PAGE;
+		$mappings    = $this->mappings->active( self::PER_PAGE, $offset );
 		if ( array() === $mappings ) {
 			echo '<p>' . esc_html__( 'No products or variations are linked yet.', 'laqi-unit-stock-manager' ) . '</p>';
 			return;
@@ -196,6 +213,21 @@ final class SetupSection implements ScreenSectionInterface {
 			<?php endforeach; ?>
 			</tbody>
 		</table>
+		<?php
+		/* translators: 1: first visible mapping number, 2: last visible mapping number, 3: total active mappings. */
+		$summary = sprintf( __( 'Showing %1$d-%2$d of %3$d product links.', 'laqi-unit-stock-manager' ), $offset + 1, $offset + count( $mappings ), $total );
+		$this->pagination->render(
+			$summary,
+			__( 'Product link pages', 'laqi-unit-stock-manager' ),
+			'mapping_page',
+			array(
+				'page'    => UnitStockPage::SLUG,
+				'section' => 'setup',
+			),
+			$page,
+			$total_pages
+		);
+		?>
 		<?php
 	}
 

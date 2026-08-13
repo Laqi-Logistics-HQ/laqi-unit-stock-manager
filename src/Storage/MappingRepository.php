@@ -193,19 +193,22 @@ final class MappingRepository {
 	/**
 	 * Find active mappings for setup management.
 	 *
-	 * @param int $limit Maximum mappings.
+	 * @param int $limit  Maximum mappings.
+	 * @param int $offset Number of active mappings to skip.
 	 * @return ProductMapping[]
 	 */
-	public function active( int $limit = 500 ): array {
-		$limit = max( 1, min( 500, $limit ) );
-		$rows  = $this->db->get_results(
+	public function active( int $limit = 500, int $offset = 0 ): array {
+		$limit  = max( 1, min( 500, $limit ) );
+		$offset = max( 0, $offset );
+		$rows   = $this->db->get_results(
 			$this->db->prepare(
-				'SELECT product_id, variation_id FROM ' . Schema::table( 'mappings' ) . ' WHERE active = 1 ORDER BY updated_at DESC, id DESC LIMIT %d',
-				$limit
+				'SELECT product_id, variation_id FROM ' . Schema::table( 'mappings' ) . ' WHERE active = 1 ORDER BY updated_at DESC, id DESC LIMIT %d OFFSET %d',
+				$limit,
+				$offset
 			),
 			ARRAY_A
 		);
-		$items = array();
+		$items  = array();
 		foreach ( $rows as $row ) {
 			$mapping = $this->find_for_product( (int) $row['product_id'], (int) $row['variation_id'] );
 			if ( null !== $mapping ) {
@@ -214,6 +217,11 @@ final class MappingRepository {
 		}
 
 		return $items;
+	}
+
+	/** Count active product mappings. @return int */
+	public function count_active(): int {
+		return (int) $this->db->get_var( 'SELECT COUNT(*) FROM ' . Schema::table( 'mappings' ) . ' WHERE active = 1' );
 	}
 
 	/**

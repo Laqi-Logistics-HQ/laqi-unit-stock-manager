@@ -92,6 +92,8 @@ one screen-scoped plugin script; it registers no storefront assets.
 Mapping edits update the active pool and exact consumption rule without repeating
 the one-time native-stock migration decision. They use optimistic mapping versions,
 so a stale form cannot silently overwrite a newer administrator change.
+Current product links use the shared pagination renderer in 25-row pages, so the
+Setup tab can manage every active mapping without a fixed listing ceiling.
 
 Custom units use soft retirement. The repository prevents retirement while a pool
 uses the key as its base/display unit or another active custom unit references it;
