@@ -3,10 +3,48 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Laqi Unit Stock Manager for WooCommerce 0.1.0\n"
-"Report-Msgid-Bugs-To: https://laqi-logistics.com/contact/\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/laqi-unit-stock-manager\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T00:00:00+00:00\n"
-"X-Generator: WP-CLI\n"
+"POT-Creation-Date: 2026-08-13T11:50:36+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
+
+#. Plugin Name of the plugin
+#: laqi-unit-stock-manager.php
+#: src/Privacy.php:44
+#: src/Privacy.php:59
+msgid "Laqi Unit Stock Manager for WooCommerce"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: laqi-unit-stock-manager.php
+msgid "https://laqi-logistics.com/plugins/laqi-unit-stock-manager/"
+msgstr ""
+
+#. Description of the plugin
+#: laqi-unit-stock-manager.php
+msgid "Laqi Unit Stock Manager for WooCommerce for WordPress / WooCommerce."
+msgstr ""
+
+#. Author of the plugin
+#: laqi-unit-stock-manager.php
+msgid "Laqi Logistics"
+msgstr ""
+
+#. Author URI of the plugin
+#: laqi-unit-stock-manager.php
+msgid "https://laqi-logistics.com"
+msgstr ""
+
+#: src/Plugin.php:145
+msgid "Laqi Unit Stock Manager for WooCommerce requires WooCommerce to be installed and active."
+msgstr ""
+
+#: src/WooCommerce/CartValidator.php:102
+msgid "The selected package quantities are no longer available from the shared stock. Please reduce the quantities in your cart."
+msgstr ""
