@@ -30,6 +30,7 @@ class Test_Supplier_Receiving extends WP_UnitTestCase {
 	/** Remove all test records. */
 	public function tear_down(): void {
 		global $wpdb;
+		$wpdb->delete( Schema::table( 'incoming_deliveries' ), array( 'pool_id' => $this->pool_id ), array( '%d' ) );
 		$wpdb->delete( Schema::table( 'receipts' ), array( 'pool_id' => $this->pool_id ), array( '%d' ) );
 		$wpdb->delete( Schema::table( 'supplier_packs' ), array( 'id' => $this->pack_id ), array( '%d' ) );
 		$wpdb->delete( Schema::table( 'suppliers' ), array( 'id' => $this->supplier_id ), array( '%d' ) );
@@ -41,14 +42,14 @@ class Test_Supplier_Receiving extends WP_UnitTestCase {
 	/** Premium receiving tables are versioned and installed. */
 	public function test_installs_receiving_schema(): void {
 		global $wpdb;
-		foreach ( array( 'suppliers', 'supplier_packs', 'receipts' ) as $suffix ) { $table = Schema::table( $suffix ); $this->assertSame( $table, $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) ); }
-		$this->assertSame( 1, (int) get_option( SupplierRepository::SCHEMA_OPTION ) );
+		foreach ( array( 'suppliers', 'supplier_packs', 'receipts', 'incoming_deliveries' ) as $suffix ) { $table = Schema::table( $suffix ); $this->assertSame( $table, $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) ); }
+		$this->assertSame( 2, (int) get_option( SupplierRepository::SCHEMA_OPTION ) );
 	}
 
 	/** Receiving packages adds their exact combined normalized quantity. */
 	public function test_receives_exact_supplier_pack_quantity(): void {
 		global $wpdb;
-		$result = $this->receiving->receive( $this->pack_id, 2, 'DEL-100', 42, 'receipt:test:100' );
+		$result = $this->receiving->receive( $this->pack_id, 2, 'DEL-100', 42, 'receipt:test:100:' . $this->pool_id );
 		$this->assertSame( 60000000000000, $result->balance() );
 		$movement = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . Schema::table( 'movements' ) . ' WHERE id = %d', $result->movement_id() ), ARRAY_A );
 		$this->assertSame( 'supplier_receipt', $movement['type'] );
@@ -63,8 +64,9 @@ class Test_Supplier_Receiving extends WP_UnitTestCase {
 	/** Retrying an external receipt key does not duplicate stock or history. */
 	public function test_receipt_is_idempotent(): void {
 		global $wpdb;
-		$first = $this->receiving->receive( $this->pack_id, 1, 'DEL-101', 42, 'receipt:test:101' );
-		$retry = $this->receiving->receive( $this->pack_id, 1, 'DEL-101', 42, 'receipt:test:101' );
+		$key   = 'receipt:test:101:' . $this->pool_id;
+		$first = $this->receiving->receive( $this->pack_id, 1, 'DEL-101', 42, $key );
+		$retry = $this->receiving->receive( $this->pack_id, 1, 'DEL-101', 42, $key );
 		$this->assertSame( $first->movement_id(), $retry->movement_id() );
 		$this->assertTrue( $retry->is_duplicate() );
 		$this->assertSame( '35000000000000', $wpdb->get_var( $wpdb->prepare( 'SELECT quantity_base FROM ' . Schema::table( 'pools' ) . ' WHERE id = %d', $this->pool_id ) ) );
@@ -74,6 +76,46 @@ class Test_Supplier_Receiving extends WP_UnitTestCase {
 	/** Invalid package counts never create stock. */
 	public function test_rejects_zero_packages(): void {
 		$this->expectException( InvalidArgumentException::class );
-		$this->receiving->receive( $this->pack_id, 0, '', 42, 'receipt:test:zero' );
+		$this->receiving->receive( $this->pack_id, 0, '', 42, 'receipt:test:zero:' . $this->pool_id );
+	}
+
+	/** Incoming stock remains separate until its arrival is confirmed. */
+	public function test_schedules_and_receives_incoming_stock(): void {
+		global $wpdb;
+		$incoming_id = $this->suppliers->create_incoming( $this->pack_id, 3, '2026-09-01', 'PO-200' );
+		$matches     = array_values( array_filter( $this->suppliers->incoming_deliveries(), static function ( array $delivery ) use ( $incoming_id ): bool { return $incoming_id === (int) $delivery['id']; } ) );
+		$incoming    = $matches[0];
+		$this->assertSame( $incoming_id, (int) $incoming['id'] );
+		$this->assertSame( 75000000000000, (int) $incoming['quantity_base'] );
+		$this->assertSame( 75000000000000, $this->suppliers->incoming_quantity( $this->pool_id ) );
+		$this->assertSame( '10000000000000', $wpdb->get_var( $wpdb->prepare( 'SELECT quantity_base FROM ' . Schema::table( 'pools' ) . ' WHERE id = %d', $this->pool_id ) ) );
+		$result = $this->receiving->receive_incoming( $incoming_id, 42 );
+		$this->assertSame( 85000000000000, $result->balance() );
+		$this->assertNull( $this->suppliers->incoming( $incoming_id ) );
+		$this->assertSame( 0, $this->suppliers->incoming_quantity( $this->pool_id ) );
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT status, movement_id FROM ' . Schema::table( 'incoming_deliveries' ) . ' WHERE id = %d', $incoming_id ), ARRAY_A );
+		$this->assertSame( 'received', $row['status'] );
+		$this->assertSame( $result->movement_id(), (int) $row['movement_id'] );
+	}
+
+	/** A confirmed arrival cannot be added to stock a second time. */
+	public function test_incoming_delivery_can_only_be_received_once(): void {
+		global $wpdb;
+		$incoming_id = $this->suppliers->create_incoming( $this->pack_id, 1, '2026-09-02', 'PO-201' );
+		$this->receiving->receive_incoming( $incoming_id, 42 );
+		try {
+			$this->receiving->receive_incoming( $incoming_id, 42 );
+			$this->fail( 'Expected a completed incoming delivery to be rejected.' );
+		} catch ( InvalidArgumentException $error ) {
+			$this->assertSame( 'The incoming delivery is not pending.', $error->getMessage() );
+		}
+		$this->assertSame( '35000000000000', $wpdb->get_var( $wpdb->prepare( 'SELECT quantity_base FROM ' . Schema::table( 'pools' ) . ' WHERE id = %d', $this->pool_id ) ) );
+		$this->assertSame( 1, (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . Schema::table( 'movements' ) . ' WHERE idempotency_key = %s', 'incoming:' . $incoming_id ) ) );
+	}
+
+	/** Invalid expected dates are rejected. */
+	public function test_rejects_invalid_expected_date(): void {
+		$this->expectException( InvalidArgumentException::class );
+		$this->suppliers->create_incoming( $this->pack_id, 1, '2026-02-30', 'PO-invalid' );
 	}
 }

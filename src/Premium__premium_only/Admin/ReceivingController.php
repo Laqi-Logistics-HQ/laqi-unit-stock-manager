@@ -51,6 +51,8 @@ final class ReceivingController {
 		add_action( 'admin_post_laqi_lusm_create_supplier', array( $this, 'create_supplier' ) );
 		add_action( 'admin_post_laqi_lusm_create_supplier_pack', array( $this, 'create_pack' ) );
 		add_action( 'admin_post_laqi_lusm_receive_supplier_pack', array( $this, 'receive' ) );
+		add_action( 'admin_post_laqi_lusm_schedule_incoming_stock', array( $this, 'schedule_incoming' ) );
+		add_action( 'admin_post_laqi_lusm_receive_incoming_stock', array( $this, 'receive_incoming' ) );
 	}
 	/** Create supplier. @return void */
 	public function create_supplier(): void {
@@ -104,6 +106,33 @@ final class ReceivingController {
 		} catch ( Throwable $error ) {
 			unset( $error );
 			$this->redirect( 'receiving_error' ); }
+	}
+	/** Schedule incoming stock. @return void */
+	public function schedule_incoming(): void {
+		$this->authorize( 'laqi_lusm_schedule_incoming_stock' );
+		try {
+			$pack_id   = isset( $_POST['pack_id'] ) ? absint( $_POST['pack_id'] ) : 0;
+			$count     = isset( $_POST['pack_count'] ) ? absint( $_POST['pack_count'] ) : 0;
+			$date      = isset( $_POST['expected_date'] ) ? sanitize_text_field( wp_unslash( $_POST['expected_date'] ) ) : '';
+			$reference = isset( $_POST['reference'] ) ? sanitize_text_field( wp_unslash( $_POST['reference'] ) ) : '';
+			$this->suppliers->create_incoming( $pack_id, $count, $date, $reference );
+			$this->redirect( 'incoming_scheduled' );
+		} catch ( Throwable $error ) {
+			unset( $error );
+			$this->redirect( 'receiving_error' );
+		}
+	}
+	/** Receive scheduled incoming stock. @return void */
+	public function receive_incoming(): void {
+		$incoming_id = isset( $_POST['incoming_id'] ) ? absint( $_POST['incoming_id'] ) : 0;
+		$this->authorize( 'laqi_lusm_receive_incoming_stock_' . $incoming_id );
+		try {
+			$this->receiving->receive_incoming( $incoming_id, get_current_user_id() );
+			$this->redirect( 'incoming_received' );
+		} catch ( Throwable $error ) {
+			unset( $error );
+			$this->redirect( 'receiving_error' );
+		}
 	}
 	/** Authorize a write.
 	 *
