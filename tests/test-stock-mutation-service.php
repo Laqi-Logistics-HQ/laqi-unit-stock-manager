@@ -179,4 +179,19 @@ class Test_Stock_Mutation_Service extends WP_UnitTestCase {
 		$this->assertSame( 'Delivery correction', $row['reason'] );
 		$this->assertSame( 'Ingredient A', $row['pool_name'] );
 	}
+
+	/** Ledger reads expose stable recent-first offsets and a complete count. */
+	public function test_movement_repository_paginates_the_complete_ledger(): void {
+		global $wpdb;
+
+		$repository = new MovementRepository( $wpdb );
+		$before     = $repository->count();
+		$service    = new StockMutationService( $wpdb );
+		$first      = $service->apply( $this->pool_id, 10, 'manual_add', 'page-first:' . $this->pool_id );
+		$second     = $service->apply( $this->pool_id, 20, 'manual_add', 'page-second:' . $this->pool_id );
+
+		$this->assertSame( $before + 2, $repository->count() );
+		$this->assertSame( $second->movement_id(), (int) $repository->recent( 1, 0 )[0]['id'] );
+		$this->assertSame( $first->movement_id(), (int) $repository->recent( 1, 1 )[0]['id'] );
+	}
 }

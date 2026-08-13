@@ -60,6 +60,13 @@ final class PoolStockSection implements ScreenSectionInterface {
 	private $diagnostics;
 
 	/**
+	 * Shared admin pagination.
+	 *
+	 * @var PaginationRenderer
+	 */
+	private $pagination;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param PoolRepository      $pools     Pool repository.
@@ -68,14 +75,16 @@ final class PoolStockSection implements ScreenSectionInterface {
 	 * @param AvailabilityService $availability Availability calculations.
 	 * @param QuantityFormatter   $formatter    Exact quantity formatting.
 	 * @param MappingDiagnostics  $diagnostics  Configuration diagnostics.
+	 * @param PaginationRenderer  $pagination   Shared admin pagination.
 	 */
-	public function __construct( PoolRepository $pools, PoolPresenter $presenter, MappingRepository $mappings, AvailabilityService $availability, QuantityFormatter $formatter, MappingDiagnostics $diagnostics ) {
+	public function __construct( PoolRepository $pools, PoolPresenter $presenter, MappingRepository $mappings, AvailabilityService $availability, QuantityFormatter $formatter, MappingDiagnostics $diagnostics, PaginationRenderer $pagination ) {
 		$this->pools        = $pools;
 		$this->presenter    = $presenter;
 		$this->mappings     = $mappings;
 		$this->availability = $availability;
 		$this->formatter    = $formatter;
 		$this->diagnostics  = $diagnostics;
+		$this->pagination   = $pagination;
 	}
 
 	/** Get the section ID. @return string */
@@ -126,60 +135,24 @@ final class PoolStockSection implements ScreenSectionInterface {
 			<?php endforeach; ?>
 			</tbody>
 		</table>
-		<?php $this->render_pagination( $search, $page, $total_pages, $offset, count( $rows ), $total ); ?>
 		<?php
-	}
-
-	/**
-	 * Render stock result counts and accessible pagination.
-	 *
-	 * @param string $search      Active search.
-	 * @param int    $page        Current page.
-	 * @param int    $total_pages Total pages.
-	 * @param int    $offset      Current row offset.
-	 * @param int    $row_count   Rows on this page.
-	 * @param int    $total       Total matching rows.
-	 * @return void
-	 */
-	private function render_pagination( string $search, int $page, int $total_pages, int $offset, int $row_count, int $total ): void {
-		if ( $total < 1 ) {
-			return;
+		if ( $total > 0 ) {
+			/* translators: 1: first visible pool number, 2: last visible pool number, 3: total matching pools. */
+			$summary = sprintf( __( 'Showing %1$d-%2$d of %3$d inventory pools.', 'laqi-unit-stock-manager' ), $offset + 1, $offset + count( $rows ), $total );
+			$this->pagination->render(
+				$summary,
+				__( 'Inventory pool pages', 'laqi-unit-stock-manager' ),
+				'stock_page',
+				array(
+					'page'    => UnitStockPage::SLUG,
+					'section' => 'stock',
+					's'       => $search,
+				),
+				$page,
+				$total_pages
+			);
 		}
 		?>
-		<div class="laqi-lusm-pagination">
-			<p>
-			<?php
-			/* translators: 1: first visible pool number, 2: last visible pool number, 3: total matching pools. */
-			echo esc_html( sprintf( __( 'Showing %1$d-%2$d of %3$d inventory pools.', 'laqi-unit-stock-manager' ), $offset + 1, $offset + $row_count, $total ) );
-			?>
-			</p>
-			<?php if ( $total_pages > 1 ) : ?>
-				<nav aria-label="<?php esc_attr_e( 'Inventory pool pages', 'laqi-unit-stock-manager' ); ?>">
-				<?php
-				$url   = add_query_arg(
-					array(
-						'page'       => UnitStockPage::SLUG,
-						'section'    => 'stock',
-						's'          => $search,
-						'stock_page' => 999999999,
-					),
-					admin_url( 'admin.php' )
-				);
-				$links = paginate_links(
-					array(
-						'base'      => str_replace( '999999999', '%#%', $url ),
-						'current'   => $page,
-						'total'     => $total_pages,
-						'type'      => 'list',
-						'prev_text' => __( 'Previous', 'laqi-unit-stock-manager' ),
-						'next_text' => __( 'Next', 'laqi-unit-stock-manager' ),
-					)
-				);
-				echo wp_kses_post( $links );
-				?>
-				</nav>
-			<?php endif; ?>
-		</div>
 		<?php
 	}
 

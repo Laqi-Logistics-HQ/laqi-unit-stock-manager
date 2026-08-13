@@ -24,7 +24,7 @@ WooCommerce > Unit Stock contains all plugin workflows as tabs under one menu it
 
 * Stock: search pools by pool name, internal SKU, linked product name, product or variation SKU, or variation attribute. See current balance, linked packages, per-item consumption, saleable quantity, diagnostics, and inline adjustments.
 * Setup: create pools, link simple products or individual variations, decide what to do with existing WooCommerce stock, and define custom merchant units.
-* Activity: review the append-only correctness movements created by orders, refunds, restorations, migrations, edits, and manual adjustments.
+* Activity: browse the complete append-only correctness ledger created by orders, refunds, restorations, migrations, edits, and manual adjustments.
 
 = Shared package availability =
 

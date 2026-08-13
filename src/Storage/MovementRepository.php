@@ -35,19 +35,27 @@ final class MovementRepository {
 	 * Get the latest correctness movements.
 	 *
 	 * @param int $limit Maximum rows.
+	 * @param int $offset Number of recent rows to skip.
 	 * @return array<int, array<string, mixed>>
 	 */
-	public function recent( int $limit = 50 ): array {
-		$limit = max( 1, min( 100, $limit ) );
-		$rows  = $this->db->get_results(
+	public function recent( int $limit = 50, int $offset = 0 ): array {
+		$limit  = max( 1, min( 100, $limit ) );
+		$offset = max( 0, $offset );
+		$rows   = $this->db->get_results(
 			$this->db->prepare(
-				'SELECT m.id, m.pool_id, m.type, m.delta_base, m.balance_base, m.source_type, m.source_id, m.actor_id, m.reason, m.created_at, p.name AS pool_name, p.family, p.display_unit FROM ' . Schema::table( 'movements' ) . ' m LEFT JOIN ' . Schema::table( 'pools' ) . ' p ON p.id = m.pool_id ORDER BY m.id DESC LIMIT %d',
-				$limit
+				'SELECT m.id, m.pool_id, m.type, m.delta_base, m.balance_base, m.source_type, m.source_id, m.actor_id, m.reason, m.created_at, p.name AS pool_name, p.family, p.display_unit FROM ' . Schema::table( 'movements' ) . ' m LEFT JOIN ' . Schema::table( 'pools' ) . ' p ON p.id = m.pool_id ORDER BY m.id DESC LIMIT %d OFFSET %d',
+				$limit,
+				$offset
 			),
 			ARRAY_A
 		);
 
 		return is_array( $rows ) ? $rows : array();
+	}
+
+	/** Get the total number of immutable movements. @return int */
+	public function count(): int {
+		return (int) $this->db->get_var( 'SELECT COUNT(*) FROM ' . Schema::table( 'movements' ) );
 	}
 
 	/**
