@@ -66,6 +66,18 @@ class Test_Batch_Allocation extends WP_UnitTestCase {
 		$this->assertSame( array( 0, 3 ), $this->batch_balances() );
 	}
 
+	/** Recall lookup includes only the quantity still held by each affected order. */
+	public function test_affected_orders_excludes_restored_quantity(): void {
+		$order_id = $this->order_seed + 20;
+		$this->mutations->apply( $this->pool_id, -5, 'order_reduction', 'order:recall-reduce:' . $this->event_namespace, array( 'source_type' => 'order', 'source_id' => $order_id ) );
+		$early_id = (int) $this->allocations->for_order( $order_id )[0]['batch_id'];
+		$this->assertSame( 4, (int) $this->allocations->affected_orders( $early_id )[0]['quantity_base'] );
+		$this->mutations->apply( $this->pool_id, 2, 'refund_restore', 'order:recall-restore:' . $this->event_namespace, array( 'source_type' => 'order', 'source_id' => $order_id ) );
+		$this->assertSame( 3, (int) $this->allocations->affected_orders( $early_id )[0]['quantity_base'] );
+		$this->mutations->apply( $this->pool_id, 3, 'order_restore', 'order:recall-full:' . $this->event_namespace, array( 'source_type' => 'order', 'source_id' => $order_id ) );
+		$this->assertSame( array(), $this->allocations->affected_orders( $early_id ) );
+	}
+
 	/** Partial and full restoration return exact quantities to consumed batches. */
 	public function test_order_restoration_reverses_exact_allocations_idempotently(): void {
 		$order_id = $this->order_seed + 2;

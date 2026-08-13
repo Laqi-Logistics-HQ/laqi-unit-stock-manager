@@ -150,6 +150,9 @@ physical on-hand stock but are excluded from every availability path. Each
 status transition records its quantity snapshot, actor, optional reason, and
 timestamp in an append-only batch-event journal; quantity-changing operations
 continue to use the authoritative stock movement and allocation journals.
+The recall review derives affected orders from the immutable allocation journal,
+requires explicit merchant confirmation and a reason, quarantines the remaining
+lot as recalled, and never contacts customers automatically.
 
 Every Action Scheduler hook added by the plugin must also be added to the list in
 `Plugin::on_deactivate()`. Deactivation must cancel all plugin-owned scheduled

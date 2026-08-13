@@ -216,9 +216,58 @@ final class BatchRepository {
 		return is_array( $rows ) ? $rows : array();
 	}
 
+	/** Confirm a recall, make remaining stock unavailable, and journal who confirmed it. */
+	public function recall( int $batch_id, int $actor_id, string $reason ): void {
+		$reason = substr( trim( $reason ), 0, 191 );
+		if ( '' === $reason ) {
+			throw new InvalidArgumentException( 'A recall reason is required.' );
+		}
+		$this->db->query( 'START TRANSACTION' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		try {
+			$batch = $this->db->get_row( $this->db->prepare( 'SELECT status,quantity_available_base FROM ' . $this->table() . ' WHERE id=%d FOR UPDATE', $batch_id ), ARRAY_A );
+			if ( ! is_array( $batch ) ) {
+				throw new InvalidArgumentException( 'Unknown batch.' );
+			}
+			if ( 'recalled' === $batch['status'] ) {
+				$this->db->query( 'COMMIT' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				return;
+			}
+			$now     = current_time( 'mysql', true );
+			$updated = $this->db->update(
+				$this->table(),
+				array(
+					'status'     => 'recalled',
+					'updated_at' => $now,
+				),
+				array( 'id' => $batch_id ),
+				array( '%s', '%s' ),
+				array( '%d' )
+			);
+			$logged  = $this->db->insert(
+				$this->events_table(),
+				array(
+					'batch_id'      => $batch_id,
+					'event_type'    => 'recall',
+					'quantity_base' => (int) $batch['quantity_available_base'],
+					'actor_id'      => max( 0, $actor_id ),
+					'reason'        => $reason,
+					'created_at'    => $now,
+				),
+				array( '%d', '%s', '%d', '%d', '%s', '%s' )
+			);
+			if ( 1 !== $updated || false === $logged ) {
+				throw new RuntimeException( 'The batch recall could not be confirmed.' );
+			}
+			$this->db->query( 'COMMIT' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		} catch ( Throwable $error ) {
+			$this->db->query( 'ROLLBACK' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			throw $error;
+		}
+	}
+
 	/** Quarantined and expired quantity excluded from sale. */
 	public function unavailable_quantity( int $pool_id ): int {
-		return (int) $this->db->get_var( $this->db->prepare( 'SELECT COALESCE(SUM(quantity_available_base),0) FROM ' . $this->table() . ' WHERE pool_id=%d AND quantity_available_base>0 AND (status=%s OR (status=%s AND expiry_date IS NOT NULL AND expiry_date<%s))', $pool_id, 'quarantined', 'active', current_time( 'Y-m-d' ) ) );
+		return (int) $this->db->get_var( $this->db->prepare( 'SELECT COALESCE(SUM(quantity_available_base),0) FROM ' . $this->table() . ' WHERE pool_id=%d AND quantity_available_base>0 AND (status IN (%s,%s) OR (status=%s AND expiry_date IS NOT NULL AND expiry_date<%s))', $pool_id, 'quarantined', 'recalled', 'active', current_time( 'Y-m-d' ) ) );
 	}
 
 	/** Batch for an idempotent receipt movement. @return array<string,mixed>|null */
