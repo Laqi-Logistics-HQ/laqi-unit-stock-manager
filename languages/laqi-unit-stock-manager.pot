@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T17:15:19+00:00\n"
+"POT-Creation-Date: 2026-08-13T20:12:59+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -517,6 +517,10 @@ msgstr ""
 msgid "Laqi Unit Stock Manager for WooCommerce requires WooCommerce to be installed and active."
 msgstr ""
 
+#: src/premium-bootstrap__premium_only.php:102
+msgid "Supplier receipt"
+msgstr ""
+
 #: src/Privacy.php:104
 msgid "Unit stock movements"
 msgstr ""
@@ -546,7 +550,7 @@ msgid "Laqi Unit Stock Manager stores inventory pools, product-to-pool mappings,
 msgstr ""
 
 #: src/Privacy.php:167
-msgid "The plugin does not copy customer names, email addresses, payment details, or shipping addresses into its own tables. It does not send inventory or personal data to Laqi Logistics or another external service. Movement records are retained until the plugin is deleted. A WordPress personal-data erasure request removes the user association while retaining the stock ledger required for inventory correctness."
+msgid "The plugin does not copy customer names, email addresses, payment details, or shipping addresses into its own tables. It does not send inventory or personal data to Laqi Logistics or another external service. Movement and temporary order-reservation records are retained for inventory correctness until their normal lifecycle completes or the plugin is deleted. A WordPress personal-data erasure request removes the user association from movements while retaining the stock ledger required for inventory correctness."
 msgstr ""
 
 #: src/WooCommerce/CartValidator.php:102

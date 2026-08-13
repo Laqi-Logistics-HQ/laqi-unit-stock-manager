@@ -164,7 +164,7 @@ final class Privacy {
 	 */
 	public function add_privacy_policy_content(): void {
 		$content  = '<p>' . __( 'Laqi Unit Stock Manager stores inventory pools, product-to-pool mappings, exact stock movements, and operational order references. When a logged-in user performs a manual adjustment, the movement records that WordPress user ID for accountability.', 'laqi-unit-stock-manager' ) . '</p>';
-		$content .= '<p>' . __( 'The plugin does not copy customer names, email addresses, payment details, or shipping addresses into its own tables. It does not send inventory or personal data to Laqi Logistics or another external service. Movement records are retained until the plugin is deleted. A WordPress personal-data erasure request removes the user association while retaining the stock ledger required for inventory correctness.', 'laqi-unit-stock-manager' ) . '</p>';
+		$content .= '<p>' . __( 'The plugin does not copy customer names, email addresses, payment details, or shipping addresses into its own tables. It does not send inventory or personal data to Laqi Logistics or another external service. Movement and temporary order-reservation records are retained for inventory correctness until their normal lifecycle completes or the plugin is deleted. A WordPress personal-data erasure request removes the user association from movements while retaining the stock ledger required for inventory correctness.', 'laqi-unit-stock-manager' ) . '</p>';
 		wp_add_privacy_policy_content( __( 'Laqi Unit Stock Manager for WooCommerce', 'laqi-unit-stock-manager' ), wp_kses_post( $content ) );
 	}
 }

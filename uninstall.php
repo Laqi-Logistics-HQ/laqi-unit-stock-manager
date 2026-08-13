@@ -27,7 +27,7 @@ if ( is_array( $laqi_lusm_editions ) ) {
 }
 
 global $wpdb;
-foreach ( array( 'receipt_costs', 'pool_costs', 'incoming_deliveries', 'receipts', 'supplier_packs', 'suppliers', 'alert_deliveries', 'movements', 'mapping_components', 'mappings', 'units', 'pools' ) as $laqi_lusm_suffix ) {
+foreach ( array( 'reservations', 'receipt_costs', 'pool_costs', 'incoming_deliveries', 'receipts', 'supplier_packs', 'suppliers', 'alert_deliveries', 'movements', 'mapping_components', 'mappings', 'units', 'pools' ) as $laqi_lusm_suffix ) {
 	$laqi_lusm_table = $wpdb->prefix . 'laqi_lusm_' . $laqi_lusm_suffix;
 	$wpdb->query( "DROP TABLE IF EXISTS {$laqi_lusm_table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 }
@@ -35,6 +35,8 @@ delete_option( 'laqi_lusm_schema_version' );
 delete_option( 'laqi_lusm_alert_schema_version' );
 delete_option( 'laqi_lusm_receiving_schema_version' );
 delete_option( 'laqi_lusm_cost_schema_version' );
+delete_option( 'laqi_lusm_reservation_schema_version' );
 delete_option( 'laqi_lusm_stock_report_settings' );
 delete_option( 'laqi_lusm_stock_report_history' );
 delete_site_option( 'laqi_lusm_schema_version' );
+wp_clear_scheduled_hook( 'laqi_lusm_expire_reservations' );

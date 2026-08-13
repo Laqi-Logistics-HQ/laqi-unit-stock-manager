@@ -82,9 +82,9 @@ final class AvailabilityService {
 
 		$shortages = array();
 		foreach ( $demand as $pool_id => $required ) {
-			$pool = $this->pools->find( $pool_id );
-			if ( null === $pool || ( ! $pool->allows_backorders() && $pool->quantity()->amount() < $required ) ) {
-				$available             = null === $pool ? 0 : $pool->quantity()->amount();
+			$pool      = $this->pools->find( $pool_id );
+			$available = null === $pool ? 0 : (int) apply_filters( 'laqi_lusm_pool_available_quantity', $pool->quantity()->amount(), $pool_id );
+			if ( null === $pool || ( ! $pool->allows_backorders() && $available < $required ) ) {
 				$shortages[ $pool_id ] = array(
 					'required'  => $required,
 					'available' => $available,
@@ -119,7 +119,8 @@ final class AvailabilityService {
 			if ( $pool->allows_backorders() ) {
 				return null;
 			}
-			$max = min( $max, intdiv( max( 0, $pool->quantity()->amount() ), $consumption ) );
+			$available = (int) apply_filters( 'laqi_lusm_pool_available_quantity', $pool->quantity()->amount(), $pool_id );
+			$max       = min( $max, intdiv( max( 0, $available ), $consumption ) );
 		}
 
 		return $max;
