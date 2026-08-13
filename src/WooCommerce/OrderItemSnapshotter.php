@@ -76,7 +76,7 @@ final class OrderItemSnapshotter {
 			return;
 		}
 
-		$this->write_snapshot( $item, $mapping->id(), $mapping->calculator_type(), $quantity, 'checkout' );
+		$this->write_snapshot( $item, $mapping->id(), $mapping->version(), $mapping->calculator_type(), $quantity, 'checkout' );
 	}
 
 	/**
@@ -131,7 +131,7 @@ final class OrderItemSnapshotter {
 		if ( null === $mapping || $quantity < 1 ) {
 			return null;
 		}
-		return $this->write_snapshot( $item, $mapping->id(), $mapping->calculator_type(), $quantity, 'admin' );
+		return $this->write_snapshot( $item, $mapping->id(), $mapping->version(), $mapping->calculator_type(), $quantity, 'admin' );
 	}
 
 	/**
@@ -139,12 +139,13 @@ final class OrderItemSnapshotter {
 	 *
 	 * @param WC_Order_Item_Product $item            Order item.
 	 * @param int                   $mapping_id      Mapping ID.
+	 * @param int                   $mapping_version Mapping version.
 	 * @param string                $calculator_type Calculator type.
 	 * @param int                   $quantity        Item quantity.
 	 * @param string                $origin          Snapshot origin.
 	 * @return array<string, mixed> Snapshot data.
 	 */
-	private function write_snapshot( WC_Order_Item_Product $item, int $mapping_id, string $calculator_type, int $quantity, string $origin ): array {
+	private function write_snapshot( WC_Order_Item_Product $item, int $mapping_id, int $mapping_version, string $calculator_type, int $quantity, string $origin ): array {
 		$mapping = $this->mappings->find_for_product( $item->get_product_id(), $item->get_variation_id() );
 		if ( null === $mapping ) {
 			return array();
@@ -154,7 +155,7 @@ final class OrderItemSnapshotter {
 			'version'         => 1,
 			'origin'          => $origin,
 			'mapping_id'      => $mapping_id,
-			'mapping_version' => 1,
+			'mapping_version' => $mapping_version,
 			'item_quantity'   => $quantity,
 			'pool_demand'     => $demand,
 		);

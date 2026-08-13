@@ -33,6 +33,9 @@ class Test_Admin_Order_Stock_Lifecycle extends WP_UnitTestCase {
 	/** @var OrderItemSnapshotter */
 	private $snapshotter;
 
+	/** @var MappingRepository */
+	private $mappings;
+
 	/** Install plugin tables. */
 	public static function set_up_before_class(): void {
 		parent::set_up_before_class();
@@ -73,6 +76,7 @@ class Test_Admin_Order_Stock_Lifecycle extends WP_UnitTestCase {
 			$wpdb->delete( Schema::table( 'mappings' ), array( 'id' => $stale_id ), array( '%d' ) );
 		}
 		$mappings->create_single_pool( $this->product->get_id(), 0, $this->pool_id, 250 );
+		$this->mappings = $mappings;
 
 		$this->order = wc_create_order();
 		$this->order->delete_meta_data( OrderStockLifecycle::STATE_META );
@@ -208,6 +212,38 @@ class Test_Admin_Order_Stock_Lifecycle extends WP_UnitTestCase {
 		$this->assertSame( 1000, $this->balance() );
 
 		$editor->remove_saved_item( $item_id );
+		$this->assertSame( 1000, $this->balance() );
+	}
+
+	/** Mapping edits after checkout cannot rewrite purchased stock demand. */
+	public function test_checkout_snapshot_survives_later_mapping_changes(): void {
+		$item = current( $this->order->get_items() );
+		$this->snapshotter->snapshot(
+			$item,
+			'checkout-line',
+			array(
+				'product_id'   => $this->product->get_id(),
+				'variation_id' => 0,
+				'quantity'     => 2,
+			),
+			$this->order
+		);
+		$item->save();
+
+		$this->mappings->save_single_pool( $this->product->get_id(), 0, $this->pool_id, 400 );
+		$this->lifecycle->reduce( $this->order );
+		$item     = new WC_Order_Item_Product( $item->get_id() );
+		$snapshot = $item->get_meta( OrderItemSnapshotter::META_KEY, true );
+
+		$this->assertSame( 500, $this->balance() );
+		$this->assertSame( 'checkout', $snapshot['origin'] );
+		$this->assertSame( 1, $snapshot['mapping_version'] );
+		$this->assertSame( 500, $snapshot['pool_demand'][ $this->pool_id ] );
+		$this->assertSame( 2, $this->mappings->find_for_product( $this->product->get_id() )->version() );
+
+		$this->lifecycle->restock_refund( true, $this->order, array( $item->get_id() => array( 'qty' => 1 ) ) );
+		$this->assertSame( 750, $this->balance() );
+		$this->lifecycle->restore( $this->order );
 		$this->assertSame( 1000, $this->balance() );
 	}
 

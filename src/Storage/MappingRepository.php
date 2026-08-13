@@ -128,12 +128,15 @@ final class MappingRepository {
 			throw $error;
 		}
 
+		$version = (int) $this->db->get_var( $this->db->prepare( 'SELECT version FROM ' . Schema::table( 'mappings' ) . ' WHERE id = %d', $mapping_id ) );
+
 		return new ProductMapping(
 			$mapping_id,
 			$product_id,
 			$variation_id,
 			'single_pool',
-			array( new MappingComponent( $pool_id, $consumption ) )
+			array( new MappingComponent( $pool_id, $consumption ) ),
+			$version
 		);
 	}
 
@@ -176,7 +179,8 @@ final class MappingRepository {
 			(int) $mapping['product_id'],
 			(int) $mapping['variation_id'],
 			(string) $mapping['calculator_type'],
-			$components
+			$components,
+			(int) $mapping['version']
 		);
 	}
 
