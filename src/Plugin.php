@@ -75,7 +75,7 @@ final class Plugin {
 		$sections->register( new Admin\ActivitySection( $container->movement_repository(), $container->movement_presenter() ) );
 		( new Admin\UnitStockPage( $sections ) )->register();
 		( new Admin\StockAdjustmentController( $container->pool_repository(), $container->unit_registry(), $container->stock_mutation_service() ) )->register();
-		( new Admin\SetupController( $container->pool_repository(), $container->mapping_repository(), $container->unit_registry(), $container->stock_mutation_service(), $container->custom_unit_repository() ) )->register();
+		( new Admin\SetupController( $container->pool_repository(), $container->mapping_repository(), $container->unit_registry(), $container->stock_mutation_service(), $container->custom_unit_repository(), new WooCommerce\ExistingStockMigrator( $container->stock_mutation_service() ) ) )->register();
 
 		// WordPress privacy tools. Replace the boilerplate's no-data callbacks
 		// when this plugin stores or transmits personal data.

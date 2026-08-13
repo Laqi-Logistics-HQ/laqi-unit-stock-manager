@@ -67,6 +67,11 @@
 	padding: 0;
 }
 
+.laqi-lusm-form-description {
+	grid-column: 2;
+	margin: -0.4rem 0 0;
+}
+
 @media screen and (max-width: 782px) {
 
 	.laqi-lusm-stock-table thead {
@@ -85,6 +90,10 @@
 	}
 
 	.laqi-lusm-setup-grid form .submit {
+		grid-column: auto;
+	}
+
+	.laqi-lusm-form-description {
 		grid-column: auto;
 	}
 }

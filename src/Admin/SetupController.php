@@ -16,6 +16,7 @@ use LaqiUnitStockManager\Storage\CustomUnitRepository;
 use LaqiUnitStockManager\Unit\UnitRegistry;
 use Throwable;
 use WC_Product_Variation;
+use LaqiUnitStockManager\WooCommerce\ExistingStockMigrator;
 
 /**
  * Applies explicit setup decisions through shared domain services.
@@ -50,20 +51,29 @@ final class SetupController {
 	private $custom_units;
 
 	/**
+	 * Existing stock migration.
+	 *
+	 * @var ExistingStockMigrator
+	 */
+	private $stock_migrator;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param PoolRepository       $pools     Pool repository.
-	 * @param MappingRepository    $mappings  Mapping repository.
-	 * @param UnitRegistry         $units     Unit registry.
-	 * @param StockMutationService $mutations Mutation service.
-	 * @param CustomUnitRepository $custom_units Custom-unit persistence.
+	 * @param PoolRepository        $pools     Pool repository.
+	 * @param MappingRepository     $mappings  Mapping repository.
+	 * @param UnitRegistry          $units     Unit registry.
+	 * @param StockMutationService  $mutations Mutation service.
+	 * @param CustomUnitRepository  $custom_units Custom-unit persistence.
+	 * @param ExistingStockMigrator $stock_migrator Existing stock migration.
 	 */
-	public function __construct( PoolRepository $pools, MappingRepository $mappings, UnitRegistry $units, StockMutationService $mutations, CustomUnitRepository $custom_units ) {
-		$this->pools        = $pools;
-		$this->mappings     = $mappings;
-		$this->units        = $units;
-		$this->mutations    = $mutations;
-		$this->custom_units = $custom_units;
+	public function __construct( PoolRepository $pools, MappingRepository $mappings, UnitRegistry $units, StockMutationService $mutations, CustomUnitRepository $custom_units, ExistingStockMigrator $stock_migrator ) {
+		$this->pools          = $pools;
+		$this->mappings       = $mappings;
+		$this->units          = $units;
+		$this->mutations      = $mutations;
+		$this->custom_units   = $custom_units;
+		$this->stock_migrator = $stock_migrator;
 	}
 
 	/** Register setup endpoints. @return void */
@@ -161,6 +171,9 @@ final class SetupController {
 			}
 
 			$this->mappings->save_single_pool( $product_id, $variation_id, $pool_id, $quantity->amount() );
+			$decision = isset( $_POST['existing_stock_decision'] ) ? sanitize_key( wp_unslash( $_POST['existing_stock_decision'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$product  = wc_get_product( $variation_id > 0 ? $variation_id : $product_id );
+			$this->stock_migrator->apply( $product, $pool_id, $quantity->amount(), $decision );
 			do_action( 'laqi_lusm_mapping_changed', $product_id, $variation_id, $pool_id );
 			$this->redirect( 'mapping_saved' );
 		} catch ( Throwable $error ) {

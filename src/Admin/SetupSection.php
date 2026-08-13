@@ -145,6 +145,13 @@ final class SetupSection implements ScreenSectionInterface {
 			</select>
 			<?php $this->text_field( 'consumption', __( 'Consumption per sold item', 'laqi-unit-stock-manager' ), true, 'decimal' ); ?>
 			<?php $this->unit_field( 'consumption_unit', __( 'Consumption unit', 'laqi-unit-stock-manager' ) ); ?>
+			<label for="laqi-lusm-existing-stock"><?php esc_html_e( 'Existing WooCommerce stock', 'laqi-unit-stock-manager' ); ?></label>
+			<select id="laqi-lusm-existing-stock" name="existing_stock_decision" required>
+				<option value="disable"><?php esc_html_e( 'Disable native quantity management', 'laqi-unit-stock-manager' ); ?></option>
+				<option value="transfer"><?php esc_html_e( 'Add native item count to this pool, then disable it', 'laqi-unit-stock-manager' ); ?></option>
+				<option value="keep"><?php esc_html_e( 'Keep native quantity management unchanged', 'laqi-unit-stock-manager' ); ?></option>
+			</select>
+			<p class="description laqi-lusm-form-description"><?php esc_html_e( 'Transferring multiplies the current native item count by the consumption per item and adds that exact quantity to the pool once.', 'laqi-unit-stock-manager' ); ?></p>
 			<?php submit_button( __( 'Save mapping', 'laqi-unit-stock-manager' ) ); ?>
 		</form>
 		<?php
