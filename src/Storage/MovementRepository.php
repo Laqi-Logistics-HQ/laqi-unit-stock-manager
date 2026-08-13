@@ -67,12 +67,14 @@ final class MovementRepository {
 	 * @return array<int, array<string, mixed>>
 	 */
 	public function search( string $term, int $limit = 50, int $offset = 0 ): array {
-		$limit  = max( 1, min( 100, $limit ) );
+		$limit  = max( 1, min( 500, $limit ) );
 		$offset = max( 0, $offset );
 		$like   = '%' . $this->db->esc_like( $term ) . '%';
 		$rows   = $this->db->get_results(
 			$this->db->prepare(
-				'SELECT m.id, m.pool_id, m.type, m.delta_base, m.balance_base, m.source_type, m.source_id, m.actor_id, m.reason, m.created_at, p.name AS pool_name, p.family, p.display_unit FROM ' . Schema::table( 'movements' ) . ' m LEFT JOIN ' . Schema::table( 'pools' ) . ' p ON p.id = m.pool_id WHERE p.name LIKE %s OR m.type LIKE %s OR m.source_type LIKE %s OR m.reason LIKE %s ORDER BY m.id DESC LIMIT %d OFFSET %d',
+				'SELECT m.id, m.pool_id, m.type, m.delta_base, m.balance_base, m.source_type, m.source_id, m.actor_id, m.reason, m.created_at, p.name AS pool_name, p.family, p.display_unit, u.display_name AS actor_name FROM ' . Schema::table( 'movements' ) . ' m LEFT JOIN ' . Schema::table( 'pools' ) . ' p ON p.id = m.pool_id LEFT JOIN ' . $this->db->users . ' u ON u.ID = m.actor_id WHERE p.name LIKE %s OR m.type LIKE %s OR m.source_type LIKE %s OR m.reason LIKE %s OR u.display_name LIKE %s OR u.user_login LIKE %s ORDER BY m.id DESC LIMIT %d OFFSET %d',
+				$like,
+				$like,
 				$like,
 				$like,
 				$like,
@@ -94,7 +96,9 @@ final class MovementRepository {
 		$like = '%' . $this->db->esc_like( $term ) . '%';
 		return (int) $this->db->get_var(
 			$this->db->prepare(
-				'SELECT COUNT(*) FROM ' . Schema::table( 'movements' ) . ' m LEFT JOIN ' . Schema::table( 'pools' ) . ' p ON p.id = m.pool_id WHERE p.name LIKE %s OR m.type LIKE %s OR m.source_type LIKE %s OR m.reason LIKE %s',
+				'SELECT COUNT(*) FROM ' . Schema::table( 'movements' ) . ' m LEFT JOIN ' . Schema::table( 'pools' ) . ' p ON p.id = m.pool_id LEFT JOIN ' . $this->db->users . ' u ON u.ID = m.actor_id WHERE p.name LIKE %s OR m.type LIKE %s OR m.source_type LIKE %s OR m.reason LIKE %s OR u.display_name LIKE %s OR u.user_login LIKE %s',
+				$like,
+				$like,
 				$like,
 				$like,
 				$like,

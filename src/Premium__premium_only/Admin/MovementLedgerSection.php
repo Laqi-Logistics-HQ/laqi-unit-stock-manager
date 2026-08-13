@@ -65,17 +65,29 @@ final class MovementLedgerSection implements ScreenSectionInterface {
 		$page        = min( $page, $total_pages );
 		$offset      = ( $page - 1 ) * self::PER_PAGE;
 		$rows        = array_map( array( $this->presenter, 'present' ), $this->movements->search( $term, self::PER_PAGE, $offset ) );
+		$export_url  = wp_nonce_url(
+			add_query_arg(
+				array(
+					'action'        => 'laqi_lusm_export_ledger',
+					'ledger_search' => $term,
+				),
+				admin_url( 'admin-post.php' )
+			),
+			'laqi_lusm_export_ledger'
+		);
 		?>
-		<form method="get" class="laqi-lusm-search"><input type="hidden" name="page" value="<?php echo esc_attr( UnitStockPage::SLUG ); ?>" /><input type="hidden" name="section" value="ledger" /><label class="screen-reader-text" for="laqi-lusm-ledger-search"><?php esc_html_e( 'Search stock movements', 'laqi-unit-stock-manager' ); ?></label><input id="laqi-lusm-ledger-search" name="ledger_search" value="<?php echo esc_attr( $term ); ?>" placeholder="<?php esc_attr_e( 'Search pools, movement types, sources, or reasons', 'laqi-unit-stock-manager' ); ?>" /><?php submit_button( __( 'Search', 'laqi-unit-stock-manager' ), 'secondary', '', false ); ?></form>
-		<table class="widefat striped laqi-lusm-activity-table"><thead><tr><th><?php esc_html_e( 'Date', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Inventory pool', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Movement', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Change', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Balance', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Reason', 'laqi-unit-stock-manager' ); ?></th></tr></thead><tbody>
+		<form method="get" class="laqi-lusm-search"><input type="hidden" name="page" value="<?php echo esc_attr( UnitStockPage::SLUG ); ?>" /><input type="hidden" name="section" value="ledger" /><label class="screen-reader-text" for="laqi-lusm-ledger-search"><?php esc_html_e( 'Search stock movements', 'laqi-unit-stock-manager' ); ?></label><input type="search" id="laqi-lusm-ledger-search" name="ledger_search" value="<?php echo esc_attr( $term ); ?>" placeholder="<?php esc_attr_e( 'Search pools, movements, sources, actors, or reasons', 'laqi-unit-stock-manager' ); ?>" /><?php submit_button( __( 'Search', 'laqi-unit-stock-manager' ), 'secondary', '', false ); ?> <a class="button" href="<?php echo esc_url( $export_url ); ?>"><?php esc_html_e( 'Export CSV', 'laqi-unit-stock-manager' ); ?></a></form>
+		<div class="laqi-lusm-table-scroll">
+		<table class="widefat striped laqi-lusm-activity-table"><thead><tr><th><?php esc_html_e( 'Date', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Inventory pool', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Movement', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Change', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Balance', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Source', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Actor', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Reason', 'laqi-unit-stock-manager' ); ?></th></tr></thead><tbody>
 		<?php
 		foreach ( $rows as $row ) :
 			?>
-			<tr><td><?php echo esc_html( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $row['created_at'] . ' UTC' ) ) ); ?></td><td><?php echo esc_html( $row['pool_name'] ); ?></td><td><?php echo esc_html( $row['type_label'] ); ?></td><td><?php echo esc_html( $row['delta_display'] ); ?></td><td><?php echo esc_html( $row['balance_display'] ); ?></td><td><?php echo esc_html( $row['reason'] ); ?></td></tr><?php endforeach; ?>
+			<tr><td><?php echo esc_html( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $row['created_at'] . ' UTC' ) ) ); ?></td><td><?php echo esc_html( $row['pool_name'] ); ?></td><td><?php echo esc_html( $row['type_label'] ); ?></td><td><?php echo esc_html( $row['delta_display'] ); ?></td><td><?php echo esc_html( $row['balance_display'] ); ?></td><td><?php echo esc_html( $this->source_label( $row ) ); ?></td><td><?php echo esc_html( $this->actor_label( $row ) ); ?></td><td><?php echo esc_html( $row['reason'] ); ?></td></tr><?php endforeach; ?>
 		<?php if ( empty( $rows ) ) : ?>
-			<tr><td colspan="6"><?php esc_html_e( 'No matching movements found.', 'laqi-unit-stock-manager' ); ?></td></tr>
+			<tr><td colspan="8"><?php esc_html_e( 'No matching movements found.', 'laqi-unit-stock-manager' ); ?></td></tr>
 		<?php endif; ?>
 		</tbody></table>
+		</div>
 		<?php
 		if ( $total > 0 ) {
 			/* translators: 1: first row, 2: last row, 3: total matching movements. */
@@ -95,5 +107,23 @@ final class MovementLedgerSection implements ScreenSectionInterface {
 		}
 		?>
 		<?php
+	}
+
+	/** Human-readable source reference.
+	 *
+	 * @param array<string, mixed> $row Movement.
+	 * @return string
+	 */
+	private function source_label( array $row ): string {
+		return $row['source_id'] > 0 ? $row['source_type'] . ' #' . $row['source_id'] : $row['source_type'];
+	}
+
+	/** Human-readable actor.
+	 *
+	 * @param array<string, mixed> $row Movement.
+	 * @return string
+	 */
+	private function actor_label( array $row ): string {
+		return '' !== $row['actor_name'] ? $row['actor_name'] : __( 'System or deleted user', 'laqi-unit-stock-manager' );
 	}
 }
