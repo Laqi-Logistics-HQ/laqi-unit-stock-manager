@@ -54,17 +54,18 @@ final class MappingRepository {
 	/**
 	 * Create or update an explicit single-pool mapping.
 	 *
-	 * @param int  $product_id   Parent/simple product ID.
-	 * @param int  $variation_id Variation ID or zero.
-	 * @param int  $pool_id      Pool ID.
-	 * @param int  $consumption  Normalized consumption per sold item.
-	 * @param bool $replace      Whether an existing mapping may be replaced.
+	 * @param int      $product_id       Parent/simple product ID.
+	 * @param int      $variation_id     Variation ID or zero.
+	 * @param int      $pool_id          Pool ID.
+	 * @param int      $consumption      Normalized consumption per sold item.
+	 * @param bool     $replace          Whether an existing mapping may be replaced.
+	 * @param int|null $expected_version Optional version required for an edit.
 	 * @return ProductMapping
 	 * @throws \InvalidArgumentException When mapping input is invalid.
 	 * @throws RuntimeException When persistence fails or mapping exists without replacement.
 	 * @throws \Throwable When transactional persistence fails.
 	 */
-	public function save_single_pool( int $product_id, int $variation_id, int $pool_id, int $consumption, bool $replace = true ): ProductMapping {
+	public function save_single_pool( int $product_id, int $variation_id, int $pool_id, int $consumption, bool $replace = true, ?int $expected_version = null ): ProductMapping {
 		if ( $product_id < 1 || $pool_id < 1 || $consumption < 1 ) {
 			throw new \InvalidArgumentException( 'A mapping requires a product, pool, and positive consumption.' );
 		}
@@ -73,15 +74,20 @@ final class MappingRepository {
 		$this->db->query( 'START TRANSACTION' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 
 		try {
-			$mapping_id = (int) $this->db->get_var(
+			$mapping_row = $this->db->get_row(
 				$this->db->prepare(
-					'SELECT id FROM ' . Schema::table( 'mappings' ) . ' WHERE product_id = %d AND variation_id = %d FOR UPDATE',
+					'SELECT id, version FROM ' . Schema::table( 'mappings' ) . ' WHERE product_id = %d AND variation_id = %d FOR UPDATE',
 					$product_id,
 					$variation_id
-				)
+				),
+				ARRAY_A
 			);
+			$mapping_id  = is_array( $mapping_row ) ? (int) $mapping_row['id'] : 0;
 			if ( $mapping_id > 0 && ! $replace ) {
 				throw new RuntimeException( 'A mapping already exists for this product or variation.' );
+			}
+			if ( null !== $expected_version && ( 0 === $mapping_id || (int) $mapping_row['version'] !== $expected_version ) ) {
+				throw new RuntimeException( 'The product mapping changed before this edit was saved.' );
 			}
 			if ( $mapping_id > 0 ) {
 				$updated = $this->db->query( $this->db->prepare( 'UPDATE ' . Schema::table( 'mappings' ) . ' SET calculator_type = %s, active = 1, version = version + 1, updated_at = %s WHERE id = %d', 'single_pool', $now, $mapping_id ) );
@@ -211,6 +217,21 @@ final class MappingRepository {
 	}
 
 	/**
+	 * Find one active mapping by its stable ID.
+	 *
+	 * @param int $mapping_id Mapping ID.
+	 * @return ProductMapping|null
+	 */
+	public function find_active( int $mapping_id ): ?ProductMapping {
+		$row = $this->db->get_row(
+			$this->db->prepare( 'SELECT product_id, variation_id FROM ' . Schema::table( 'mappings' ) . ' WHERE id = %d AND active = 1', $mapping_id ),
+			ARRAY_A
+		);
+
+		return is_array( $row ) ? $this->find_for_product( (int) $row['product_id'], (int) $row['variation_id'] ) : null;
+	}
+
+	/**
 	 * Deactivate a mapping while retaining its versioned record.
 	 *
 	 * Existing order snapshots remain authoritative for later restoration.
@@ -221,15 +242,7 @@ final class MappingRepository {
 	 * @throws RuntimeException When persistence fails.
 	 */
 	public function deactivate( int $mapping_id ): ProductMapping {
-		$row = $this->db->get_row(
-			$this->db->prepare( 'SELECT product_id, variation_id FROM ' . Schema::table( 'mappings' ) . ' WHERE id = %d AND active = 1', $mapping_id ),
-			ARRAY_A
-		);
-		if ( ! is_array( $row ) ) {
-			throw new \InvalidArgumentException( 'The product mapping is not active.' );
-		}
-
-		$mapping = $this->find_for_product( (int) $row['product_id'], (int) $row['variation_id'] );
+		$mapping = $this->find_active( $mapping_id );
 		if ( null === $mapping ) {
 			throw new \InvalidArgumentException( 'The product mapping is not active.' );
 		}

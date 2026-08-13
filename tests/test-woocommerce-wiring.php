@@ -27,6 +27,7 @@ class Test_WooCommerce_Wiring extends WP_UnitTestCase {
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_create_pool' ) );
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_save_mapping' ) );
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_unlink_mapping' ) );
+		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_update_mapping' ) );
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_create_unit' ) );
 		$this->assertNotFalse( has_action( 'laqi_lusm_stock_mutated' ) );
 		$this->assertNotFalse( has_action( 'laqi_lusm_mapping_changed' ) );

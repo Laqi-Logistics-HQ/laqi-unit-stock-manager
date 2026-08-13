@@ -43,6 +43,18 @@ final class QuantityFormatter {
 	 * @throws InvalidArgumentException When the unit family differs.
 	 */
 	public function format( Quantity $quantity, string $unit ): string {
+		return $this->decimal( $quantity, $unit ) . ' ' . $unit;
+	}
+
+	/**
+	 * Format only the exact decimal value for an editable field.
+	 *
+	 * @param Quantity $quantity Quantity.
+	 * @param string   $unit     Unit key.
+	 * @return string
+	 * @throws InvalidArgumentException When the unit family differs.
+	 */
+	public function decimal( Quantity $quantity, string $unit ): string {
 		$definition = $this->units->get( $unit );
 		if ( $definition->family() !== $quantity->family() ) {
 			throw new InvalidArgumentException( 'The display unit is incompatible with the quantity.' );
@@ -60,7 +72,7 @@ final class QuantityFormatter {
 			$fraction = '';
 			for ( $position = 0; $position < 12 && 0 !== $remainder; ++$position ) {
 				if ( $remainder > intdiv( PHP_INT_MAX, 10 ) ) {
-					return ( $negative ? '-' : '' ) . $integer . ' ' . $remainder . '/' . $factor . ' ' . $unit;
+					return ( $negative ? '-' : '' ) . $integer . ' ' . $remainder . '/' . $factor;
 				}
 				$remainder *= 10;
 				$fraction  .= (string) intdiv( $remainder, $factor );
@@ -72,6 +84,33 @@ final class QuantityFormatter {
 			}
 		}
 
-		return ( $negative ? '-' : '' ) . $value . ' ' . $unit;
+		return ( $negative ? '-' : '' ) . $value;
+	}
+
+	/**
+	 * Choose a compatible unit whose editable decimal round-trips exactly.
+	 *
+	 * @param Quantity $quantity       Quantity.
+	 * @param string   $preferred_unit Preferred unit key.
+	 * @return array{value: string, unit: string}
+	 * @throws InvalidArgumentException When no registered exact representation exists.
+	 */
+	public function editable( Quantity $quantity, string $preferred_unit ): array {
+		$definitions = $this->units->all();
+		$candidates  = array( $preferred_unit => $this->units->get( $preferred_unit ) ) + $definitions;
+		foreach ( $candidates as $unit => $definition ) {
+			if ( $definition->family() !== $quantity->family() ) {
+				continue;
+			}
+			$value = $this->decimal( $quantity, $unit );
+			if ( false === strpos( $value, '…' ) && false === strpos( $value, '/' ) && $this->units->normalize( $value, $unit )->amount() === $quantity->amount() ) {
+				return array(
+					'value' => $value,
+					'unit'  => $unit,
+				);
+			}
+		}
+
+		throw new InvalidArgumentException( 'The quantity has no exact editable unit representation.' );
 	}
 }

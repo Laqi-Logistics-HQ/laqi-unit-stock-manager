@@ -99,6 +99,13 @@
 	display: block;
 }
 
+.laqi-lusm-setup-grid .laqi-lusm-mapping-table .laqi-lusm-mapping-edit {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	align-items: center;
+}
+
 .laqi-lusm-mapping-table .submit {
 	margin: 0;
 	padding: 0;

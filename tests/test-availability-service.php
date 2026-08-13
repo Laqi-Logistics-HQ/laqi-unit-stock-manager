@@ -124,6 +124,24 @@ class Test_Availability_Service extends WP_UnitTestCase {
 		$this->assertSame( 1, (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . Schema::table( 'mapping_components' ) . ' WHERE mapping_id = (SELECT id FROM ' . Schema::table( 'mappings' ) . ' WHERE product_id = %d AND variation_id = %d)', 100, 101 ) ) );
 	}
 
+	/** Stale setup forms cannot overwrite a newer mapping version. */
+	public function test_mapping_update_rejects_a_stale_version(): void {
+		global $wpdb;
+
+		$maps    = new MappingRepository( $wpdb );
+		$mapping = $maps->find_for_product( 100, 101 );
+		$this->assertNotNull( $mapping );
+		$maps->save_single_pool( 100, 101, $this->pool_id, 500000000, true, $mapping->version() );
+
+		try {
+			$maps->save_single_pool( 100, 101, $this->pool_id, 750000000, true, $mapping->version() );
+			$this->fail( 'Expected a stale mapping version to be rejected.' );
+		} catch ( RuntimeException $error ) {
+			$this->assertSame( 'The product mapping changed before this edit was saved.', $error->getMessage() );
+			$this->assertSame( 20, $this->service->saleable_quantity( 100, 101 ) );
+		}
+	}
+
 	/**
 	 * Unlinking keeps the versioned definition but removes it from availability.
 	 */

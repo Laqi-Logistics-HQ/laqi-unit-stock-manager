@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T16:34:49+00:00\n"
+"POT-Creation-Date: 2026-08-13T16:44:46+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -61,8 +61,8 @@ msgstr ""
 
 #: src/Admin/ActivitySection.php:79
 #: src/Admin/PoolStockSection.php:119
-#: src/Admin/SetupSection.php:143
-#: src/Admin/SetupSection.php:205
+#: src/Admin/SetupSection.php:171
+#: src/Admin/SetupSection.php:230
 msgid "Inventory pool"
 msgstr ""
 
@@ -205,7 +205,7 @@ msgstr ""
 msgid "Apply"
 msgstr ""
 
-#: src/Admin/SetupController.php:211
+#: src/Admin/SetupController.php:246
 msgid "You are not allowed to configure unit stock."
 msgstr ""
 
@@ -255,7 +255,7 @@ msgid "Current product links"
 msgstr ""
 
 #: src/Admin/SetupSection.php:110
-msgid "Review active consumption rules or unlink an item. Unlinking does not alter past orders or their stock-restoration snapshots."
+msgid "Edit active consumption rules or unlink an item. Changes affect future purchases only and do not alter past order snapshots."
 msgstr ""
 
 #: src/Admin/SetupSection.php:114
@@ -287,81 +287,86 @@ msgstr ""
 msgid "Of unit"
 msgstr ""
 
-#: src/Admin/SetupSection.php:136
+#: src/Admin/SetupSection.php:137
 msgid "No products or variations are linked yet."
 msgstr ""
 
-#: src/Admin/SetupSection.php:142
-#: src/Admin/SetupSection.php:203
+#: src/Admin/SetupSection.php:143
+#: src/Admin/SetupSection.php:228
 msgid "Product or variation"
 msgstr ""
 
 #: src/Admin/SetupSection.php:144
-#: src/Admin/SetupSection.php:211
-msgid "Consumption per sold item"
+msgid "Consumption rule"
 msgstr ""
 
 #: src/Admin/SetupSection.php:145
-msgid "Action"
+msgid "Actions"
 msgstr ""
 
 #. translators: %d: unavailable WooCommerce product or variation ID.
-#: src/Admin/SetupSection.php:158
+#: src/Admin/SetupSection.php:162
 #, php-format
 msgid "Unavailable product #%d"
 msgstr ""
 
-#: src/Admin/SetupSection.php:161
-msgid "Unavailable pool"
+#: src/Admin/SetupSection.php:177
+#: src/Admin/SetupSection.php:236
+msgid "Consumption per sold item"
 msgstr ""
 
-#: src/Admin/SetupSection.php:168
+#: src/Admin/SetupSection.php:179
+#: src/Admin/SetupSection.php:237
+msgid "Consumption unit"
+msgstr ""
+
+#: src/Admin/SetupSection.php:185
+msgid "Save changes"
+msgstr ""
+
+#: src/Admin/SetupSection.php:193
 msgid "Unlink"
 msgstr ""
 
-#: src/Admin/SetupSection.php:184
+#: src/Admin/SetupSection.php:209
 msgid "Custom units"
 msgstr ""
 
 #. translators: 1: unit label, 2: unit key, 3: equivalent quantity, 4: reference unit.
-#: src/Admin/SetupSection.php:187
+#: src/Admin/SetupSection.php:212
 #, php-format
 msgid "%1$s (%2$s) = %3$s %4$s"
 msgstr ""
 
-#: src/Admin/SetupSection.php:196
+#: src/Admin/SetupSection.php:221
 msgid "Create an inventory pool before linking products."
 msgstr ""
 
-#: src/Admin/SetupSection.php:204
+#: src/Admin/SetupSection.php:229
 msgid "Search for a product or variation"
 msgstr ""
 
-#: src/Admin/SetupSection.php:212
-msgid "Consumption unit"
-msgstr ""
-
-#: src/Admin/SetupSection.php:213
+#: src/Admin/SetupSection.php:238
 msgid "Existing WooCommerce stock"
 msgstr ""
 
-#: src/Admin/SetupSection.php:215
+#: src/Admin/SetupSection.php:240
 msgid "Disable native quantity management"
 msgstr ""
 
-#: src/Admin/SetupSection.php:216
+#: src/Admin/SetupSection.php:241
 msgid "Add native item count to this pool, then disable it"
 msgstr ""
 
-#: src/Admin/SetupSection.php:217
+#: src/Admin/SetupSection.php:242
 msgid "Keep native quantity management unchanged"
 msgstr ""
 
-#: src/Admin/SetupSection.php:219
+#: src/Admin/SetupSection.php:244
 msgid "Transferring multiplies the current native item count by the consumption per item and adds that exact quantity to the pool once."
 msgstr ""
 
-#: src/Admin/SetupSection.php:220
+#: src/Admin/SetupSection.php:245
 msgid "Save mapping"
 msgstr ""
 
@@ -400,14 +405,18 @@ msgid "Product stock mapping unlinked."
 msgstr ""
 
 #: src/Admin/UnitStockPage.php:132
+msgid "Product stock mapping updated."
+msgstr ""
+
+#: src/Admin/UnitStockPage.php:140
 msgid "Custom stock unit created."
 msgstr ""
 
-#: src/Admin/UnitStockPage.php:139
+#: src/Admin/UnitStockPage.php:147
 msgid "The setup could not be saved. Check that the quantities and units are compatible."
 msgstr ""
 
-#: src/Admin/UnitStockPage.php:141
+#: src/Admin/UnitStockPage.php:149
 msgid "Inventory stock could not be updated. Check the quantity and try again."
 msgstr ""
 
