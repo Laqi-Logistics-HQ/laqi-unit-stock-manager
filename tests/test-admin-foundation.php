@@ -13,6 +13,7 @@ use LaqiUnitStockManager\Presentation\QuantityFormatter;
 use LaqiUnitStockManager\Unit\UnitRegistry;
 use LaqiUnitStockManager\Inventory\MovementRegistry;
 use LaqiUnitStockManager\Inventory\MovementType;
+use LaqiUnitStockManager\Admin\PaginationRenderer;
 
 /**
  * Verifies stable presentation and extension contracts.
@@ -67,5 +68,24 @@ class Test_Admin_Foundation extends WP_UnitTestCase {
 
 		$this->assertSame( 'Receiving', $registry->label( 'receiving' ) );
 		$this->assertSame( 'Future Type', $registry->label( 'future_type' ) );
+	}
+
+	/** Shared pagination keeps registered tab context and its own page argument. */
+	public function test_shared_pagination_renderer_preserves_section_context(): void {
+		ob_start();
+		( new PaginationRenderer() )->render(
+			'Showing 51-100 of 120 stock movements.',
+			'Stock movement pages',
+			'activity_page',
+			array( 'page' => 'laqi-unit-stock-manager', 'section' => 'activity' ),
+			2,
+			3
+		);
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'Showing 51-100 of 120 stock movements.', $html );
+		$this->assertStringContainsString( 'section=activity', $html );
+		$this->assertStringContainsString( 'activity_page=3', $html );
+		$this->assertStringContainsString( 'aria-label="Stock movement pages"', $html );
 	}
 }

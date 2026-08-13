@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T16:28:58+00:00\n"
+"POT-Creation-Date: 2026-08-13T16:34:49+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -46,152 +46,162 @@ msgstr ""
 msgid "Two editions of Laqi Unit Stock Manager are active. Only one is running. Deactivate the edition you are not using, then reload this page. Both editions share the same inventory pools and settings, so removing the one you no longer need keeps them."
 msgstr ""
 
-#: src/Admin/ActivitySection.php:51
+#: src/Admin/ActivitySection.php:63
 msgid "Activity"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:58
+#: src/Admin/ActivitySection.php:75
 msgid "The latest pooled-stock changes are shown below. These records are append-only."
 msgstr ""
 
-#: src/Admin/ActivitySection.php:61
+#: src/Admin/ActivitySection.php:78
 #: src/Privacy.php:108
 msgid "Date"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:62
-#: src/Admin/PoolStockSection.php:110
+#: src/Admin/ActivitySection.php:79
+#: src/Admin/PoolStockSection.php:119
 #: src/Admin/SetupSection.php:143
 #: src/Admin/SetupSection.php:205
 msgid "Inventory pool"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:63
+#: src/Admin/ActivitySection.php:80
 msgid "Movement"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:64
+#: src/Admin/ActivitySection.php:81
 msgid "Change"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:65
+#: src/Admin/ActivitySection.php:82
 msgid "Balance"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:66
+#: src/Admin/ActivitySection.php:83
 msgid "Source"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:67
-#: src/Admin/PoolStockSection.php:249
+#: src/Admin/ActivitySection.php:84
+#: src/Admin/PoolStockSection.php:222
 #: src/Privacy.php:128
 msgid "Reason"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:71
+#: src/Admin/ActivitySection.php:88
 msgid "No stock movements recorded yet."
 msgstr ""
 
-#: src/Admin/ActivitySection.php:103
+#. translators: 1: first visible movement number, 2: last visible movement number, 3: total movements.
+#: src/Admin/ActivitySection.php:106
+#, php-format
+msgid "Showing %1$d-%2$d of %3$d stock movements."
+msgstr ""
+
+#: src/Admin/ActivitySection.php:109
+msgid "Stock movement pages"
+msgstr ""
+
+#: src/Admin/ActivitySection.php:137
 msgid "System"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:88
+#: src/Admin/PaginationRenderer.php:43
+msgid "Previous"
+msgstr ""
+
+#: src/Admin/PaginationRenderer.php:44
+msgid "Next"
+msgstr ""
+
+#: src/Admin/PoolStockSection.php:97
 msgid "Stock"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:104
+#: src/Admin/PoolStockSection.php:113
 msgid "Search inventory pools"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:105
+#: src/Admin/PoolStockSection.php:114
 msgid "Search pools, products, SKUs, or attributes"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:106
+#: src/Admin/PoolStockSection.php:115
 msgid "Search"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:111
+#: src/Admin/PoolStockSection.php:120
 msgid "On hand"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:112
+#: src/Admin/PoolStockSection.php:121
 msgid "Linked products"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:113
+#: src/Admin/PoolStockSection.php:122
 msgid "Adjustment"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:117
+#: src/Admin/PoolStockSection.php:126
 msgid "No inventory pools found."
 msgstr ""
 
 #. translators: 1: first visible pool number, 2: last visible pool number, 3: total matching pools.
-#: src/Admin/PoolStockSection.php:153
+#: src/Admin/PoolStockSection.php:141
 #, php-format
 msgid "Showing %1$d-%2$d of %3$d inventory pools."
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:157
+#: src/Admin/PoolStockSection.php:144
 msgid "Inventory pool pages"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:174
-msgid "Previous"
-msgstr ""
-
-#: src/Admin/PoolStockSection.php:175
-msgid "Next"
-msgstr ""
-
-#: src/Admin/PoolStockSection.php:194
+#: src/Admin/PoolStockSection.php:167
 msgid "No products linked"
 msgstr ""
 
 #. translators: %s: exact pool quantity consumed by one sold item.
-#: src/Admin/PoolStockSection.php:215
+#: src/Admin/PoolStockSection.php:188
 #, php-format
 msgid "Uses %s per item."
 msgstr ""
 
 #. translators: %s: number of saleable items or Unlimited.
-#: src/Admin/PoolStockSection.php:218
+#: src/Admin/PoolStockSection.php:191
 #, php-format
 msgid "Saleable: %s"
 msgstr ""
 
 #. translators: %s: number of saleable items or Unlimited.
-#: src/Admin/PoolStockSection.php:218
+#: src/Admin/PoolStockSection.php:191
 msgid "Unlimited"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:240
+#: src/Admin/PoolStockSection.php:213
 msgid "Adjustment type"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:242
+#: src/Admin/PoolStockSection.php:215
 msgid "Set to"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:243
+#: src/Admin/PoolStockSection.php:216
 msgid "Add"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:244
+#: src/Admin/PoolStockSection.php:217
 msgid "Subtract"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:246
+#: src/Admin/PoolStockSection.php:219
 msgid "Quantity"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:250
+#: src/Admin/PoolStockSection.php:223
 msgid "Reason (optional)"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:251
+#: src/Admin/PoolStockSection.php:224
 msgid "Apply"
 msgstr ""
 
@@ -445,7 +455,7 @@ msgstr ""
 msgid "This linked item is not currently purchasable."
 msgstr ""
 
-#: src/Plugin.php:157
+#: src/Plugin.php:158
 msgid "Laqi Unit Stock Manager for WooCommerce requires WooCommerce to be installed and active."
 msgstr ""
 

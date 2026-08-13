@@ -17,6 +17,9 @@ use LaqiUnitStockManager\Storage\MovementRepository;
  */
 final class ActivitySection implements ScreenSectionInterface {
 
+	/** Movements displayed per page. */
+	const PER_PAGE = 50;
+
 	/**
 	 * Movement reads.
 	 *
@@ -31,14 +34,23 @@ final class ActivitySection implements ScreenSectionInterface {
 	 */
 	private $presenter;
 
+	/**
+	 * Shared admin pagination.
+	 *
+	 * @var PaginationRenderer
+	 */
+	private $pagination;
+
 	/** Constructor.
 	 *
 	 * @param MovementRepository $movements Movement reads.
 	 * @param MovementPresenter  $presenter Movement presenter.
+	 * @param PaginationRenderer $pagination Shared admin pagination.
 	 */
-	public function __construct( MovementRepository $movements, MovementPresenter $presenter ) {
-		$this->movements = $movements;
-		$this->presenter = $presenter;
+	public function __construct( MovementRepository $movements, MovementPresenter $presenter, PaginationRenderer $pagination ) {
+		$this->movements  = $movements;
+		$this->presenter  = $presenter;
+		$this->pagination = $pagination;
 	}
 
 	/** Get the section ID. @return string */
@@ -53,7 +65,12 @@ final class ActivitySection implements ScreenSectionInterface {
 
 	/** Render recent movements. @return void */
 	public function render(): void {
-		$rows = array_map( array( $this->presenter, 'present' ), $this->movements->recent() );
+		$total       = $this->movements->count();
+		$total_pages = max( 1, intdiv( $total + self::PER_PAGE - 1, self::PER_PAGE ) );
+		$page        = isset( $_GET['activity_page'] ) ? absint( $_GET['activity_page'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$page        = max( 1, min( $total_pages, $page ) );
+		$offset      = ( $page - 1 ) * self::PER_PAGE;
+		$rows        = array_map( array( $this->presenter, 'present' ), $this->movements->recent( self::PER_PAGE, $offset ) );
 		?>
 		<p><?php esc_html_e( 'The latest pooled-stock changes are shown below. These records are append-only.', 'laqi-unit-stock-manager' ); ?></p>
 		<table class="widefat striped laqi-lusm-activity-table">
@@ -83,6 +100,23 @@ final class ActivitySection implements ScreenSectionInterface {
 			<?php endforeach; ?>
 			</tbody>
 		</table>
+		<?php
+		if ( $total > 0 ) {
+			/* translators: 1: first visible movement number, 2: last visible movement number, 3: total movements. */
+			$summary = sprintf( __( 'Showing %1$d-%2$d of %3$d stock movements.', 'laqi-unit-stock-manager' ), $offset + 1, $offset + count( $rows ), $total );
+			$this->pagination->render(
+				$summary,
+				__( 'Stock movement pages', 'laqi-unit-stock-manager' ),
+				'activity_page',
+				array(
+					'page'    => UnitStockPage::SLUG,
+					'section' => 'activity',
+				),
+				$page,
+				$total_pages
+			);
+		}
+		?>
 		<?php
 	}
 

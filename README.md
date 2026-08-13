@@ -92,6 +92,9 @@ plugin-owned scripts or storefront assets.
 The Stock tab searches pool names and internal SKUs together with linked product
 names, variation SKUs, and attributes. Results use repository-backed counts and
 25-row pages, so the admin screen does not silently stop at a fixed catalog size.
+The Activity tab uses the same shared pagination renderer to expose the complete
+append-only ledger in 50-row pages. The versioned movements REST endpoint accepts
+`page` and `limit` and returns matching pagination metadata alongside its items.
 All plugin-owned globals use `laqi_lusm_`; registered handles, slugs,
 HTML IDs, CSS classes, and CSS custom properties use the equivalent hyphenated
 form combining `laqi` with the plugin initials. Do not shorten UI selectors just

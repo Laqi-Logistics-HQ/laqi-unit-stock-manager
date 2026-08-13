@@ -151,6 +151,12 @@ final class InventoryController {
 						'maximum' => 100,
 						'default' => 50,
 					),
+					'page'  => array(
+						'type'    => 'integer',
+						'minimum' => 1,
+						'maximum' => 1000000,
+						'default' => 1,
+					),
 				),
 			)
 		);
@@ -201,11 +207,20 @@ final class InventoryController {
 	 * @param WP_REST_Request $request REST request.
 	 * @return WP_REST_Response */
 	public function get_movements( WP_REST_Request $request ): WP_REST_Response {
-		$rows = array_map( array( $this->movement_presenter, 'present' ), $this->movements->recent( (int) $request['limit'] ) );
+		$limit = (int) $request['limit'];
+		$page  = (int) $request['page'];
+		$total = $this->movements->count();
+		$rows  = array_map( array( $this->movement_presenter, 'present' ), $this->movements->recent( $limit, ( $page - 1 ) * $limit ) );
 		return new WP_REST_Response(
 			array(
-				'version' => 1,
-				'items'   => $rows,
+				'version'    => 1,
+				'items'      => $rows,
+				'pagination' => array(
+					'page'        => $page,
+					'per_page'    => $limit,
+					'total_items' => $total,
+					'total_pages' => max( 1, intdiv( $total + $limit - 1, $limit ) ),
+				),
 			)
 		);
 	}

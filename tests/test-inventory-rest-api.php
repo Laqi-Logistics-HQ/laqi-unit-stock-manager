@@ -8,6 +8,7 @@
 use LaqiUnitStockManager\Domain\Quantity;
 use LaqiUnitStockManager\Storage\PoolRepository;
 use LaqiUnitStockManager\Storage\Schema;
+use LaqiUnitStockManager\Inventory\StockMutationService;
 
 /**
  * Verifies shared inventory reads and idempotent adjustments over REST.
@@ -76,6 +77,29 @@ class Test_Inventory_REST_API extends WP_UnitTestCase {
 		$this->assertFalse( $first->get_data()['duplicate'] );
 		$this->assertTrue( $second->get_data()['duplicate'] );
 		$this->assertSame( 12, $second->get_data()['pool']['quantity_base'] );
+	}
+
+	/** Movement pages expose pagination metadata and stable recent-first rows. */
+	public function test_movement_endpoint_supports_pagination(): void {
+		global $wpdb;
+
+		$service = new StockMutationService( $wpdb );
+		$first   = $service->apply( $this->pool_id, 1, 'manual_add', 'rest-page-first:' . $this->pool_id );
+		$second  = $service->apply( $this->pool_id, 1, 'manual_add', 'rest-page-second:' . $this->pool_id );
+
+		$first_page = new WP_REST_Request( 'GET', '/laqi-lusm/v1/movements' );
+		$first_page->set_query_params( array( 'limit' => 1, 'page' => 1 ) );
+		$second_page = new WP_REST_Request( 'GET', '/laqi-lusm/v1/movements' );
+		$second_page->set_query_params( array( 'limit' => 1, 'page' => 2 ) );
+		$first_data  = rest_get_server()->dispatch( $first_page )->get_data();
+		$second_data = rest_get_server()->dispatch( $second_page )->get_data();
+
+		$this->assertSame( $second->movement_id(), $first_data['items'][0]['id'] );
+		$this->assertSame( $first->movement_id(), $second_data['items'][0]['id'] );
+		$this->assertSame( 1, $first_data['pagination']['page'] );
+		$this->assertSame( 1, $first_data['pagination']['per_page'] );
+		$this->assertGreaterThanOrEqual( 2, $first_data['pagination']['total_items'] );
+		$this->assertSame( $first_data['pagination']['total_items'], $first_data['pagination']['total_pages'] );
 	}
 
 	/** Anonymous clients cannot read operational inventory. */

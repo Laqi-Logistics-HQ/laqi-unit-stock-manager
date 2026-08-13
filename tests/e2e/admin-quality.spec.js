@@ -41,16 +41,23 @@ test( 'admin screen renders without serious accessibility or runtime failures', 
 	} );
 
 	await page.emulateMedia( { reducedMotion: 'reduce' } );
-	await page.goto( plugin.adminPath, { waitUntil: 'networkidle' } );
-	await expect( page.locator( plugin.ready ) ).toBeVisible();
-
-	const results = await new AxeBuilder( { page } )
-		.include( plugin.scope )
-		.withTags( [ 'wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa' ] )
-		.analyze();
-	const blocking = results.violations.filter( ( violation ) =>
-		[ 'serious', 'critical' ].includes( violation.impact )
-	);
+	const blocking = [];
+	for ( const path of [
+		plugin.adminPath,
+		`${ plugin.adminPath }&section=activity`,
+	] ) {
+		await page.goto( path, { waitUntil: 'networkidle' } );
+		await expect( page.locator( plugin.ready ) ).toBeVisible();
+		const results = await new AxeBuilder( { page } )
+			.include( plugin.scope )
+			.withTags( [ 'wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa' ] )
+			.analyze();
+		blocking.push(
+			...results.violations.filter( ( violation ) =>
+				[ 'serious', 'critical' ].includes( violation.impact )
+			)
+		);
+	}
 
 	expect( failures ).toEqual( [] );
 	expect( blocking ).toEqual( [] );
