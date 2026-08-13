@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 use InvalidArgumentException;
 use LaqiUnitStockManager\Inventory\MovementResult;
 use LaqiUnitStockManager\Inventory\StockMutationService;
+use LaqiUnitStockManager\Premium\Costing\MaterialCostRepository;
 use OverflowException;
 
 /** Receives exact supplier packs through the authoritative mutation path. */
@@ -24,14 +25,20 @@ final class ReceivingService {
 	 *
 	 * @var StockMutationService
 	 */ private $mutations;
+	/** Costs.
+	 *
+	 * @var MaterialCostRepository
+	 */ private $costs;
 	/** Constructor.
 	 *
-	 * @param SupplierRepository   $suppliers Suppliers.
-	 * @param StockMutationService $mutations Mutations.
+	 * @param SupplierRepository     $suppliers Suppliers.
+	 * @param StockMutationService   $mutations Mutations.
+	 * @param MaterialCostRepository $costs Costs.
 	 */
-	public function __construct( SupplierRepository $suppliers, StockMutationService $mutations ) {
+	public function __construct( SupplierRepository $suppliers, StockMutationService $mutations, MaterialCostRepository $costs ) {
 		$this->suppliers = $suppliers;
-		$this->mutations = $mutations; }
+		$this->mutations = $mutations;
+		$this->costs     = $costs; }
 	/** Receive supplier packages.
 	 *
 	 * @param int    $pack_id Pack ID.
@@ -39,19 +46,25 @@ final class ReceivingService {
 	 * @param string $reference Reference.
 	 * @param int    $actor_id Actor ID.
 	 * @param string $idempotency_key Stable key.
+	 * @param int    $total_cost_minor Optional receipt cost in minor units.
+	 * @param string $currency Currency for a priced receipt.
 	 * @return MovementResult
 	 * @throws InvalidArgumentException For invalid input.
 	 * @throws OverflowException For excessive quantities.
 	 */
-	public function receive( int $pack_id, int $pack_count, string $reference, int $actor_id, string $idempotency_key ): MovementResult {
+	public function receive( int $pack_id, int $pack_count, string $reference, int $actor_id, string $idempotency_key, int $total_cost_minor = 0, string $currency = '' ): MovementResult {
 		$pack = $this->suppliers->pack( $pack_id );
 		if ( null === $pack || $pack_count < 1 || $pack_count > 1000000 || '' === $idempotency_key ) {
 			throw new InvalidArgumentException( 'The supplier receipt is invalid.' ); }
 		$pack_quantity = (int) $pack['quantity_base'];
 		if ( $pack_quantity > intdiv( PHP_INT_MAX, $pack_count ) ) {
 			throw new OverflowException( 'The supplier receipt is too large.' ); }
-		$quantity = $pack_quantity * $pack_count;
-		$result   = $this->mutations->apply(
+		$quantity     = $pack_quantity * $pack_count;
+		$current_cost = $this->costs->pool_cost( (int) $pack['pool_id'] );
+		if ( $total_cost_minor > 0 && null !== $current_cost && strtoupper( $currency ) !== $current_cost['currency'] ) {
+			throw new InvalidArgumentException( 'Receipt currency must match the pool cost currency.' );
+		}
+		$result = $this->mutations->apply(
 			(int) $pack['pool_id'],
 			$quantity,
 			'supplier_receipt',
@@ -69,6 +82,9 @@ final class ReceivingService {
 			)
 		);
 		$this->suppliers->record_receipt( $pack, $pack_count, $quantity, $result->movement_id(), $actor_id, $reference );
+		if ( $total_cost_minor > 0 ) {
+			$this->costs->record_receipt( $result->movement_id(), (int) $pack['pool_id'], $quantity, $result->balance(), $total_cost_minor, $currency );
+		}
 		return $result;
 	}
 

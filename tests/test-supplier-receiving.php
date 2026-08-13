@@ -3,6 +3,8 @@
 
 use LaqiUnitStockManager\Container;
 use LaqiUnitStockManager\Domain\Quantity;
+use LaqiUnitStockManager\Premium\Costing\MaterialCostRepository;
+use LaqiUnitStockManager\Premium\Costing\MaterialEconomicsService;
 use LaqiUnitStockManager\Premium\Receiving\ReceivingService;
 use LaqiUnitStockManager\Premium\Receiving\SupplierRepository;
 use LaqiUnitStockManager\Storage\Schema;
@@ -11,17 +13,20 @@ use LaqiUnitStockManager\Storage\Schema;
 class Test_Supplier_Receiving extends WP_UnitTestCase {
 	/** @var SupplierRepository */ private $suppliers;
 	/** @var ReceivingService */ private $receiving;
+	/** @var MaterialCostRepository */ private $costs;
 	/** @var int */ private $pool_id;
 	/** @var int */ private $supplier_id;
 	/** @var int */ private $pack_id;
+	/** @var int */ private $mapping_id = 0;
+	/** @var int */ private $product_id = 0;
 
 	/** Install shared and premium tables. */
-	public static function set_up_before_class(): void { parent::set_up_before_class(); Schema::install(); global $wpdb; delete_option( SupplierRepository::SCHEMA_OPTION ); ( new SupplierRepository( $wpdb ) )->install(); }
+	public static function set_up_before_class(): void { parent::set_up_before_class(); Schema::install(); global $wpdb; delete_option( SupplierRepository::SCHEMA_OPTION ); ( new SupplierRepository( $wpdb ) )->install(); delete_option( MaterialCostRepository::SCHEMA_OPTION ); ( new MaterialCostRepository( $wpdb ) )->install(); }
 
 	/** Create a 10 kg pool and 25 kg supplier sack. */
 	public function set_up(): void {
 		parent::set_up(); global $wpdb;
-		$container = new Container(); $this->suppliers = new SupplierRepository( $wpdb ); $this->receiving = new ReceivingService( $this->suppliers, $container->stock_mutation_service() );
+		$container = new Container(); $this->suppliers = new SupplierRepository( $wpdb ); $this->costs = new MaterialCostRepository( $wpdb ); $this->receiving = new ReceivingService( $this->suppliers, $container->stock_mutation_service(), $this->costs );
 		$this->pool_id = $container->pool_repository()->create( 'Receiving flour', new Quantity( 'mass', 10000000000000 ), 'ng', 'kg' )->id();
 		$this->supplier_id = $this->suppliers->create_supplier( 'Miller Ltd', 'orders@example.org', 7 );
 		$this->pack_id = $this->suppliers->create_pack( $this->supplier_id, $this->pool_id, '25 kg sack', 25000000000000 );
@@ -30,7 +35,11 @@ class Test_Supplier_Receiving extends WP_UnitTestCase {
 	/** Remove all test records. */
 	public function tear_down(): void {
 		global $wpdb;
+		if ( $this->mapping_id > 0 ) { $wpdb->delete( Schema::table( 'mapping_components' ), array( 'mapping_id' => $this->mapping_id ), array( '%d' ) ); $wpdb->delete( Schema::table( 'mappings' ), array( 'id' => $this->mapping_id ), array( '%d' ) ); }
+		if ( $this->product_id > 0 ) { wp_delete_post( $this->product_id, true ); }
 		$wpdb->delete( Schema::table( 'incoming_deliveries' ), array( 'pool_id' => $this->pool_id ), array( '%d' ) );
+		$wpdb->delete( Schema::table( 'receipt_costs' ), array( 'pool_id' => $this->pool_id ), array( '%d' ) );
+		$wpdb->delete( Schema::table( 'pool_costs' ), array( 'pool_id' => $this->pool_id ), array( '%d' ) );
 		$wpdb->delete( Schema::table( 'receipts' ), array( 'pool_id' => $this->pool_id ), array( '%d' ) );
 		$wpdb->delete( Schema::table( 'supplier_packs' ), array( 'id' => $this->pack_id ), array( '%d' ) );
 		$wpdb->delete( Schema::table( 'suppliers' ), array( 'id' => $this->supplier_id ), array( '%d' ) );
@@ -71,6 +80,48 @@ class Test_Supplier_Receiving extends WP_UnitTestCase {
 		$this->assertTrue( $retry->is_duplicate() );
 		$this->assertSame( '35000000000000', $wpdb->get_var( $wpdb->prepare( 'SELECT quantity_base FROM ' . Schema::table( 'pools' ) . ' WHERE id = %d', $this->pool_id ) ) );
 		$this->assertSame( 1, (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . Schema::table( 'receipts' ) . ' WHERE pool_id = %d', $this->pool_id ) ) );
+	}
+
+	/** Priced receipts maintain one pool-level weighted average and retry safely. */
+	public function test_priced_receipts_update_weighted_average_idempotently(): void {
+		$first = $this->receiving->receive( $this->pack_id, 2, 'COST-1', 42, 'receipt:cost:1:' . $this->pool_id, 10000, 'EUR' );
+		$this->assertSame( 20, $this->costs->consumption_cost_minor( $this->pool_id, 100000000000 ) );
+		$this->receiving->receive( $this->pack_id, 1, 'COST-2', 42, 'receipt:cost:2:' . $this->pool_id, 10000, 'EUR' );
+		$this->assertSame( 26, $this->costs->consumption_cost_minor( $this->pool_id, 100000000000 ) );
+		$this->receiving->receive( $this->pack_id, 2, 'COST-1', 42, 'receipt:cost:1:' . $this->pool_id, 10000, 'EUR' );
+		$this->assertSame( 26, $this->costs->consumption_cost_minor( $this->pool_id, 100000000000 ) );
+		$this->assertNotNull( $this->costs->pool_cost( $this->pool_id ) );
+		$this->assertGreaterThan( 0, $first->movement_id() );
+	}
+
+	/** Existing weighted averages cannot combine different currencies. */
+	public function test_rejects_mixed_receipt_currencies(): void {
+		global $wpdb;
+		$this->receiving->receive( $this->pack_id, 1, 'COST-EUR', 42, 'receipt:cost:eur:' . $this->pool_id, 5000, 'EUR' );
+		try {
+			$this->receiving->receive( $this->pack_id, 1, 'COST-USD', 42, 'receipt:cost:usd:' . $this->pool_id, 5000, 'USD' );
+			$this->fail( 'Expected a mixed-currency receipt to be rejected.' );
+		} catch ( InvalidArgumentException $error ) {
+			$this->assertSame( 'Receipt currency must match the pool cost currency.', $error->getMessage() );
+		}
+		$this->assertSame( '35000000000000', $wpdb->get_var( $wpdb->prepare( 'SELECT quantity_base FROM ' . Schema::table( 'pools' ) . ' WHERE id = %d', $this->pool_id ) ) );
+	}
+
+	/** Linked-product economics reuse normalized consumption and never alter price. */
+	public function test_calculates_linked_product_material_margin_without_repricing(): void {
+		$container = new Container();
+		$product = new WC_Product_Simple();
+		$product->set_name( 'Costed flour bag' );
+		$product->set_regular_price( '5.00' );
+		$this->product_id = $product->save();
+		$mapping = $container->mapping_repository()->save_single_pool( $this->product_id, 0, $this->pool_id, 1000000000000 );
+		$this->mapping_id = $mapping->id();
+		$this->receiving->receive( $this->pack_id, 2, 'COST-MARGIN', 42, 'receipt:cost:margin:' . $this->pool_id, 10000, 'EUR' );
+		$result = ( new MaterialEconomicsService( $this->costs ) )->calculate( $mapping );
+		$this->assertEqualsWithDelta( 2.0, (float) $result['material_cost'], 0.001 );
+		$this->assertEqualsWithDelta( 5.0, (float) $result['price'], 0.001 );
+		$this->assertEqualsWithDelta( 60.0, (float) $result['margin'], 0.001 );
+		$this->assertSame( '5.00', wc_get_product( $this->product_id )->get_regular_price() );
 	}
 
 	/** Invalid package counts never create stock. */
