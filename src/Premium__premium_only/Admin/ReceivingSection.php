@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 use LaqiUnitStockManager\Admin\ScreenSectionInterface;
 use LaqiUnitStockManager\Domain\Quantity;
 use LaqiUnitStockManager\Premium\Batches\BatchAllocationRepository;
+use LaqiUnitStockManager\Premium\Batches\BatchExpirySettings;
 use LaqiUnitStockManager\Premium\Batches\BatchRepository;
 use LaqiUnitStockManager\Premium\Receiving\SupplierRepository;
 use LaqiUnitStockManager\Presentation\QuantityFormatter;
@@ -39,6 +40,10 @@ final class ReceivingSection implements ScreenSectionInterface {
 	 *
 	 * @var BatchAllocationRepository
 	 */ private $allocations;
+	/** Expiry policy.
+	 *
+	 * @var BatchExpirySettings
+	 */ private $expiry_settings;
 	/** Constructor.
 	 *
 	 * @param SupplierRepository        $suppliers Suppliers.
@@ -46,13 +51,15 @@ final class ReceivingSection implements ScreenSectionInterface {
 	 * @param QuantityFormatter         $formatter Formatter.
 	 * @param BatchRepository           $batches Batches.
 	 * @param BatchAllocationRepository $allocations Allocation traceability.
+	 * @param BatchExpirySettings       $expiry_settings Expiry policy storage.
 	 */
-	public function __construct( SupplierRepository $suppliers, PoolRepository $pools, QuantityFormatter $formatter, BatchRepository $batches, BatchAllocationRepository $allocations ) {
-		$this->suppliers   = $suppliers;
-		$this->pools       = $pools;
-		$this->formatter   = $formatter;
-		$this->batches     = $batches;
-		$this->allocations = $allocations; }
+	public function __construct( SupplierRepository $suppliers, PoolRepository $pools, QuantityFormatter $formatter, BatchRepository $batches, BatchAllocationRepository $allocations, BatchExpirySettings $expiry_settings ) {
+		$this->suppliers       = $suppliers;
+		$this->pools           = $pools;
+		$this->formatter       = $formatter;
+		$this->batches         = $batches;
+		$this->allocations     = $allocations;
+		$this->expiry_settings = $expiry_settings; }
 	/** ID. @return string */ public function id(): string {
 		return 'receiving'; }
 	/** Title. @return string */ public function title(): string {
@@ -71,6 +78,8 @@ final class ReceivingSection implements ScreenSectionInterface {
 		);
 		$this->notice();
 		$this->render_recall(); ?>
+		<?php $expiry_policy = $this->expiry_settings->get(); ?>
+		<section class="card"><h2><?php esc_html_e( 'Batch expiry alerts', 'laqi-unit-stock-manager' ); ?></h2><p><?php esc_html_e( 'Send one notification when a dated batch enters the warning window and another if stock remains when it expires.', 'laqi-unit-stock-manager' ); ?></p><form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="laqi_lusm_save_batch_expiry"/><?php wp_nonce_field( 'laqi_lusm_save_batch_expiry' ); ?><label for="laqi-lusm-expiry-warning-days"><?php esc_html_e( 'Warning window (days)', 'laqi-unit-stock-manager' ); ?></label><input type="number" min="0" max="365" id="laqi-lusm-expiry-warning-days" name="warning_days" value="<?php echo esc_attr( (string) $expiry_policy['warning_days'] ); ?>" required/><label for="laqi-lusm-expiry-recipients"><?php esc_html_e( 'Expiry alert recipients', 'laqi-unit-stock-manager' ); ?></label><textarea id="laqi-lusm-expiry-recipients" name="recipients" required><?php echo esc_textarea( implode( "\n", $expiry_policy['recipients'] ) ); ?></textarea><?php submit_button( __( 'Save expiry alerts', 'laqi-unit-stock-manager' ) ); ?></form></section>
 		<div class="laqi-lusm-setup-grid"><section class="card"><h2><?php esc_html_e( 'Add supplier', 'laqi-unit-stock-manager' ); ?></h2><form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="laqi_lusm_create_supplier" /><?php wp_nonce_field( 'laqi_lusm_create_supplier' ); ?><label for="laqi-lusm-supplier-name"><?php esc_html_e( 'Supplier name', 'laqi-unit-stock-manager' ); ?></label><input id="laqi-lusm-supplier-name" name="name" maxlength="191" required /><label for="laqi-lusm-supplier-email"><?php esc_html_e( 'Email', 'laqi-unit-stock-manager' ); ?></label><input type="email" id="laqi-lusm-supplier-email" name="email" /><label for="laqi-lusm-lead-time"><?php esc_html_e( 'Lead time (days)', 'laqi-unit-stock-manager' ); ?></label><input type="number" min="0" max="365" id="laqi-lusm-lead-time" name="lead_time_days" value="0" /><?php submit_button( __( 'Add supplier', 'laqi-unit-stock-manager' ) ); ?></form></section>
 		<section class="card"><h2><?php esc_html_e( 'Define supplier pack', 'laqi-unit-stock-manager' ); ?></h2><p><?php esc_html_e( 'Examples include a sack, drum, case, or pallet. The quantity is stored exactly for the selected pool.', 'laqi-unit-stock-manager' ); ?></p><form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="laqi_lusm_create_supplier_pack" /><?php wp_nonce_field( 'laqi_lusm_create_supplier_pack' ); ?><label for="laqi-lusm-pack-supplier"><?php esc_html_e( 'Supplier', 'laqi-unit-stock-manager' ); ?></label><select id="laqi-lusm-pack-supplier" name="supplier_id" required>
 		<?php
@@ -104,7 +113,11 @@ else :
 		<?php foreach ( $batches as $batch ) : ?>
 		<tr><td><?php echo esc_html( mysql2date( get_option( 'date_format' ), $batch['received_at'] . ' +0000' ) ); ?></td><td><?php echo esc_html( $batch['pool_name'] ); ?></td><td><?php echo esc_html( $batch['supplier_name'] ); ?></td><td><?php echo esc_html( '' === $batch['supplier_lot'] ? __( 'Not supplied', 'laqi-unit-stock-manager' ) : $batch['supplier_lot'] ); ?></td><td><?php echo esc_html( empty( $batch['expiry_date'] ) ? __( 'No expiry', 'laqi-unit-stock-manager' ) : mysql2date( get_option( 'date_format' ), $batch['expiry_date'] ) ); ?></td><td><?php echo esc_html( $this->formatter->format( new Quantity( $batch['family'], (int) $batch['quantity_received_base'] ), $batch['display_unit'] ) ); ?></td><td><?php echo esc_html( $this->formatter->format( new Quantity( $batch['family'], (int) $batch['quantity_available_base'] ), $batch['display_unit'] ) . ' — ' . ( $statuses[ $batch['status'] ] ?? $batch['status'] ) ); ?>
 			<?php
-			if ( in_array( $batch['status'], array( 'active', 'quarantined' ), true ) && (int) $batch['quantity_available_base'] > 0 ) :
+			if ( ! empty( $batch['expiry_date'] ) && $batch['expiry_date'] < current_time( 'Y-m-d' ) && (int) $batch['quantity_available_base'] > 0 ) :
+				?>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="laqi_lusm_batch_expiry_write_off"/><input type="hidden" name="batch_id" value="<?php echo esc_attr( (string) $batch['id'] ); ?>"/><?php wp_nonce_field( 'laqi_lusm_batch_expiry_write_off_' . $batch['id'] ); ?><?php submit_button( __( 'Record expired stock as waste', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?></form><?php endif; ?>
+			<?php
+			if ( in_array( $batch['status'], array( 'active', 'quarantined' ), true ) && (int) $batch['quantity_available_base'] > 0 && ( empty( $batch['expiry_date'] ) || $batch['expiry_date'] >= current_time( 'Y-m-d' ) ) ) :
 				?>
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="laqi_lusm_batch_<?php echo esc_attr( 'active' === $batch['status'] ? 'quarantine' : 'release' ); ?>"/><input type="hidden" name="batch_id" value="<?php echo esc_attr( (string) $batch['id'] ); ?>"/><?php wp_nonce_field( 'laqi_lusm_batch_' . ( 'active' === $batch['status'] ? 'quarantine' : 'release' ) . '_' . $batch['id'] ); ?><label for="laqi-lusm-batch-reason-<?php echo esc_attr( (string) $batch['id'] ); ?>"><?php esc_html_e( 'Reason (optional)', 'laqi-unit-stock-manager' ); ?></label><input id="laqi-lusm-batch-reason-<?php echo esc_attr( (string) $batch['id'] ); ?>" name="reason" maxlength="191"/><?php submit_button( 'active' === $batch['status'] ? __( 'Quarantine batch', 'laqi-unit-stock-manager' ) : __( 'Release batch', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?></form><form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="laqi_lusm_batch_stocktake"/><input type="hidden" name="batch_id" value="<?php echo esc_attr( (string) $batch['id'] ); ?>"/><?php wp_nonce_field( 'laqi_lusm_batch_stocktake_' . $batch['id'] ); ?><label for="laqi-lusm-batch-count-<?php echo esc_attr( (string) $batch['id'] ); ?>"><?php esc_html_e( 'Counted quantity', 'laqi-unit-stock-manager' ); ?></label><input id="laqi-lusm-batch-count-<?php echo esc_attr( (string) $batch['id'] ); ?>" name="quantity" inputmode="decimal" required/><?php submit_button( __( 'Save batch count', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?></form><form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="laqi_lusm_batch_write_off"/><input type="hidden" name="batch_id" value="<?php echo esc_attr( (string) $batch['id'] ); ?>"/><?php wp_nonce_field( 'laqi_lusm_batch_write_off_' . $batch['id'] ); ?><?php submit_button( __( 'Write off batch', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?></form><form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="laqi_lusm_batch_transfer"/><input type="hidden" name="batch_id" value="<?php echo esc_attr( (string) $batch['id'] ); ?>"/><input type="hidden" name="transfer_key" value="<?php echo esc_attr( wp_generate_uuid4() ); ?>"/><?php wp_nonce_field( 'laqi_lusm_batch_transfer_' . $batch['id'] ); ?><label for="laqi-lusm-transfer-pool-<?php echo esc_attr( (string) $batch['id'] ); ?>"><?php esc_html_e( 'Destination pool', 'laqi-unit-stock-manager' ); ?></label><select id="laqi-lusm-transfer-pool-<?php echo esc_attr( (string) $batch['id'] ); ?>" name="destination_pool_id" class="laqi-lusm-pool-search" required></select><label for="laqi-lusm-transfer-quantity-<?php echo esc_attr( (string) $batch['id'] ); ?>"><?php echo esc_html( sprintf( /* translators: %s: source pool display unit. */ __( 'Transfer quantity (%s)', 'laqi-unit-stock-manager' ), $batch['display_unit'] ) ); ?></label><input id="laqi-lusm-transfer-quantity-<?php echo esc_attr( (string) $batch['id'] ); ?>" name="quantity" inputmode="decimal" required/><label for="laqi-lusm-transfer-reason-<?php echo esc_attr( (string) $batch['id'] ); ?>"><?php esc_html_e( 'Transfer reason', 'laqi-unit-stock-manager' ); ?></label><input id="laqi-lusm-transfer-reason-<?php echo esc_attr( (string) $batch['id'] ); ?>" name="reason" maxlength="191" required/><?php submit_button( __( 'Transfer batch stock', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?></form>
 				<?php
@@ -183,21 +196,23 @@ else :
 	private function notice(): void {
 		$result   = isset( $_GET['laqi_lusm_receiving_result'] ) ? sanitize_key( wp_unslash( $_GET['laqi_lusm_receiving_result'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$messages = array(
-			'supplier_created'      => __( 'Supplier added.', 'laqi-unit-stock-manager' ),
-			'pack_created'          => __( 'Supplier pack defined.', 'laqi-unit-stock-manager' ),
-			'stock_received'        => __( 'Supplier stock received.', 'laqi-unit-stock-manager' ),
-			'incoming_scheduled'    => __( 'Incoming stock scheduled.', 'laqi-unit-stock-manager' ),
-			'incoming_received'     => __( 'Incoming stock moved into on-hand inventory.', 'laqi-unit-stock-manager' ),
-			'batch_quarantined'     => __( 'Batch quarantined.', 'laqi-unit-stock-manager' ),
-			'batch_released'        => __( 'Batch released.', 'laqi-unit-stock-manager' ),
-			'batch_written_off'     => __( 'Batch written off.', 'laqi-unit-stock-manager' ),
-			'batch_stocktake_saved' => __( 'Batch count saved.', 'laqi-unit-stock-manager' ),
-			'batch_recalled'        => __( 'Batch recall confirmed. Customers were not contacted.', 'laqi-unit-stock-manager' ),
-			'batch_transferred'     => __( 'Batch stock transferred.', 'laqi-unit-stock-manager' ),
-			'batch_error'           => __( 'The batch operation could not be completed.', 'laqi-unit-stock-manager' ),
-			'csv_imported'          => sprintf( /* translators: 1: created rows, 2: skipped rows. */ __( 'CSV imported: %1$d created, %2$d already present.', 'laqi-unit-stock-manager' ), isset( $_GET['created'] ) ? absint( $_GET['created'] ) : 0, isset( $_GET['skipped'] ) ? absint( $_GET['skipped'] ) : 0 ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			'csv_error'             => __( 'The operations CSV could not be imported.', 'laqi-unit-stock-manager' ),
-			'receiving_error'       => __( 'The receiving operation could not be completed.', 'laqi-unit-stock-manager' ),
+			'supplier_created'         => __( 'Supplier added.', 'laqi-unit-stock-manager' ),
+			'pack_created'             => __( 'Supplier pack defined.', 'laqi-unit-stock-manager' ),
+			'stock_received'           => __( 'Supplier stock received.', 'laqi-unit-stock-manager' ),
+			'incoming_scheduled'       => __( 'Incoming stock scheduled.', 'laqi-unit-stock-manager' ),
+			'incoming_received'        => __( 'Incoming stock moved into on-hand inventory.', 'laqi-unit-stock-manager' ),
+			'batch_quarantined'        => __( 'Batch quarantined.', 'laqi-unit-stock-manager' ),
+			'batch_released'           => __( 'Batch released.', 'laqi-unit-stock-manager' ),
+			'batch_written_off'        => __( 'Batch written off.', 'laqi-unit-stock-manager' ),
+			'batch_stocktake_saved'    => __( 'Batch count saved.', 'laqi-unit-stock-manager' ),
+			'batch_recalled'           => __( 'Batch recall confirmed. Customers were not contacted.', 'laqi-unit-stock-manager' ),
+			'batch_transferred'        => __( 'Batch stock transferred.', 'laqi-unit-stock-manager' ),
+			'batch_expiry_saved'       => __( 'Batch expiry alert settings saved.', 'laqi-unit-stock-manager' ),
+			'batch_expiry_written_off' => __( 'Expired batch stock recorded as waste.', 'laqi-unit-stock-manager' ),
+			'batch_error'              => __( 'The batch operation could not be completed.', 'laqi-unit-stock-manager' ),
+			'csv_imported'             => sprintf( /* translators: 1: created rows, 2: skipped rows. */ __( 'CSV imported: %1$d created, %2$d already present.', 'laqi-unit-stock-manager' ), isset( $_GET['created'] ) ? absint( $_GET['created'] ) : 0, isset( $_GET['skipped'] ) ? absint( $_GET['skipped'] ) : 0 ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			'csv_error'                => __( 'The operations CSV could not be imported.', 'laqi-unit-stock-manager' ),
+			'receiving_error'          => __( 'The receiving operation could not be completed.', 'laqi-unit-stock-manager' ),
 		);
 		if ( isset( $messages[ $result ] ) ) {
 			wp_admin_notice(

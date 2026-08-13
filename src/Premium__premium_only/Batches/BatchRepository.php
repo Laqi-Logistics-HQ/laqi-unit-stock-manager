@@ -191,6 +191,13 @@ final class BatchRepository {
 		return is_array( $rows ) ? $rows : array();
 	}
 
+	/** Non-empty dated batches that are expired or inside the warning window. @return array<int,array<string,mixed>> */
+	public function expiring( int $warning_days ): array {
+		$cutoff = wp_date( 'Y-m-d', time() + ( max( 0, min( 365, $warning_days ) ) * DAY_IN_SECONDS ) );
+		$rows   = $this->db->get_results( $this->db->prepare( 'SELECT b.*,p.name AS pool_name,p.family,p.display_unit FROM ' . $this->table() . ' b INNER JOIN ' . $this->db->prefix . 'laqi_lusm_pools p ON p.id=b.pool_id WHERE b.status IN (%s,%s) AND b.quantity_available_base>0 AND b.expiry_date IS NOT NULL AND b.expiry_date<=%s ORDER BY b.expiry_date ASC,b.id ASC', 'active', 'quarantined', $cutoff ), ARRAY_A );
+		return is_array( $rows ) ? $rows : array();
+	}
+
 	/** Active FEFO candidates for one pool; undated quantities are last. @return array<int,array<string,mixed>> */
 	public function allocatable( int $pool_id ): array {
 		$rows = $this->db->get_results( $this->db->prepare( 'SELECT * FROM ' . $this->table() . ' WHERE pool_id = %d AND status = %s AND quantity_available_base > 0 AND (expiry_date IS NULL OR expiry_date >= %s) ORDER BY CASE WHEN expiry_date IS NULL THEN 1 ELSE 0 END, expiry_date ASC, received_at ASC, id ASC', $pool_id, 'active', current_time( 'Y-m-d' ) ), ARRAY_A );

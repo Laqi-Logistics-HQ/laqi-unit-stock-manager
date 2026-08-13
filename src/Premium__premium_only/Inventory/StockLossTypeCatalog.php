@@ -22,6 +22,7 @@ final class StockLossTypeCatalog {
 			'loss_evaporation' => __( 'Evaporation', 'laqi-unit-stock-manager' ),
 			'loss_damage'      => __( 'Damage', 'laqi-unit-stock-manager' ),
 			'loss_sample'      => __( 'Samples or internal use', 'laqi-unit-stock-manager' ),
+			'loss_expiry'      => __( 'Expired batch waste', 'laqi-unit-stock-manager' ),
 		);
 	}
 

@@ -60,6 +60,9 @@ class Test_WooCommerce_Wiring extends WP_UnitTestCase {
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_batch_stocktake' ) );
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_batch_recall' ) );
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_batch_transfer' ) );
+		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_batch_expiry_write_off' ) );
+		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_save_batch_expiry' ) );
+		$this->assertNotFalse( has_action( \LaqiUnitStockManager\Premium\Batches\BatchExpiryEvaluator::CRON_HOOK ) );
 		$this->assertNotFalse( has_action( \LaqiUnitStockManager\Premium\Alerts\LowStockAlertEvaluator::CRON_HOOK ) );
 		$this->assertNotFalse( has_action( \LaqiUnitStockManager\Premium\Reports\StockReportScheduler::CRON_HOOK ) );
 		$this->assertNotFalse( has_action( 'laqi_lusm_mapping_changed' ) );
