@@ -1,3 +1,4 @@
+/* global jQuery */
 ( function ( $, config ) {
 	'use strict';
 
@@ -32,4 +33,4 @@
 				.attr( 'aria-label', label || field.data( 'placeholder' ) );
 		} );
 	} );
-}( jQuery, window.laqi_lusm_pool_search ) );
+} )( jQuery, window.laqi_lusm_pool_search );

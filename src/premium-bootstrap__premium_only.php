@@ -50,6 +50,9 @@ require_once __DIR__ . '/Premium__premium_only/Exchange/PackCsvRowMapper.php';
 require_once __DIR__ . '/Premium__premium_only/Exchange/IncomingCsvRowMapper.php';
 require_once __DIR__ . '/Premium__premium_only/Exchange/ReorderCsvRowMapper.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/CsvExchangeController.php';
+require_once __DIR__ . '/Premium__premium_only/Costing/MaterialCostRepository.php';
+require_once __DIR__ . '/Premium__premium_only/Costing/MaterialEconomicsService.php';
+require_once __DIR__ . '/Premium__premium_only/Admin/MaterialCostsSection.php';
 
 /**
  * Give physically separate paid modules the completed shared composition root.
@@ -76,7 +79,10 @@ add_action(
 		$scenario_planner  = new Premium\Planning\StockScenarioPlanner( $container->pool_repository(), $container->mapping_repository(), $forecast_policies, $forecast_service );
 		$suppliers         = new Premium\Receiving\SupplierRepository( $wpdb );
 		$suppliers->install();
-		$receiving           = new Premium\Receiving\ReceivingService( $suppliers, $container->stock_mutation_service() );
+		$material_costs = new Premium\Costing\MaterialCostRepository( $wpdb );
+		$material_costs->install();
+		$material_economics  = new Premium\Costing\MaterialEconomicsService( $material_costs );
+		$receiving           = new Premium\Receiving\ReceivingService( $suppliers, $container->stock_mutation_service(), $material_costs );
 		$reorder_policies    = new Premium\Replenishment\ReorderPolicyRepository( $wpdb );
 		$reorder_suggestions = new Premium\Replenishment\ReorderSuggestionService( $container->pool_repository(), $reorder_policies, $forecast_policies, $forecast_service, $suppliers );
 		$csv_mappers         = new Premium\Exchange\CsvRowMapperRegistry();
@@ -95,6 +101,7 @@ add_action(
 		$container->screen_section_catalog()->register( new Premium\Admin\StockScenarioSection( $container->pool_repository(), $scenario_planner, $container->quantity_formatter() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ReceivingSection( $suppliers, $container->pool_repository(), $container->quantity_formatter() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ReorderSection( $container->pool_repository(), $suppliers, $reorder_policies, $reorder_suggestions, $container->quantity_formatter() ) );
+		$container->screen_section_catalog()->register( new Premium\Admin\MaterialCostsSection( $material_economics, $container->mapping_repository() ) );
 		( new Premium\Admin\MovementLedgerExportController( $container->movement_repository(), $container->movement_presenter() ) )->register();
 		( new Premium\Admin\StockLossController( $container->stock_adjustment_service(), $loss_types ) )->register();
 		( new Premium\Admin\LowStockAlertController( $alert_policies, $container->pool_repository(), $container->unit_registry() ) )->register();
