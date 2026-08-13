@@ -1,6 +1,6 @@
 <?php
 /**
- * Reserved and available-to-sell supply screen.
+ * Supply states screen.
  *
  * @package LaqiUnitStockManager
  */
@@ -8,43 +8,55 @@
 namespace LaqiUnitStockManager\Premium\Admin;
 
 defined( 'ABSPATH' ) || exit;
-
-// Compact section methods implement the screen-section contract.
-// phpcs:disable Generic.Commenting.DocComment.MissingShort, Squiz.Commenting.FunctionComment
-
+// phpcs:disable Generic.Commenting.DocComment.MissingShort, Squiz.Commenting.FunctionComment, WordPress.Security.NonceVerification.Recommended
 use LaqiUnitStockManager\Admin\ScreenSectionInterface;
 use LaqiUnitStockManager\Domain\Quantity;
-use LaqiUnitStockManager\Premium\Reservations\ReservationRepository;
+use LaqiUnitStockManager\Premium\Supply\StockHoldRepository;
 use LaqiUnitStockManager\Presentation\QuantityFormatter;
-
-/** Presents reservation supply states without creating another menu. */
+use LaqiUnitStockManager\Storage\PoolRepository;
+/** Shows all quantities that affect available-to-sell stock. */
 final class ReservationsSection implements ScreenSectionInterface {
-	/** @var ReservationRepository */ private $reservations;
+	/** @var StockHoldRepository */ private $holds;
+	/** @var PoolRepository */ private $pools;
 	/** @var QuantityFormatter */ private $formatter;
-	/** Constructor. */ public function __construct( ReservationRepository $reservations, QuantityFormatter $formatter ) {
-		$this->reservations = $reservations;
-		$this->formatter    = $formatter; }
+	/** Constructor. */ public function __construct( StockHoldRepository $holds, PoolRepository $pools, QuantityFormatter $formatter ) {
+		$this->holds     = $holds;
+		$this->pools     = $pools;
+		$this->formatter = $formatter;}
 	/** ID. */ public function id(): string {
-		return 'reservations'; }
-	/** Title. */ public function title(): string {
-		return __( 'Reservations', 'laqi-unit-stock-manager' ); }
+		return 'reservations';
+	} /** Title. */ public function title(): string {
+		return __( 'Supply states', 'laqi-unit-stock-manager' );}
 	/** Render. */ public function render(): void {
-		$rows = $this->reservations->active_summary(); ?>
-		<section class="card"><h2><?php esc_html_e( 'Reserved and available-to-sell stock', 'laqi-unit-stock-manager' ); ?></h2><p><?php esc_html_e( 'Checkout reservations temporarily withhold pooled stock. Successful stock reduction converts them; cancellation, failure, or expiry releases them.', 'laqi-unit-stock-manager' ); ?></p>
+		$pool_id = isset( $_GET['pool_id'] ) ? absint( $_GET['pool_id'] ) : 0;
+		$pool    = $pool_id > 0 ? $this->pools->find( $pool_id ) : null;
+		$rows    = $this->holds->summary(); ?>
+	<section class="card"><h2><?php esc_html_e( 'Place stock on hold', 'laqi-unit-stock-manager' ); ?></h2><form method="get"><input type="hidden" name="page" value="laqi-unit-stock-manager"/><input type="hidden" name="section" value="reservations"/><label for="laqi-lusm-supply-pool"><?php esc_html_e( 'Inventory pool', 'laqi-unit-stock-manager' ); ?></label><select id="laqi-lusm-supply-pool" name="pool_id" class="laqi-lusm-pool-search" required>
 		<?php
-		if ( array() === $rows ) :
+		if ( null !== $pool ) :
 			?>
-			<p><?php esc_html_e( 'No active order reservations.', 'laqi-unit-stock-manager' ); ?></p>
+		<option value="<?php echo esc_attr( (string) $pool->id() ); ?>" selected><?php echo esc_html( $pool->name() ); ?></option><?php endif; ?></select><?php submit_button( __( 'Choose pool', 'laqi-unit-stock-manager' ), 'secondary', '', false ); ?></form>
+		<?php
+		if ( null !== $pool ) :
+			?>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="laqi_lusm_place_stock_hold"/><input type="hidden" name="pool_id" value="<?php echo esc_attr( (string) $pool->id() ); ?>"/><?php wp_nonce_field( 'laqi_lusm_place_stock_hold_' . $pool->id() ); ?><label for="laqi-lusm-hold-state"><?php esc_html_e( 'State', 'laqi-unit-stock-manager' ); ?></label><select id="laqi-lusm-hold-state" name="state"><option value="quarantined"><?php esc_html_e( 'Quarantined', 'laqi-unit-stock-manager' ); ?></option><option value="damaged"><?php esc_html_e( 'Damaged', 'laqi-unit-stock-manager' ); ?></option></select><label for="laqi-lusm-hold-quantity"><?php echo esc_html( sprintf( /* translators: %s: unit. */ __( 'Quantity (%s)', 'laqi-unit-stock-manager' ), $pool->display_unit() ) ); ?></label><input id="laqi-lusm-hold-quantity" name="quantity" inputmode="decimal" required/><label for="laqi-lusm-hold-reason"><?php esc_html_e( 'Reason', 'laqi-unit-stock-manager' ); ?></label><input id="laqi-lusm-hold-reason" name="reason" maxlength="191" required/><?php submit_button( __( 'Place on hold', 'laqi-unit-stock-manager' ) ); ?></form><?php endif; ?></section>
+	<section class="card"><h2><?php esc_html_e( 'Supply state summary', 'laqi-unit-stock-manager' ); ?></h2><table class="widefat striped"><thead><tr><th><?php esc_html_e( 'Pool', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'On hand', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Reserved', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Quarantined', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Damaged', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Incoming', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Available to sell', 'laqi-unit-stock-manager' ); ?></th></tr></thead><tbody>
+		<?php
+		foreach ( $rows as $row ) :
+			$on          = (int) $row['quantity_base'];
+			$unavailable = (int) $row['reserved_base'] + (int) $row['quarantined_base'] + (int) $row['damaged_base'];
+			?>
+		<tr><td><?php echo esc_html( $row['name'] ); ?></td>
 			<?php
-else :
-	?>
-			<table class="widefat striped"><thead><tr><th><?php esc_html_e( 'Pool', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'On hand', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Reserved', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Available to sell', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Orders', 'laqi-unit-stock-manager' ); ?></th></tr></thead><tbody>
-			<?php
-			foreach ( $rows as $row ) :
-				$on_hand  = (int) $row['quantity_base'];
-				$reserved = (int) $row['reserved_base'];
+			foreach ( array( $on, $row['reserved_base'], $row['quarantined_base'], $row['damaged_base'], $row['incoming_base'], max( 0, $on - $unavailable ) ) as $amount ) :
 				?>
-	<tr><td><?php echo esc_html( $row['name'] ); ?></td><td><?php echo esc_html( $this->formatter->format( new Quantity( $row['family'], $on_hand ), $row['display_unit'] ) ); ?></td><td><?php echo esc_html( $this->formatter->format( new Quantity( $row['family'], $reserved ), $row['display_unit'] ) ); ?></td><td><?php echo esc_html( $this->formatter->format( new Quantity( $row['family'], max( 0, $on_hand - $reserved ) ), $row['display_unit'] ) ); ?></td><td><?php echo esc_html( (string) $row['reservation_count'] ); ?></td></tr><?php endforeach; ?></tbody></table><?php endif; ?></section>
+		<td><?php echo esc_html( $this->formatter->format( new Quantity( $row['family'], (int) $amount ), $row['display_unit'] ) ); ?></td><?php endforeach; ?></tr><?php endforeach; ?></tbody></table></section>
+	<section class="card"><h2><?php esc_html_e( 'Active stock holds', 'laqi-unit-stock-manager' ); ?></h2>
+		<?php
+		foreach ( $this->holds->active() as $hold ) :
+			$state_label = 'quarantined' === $hold['state'] ? __( 'Quarantined', 'laqi-unit-stock-manager' ) : __( 'Damaged', 'laqi-unit-stock-manager' );
+			?>
+		<div><p><?php echo esc_html( $hold['pool_name'] . ' — ' . $state_label . ' — ' . $this->formatter->format( new Quantity( $hold['family'], (int) $hold['quantity_base'] ), $hold['display_unit'] ) . ' — ' . $hold['reason'] ); ?></p><form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="laqi_lusm_release_stock_hold"/><input type="hidden" name="pool_id" value="<?php echo esc_attr( (string) $hold['pool_id'] ); ?>"/><input type="hidden" name="hold_id" value="<?php echo esc_attr( (string) $hold['id'] ); ?>"/><?php wp_nonce_field( 'laqi_lusm_release_stock_hold_' . $hold['id'] ); ?><?php submit_button( __( 'Release to available stock', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?></form><form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="laqi_lusm_write_off_stock_hold"/><input type="hidden" name="pool_id" value="<?php echo esc_attr( (string) $hold['pool_id'] ); ?>"/><input type="hidden" name="hold_id" value="<?php echo esc_attr( (string) $hold['id'] ); ?>"/><?php wp_nonce_field( 'laqi_lusm_write_off_stock_hold_' . $hold['id'] ); ?><?php submit_button( __( 'Write off permanently', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?></form></div><?php endforeach; ?></section>
 		<?php
 	}
 }
