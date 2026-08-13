@@ -8,6 +8,7 @@
 use LaqiUnitStockManager\Inventory\InsufficientStockException;
 use LaqiUnitStockManager\Inventory\StockMutationService;
 use LaqiUnitStockManager\Storage\Schema;
+use LaqiUnitStockManager\Storage\MovementRepository;
 
 /**
  * Tests the single authoritative stock mutation path.
@@ -155,5 +156,27 @@ class Test_Stock_Mutation_Service extends WP_UnitTestCase {
 		$this->assertTrue( $second->is_duplicate() );
 		$this->assertSame( -5000000000000, (int) $wpdb->get_var( $wpdb->prepare( 'SELECT delta_base FROM ' . Schema::table( 'movements' ) . ' WHERE id = %d', $first->movement_id() ) ) );
 		$this->assertSame( 'Counted stock', $wpdb->get_var( $wpdb->prepare( 'SELECT reason FROM ' . Schema::table( 'movements' ) . ' WHERE id = %d', $first->movement_id() ) ) );
+	}
+
+	/**
+	 * Completed mutations are readable through the shared activity repository.
+	 */
+	public function test_movement_repository_reads_ledger_context(): void {
+		global $wpdb;
+
+		$result = ( new StockMutationService( $wpdb ) )->apply(
+			$this->pool_id,
+			100,
+			'manual_add',
+			'activity:' . $this->pool_id,
+			array( 'source_type' => 'manual', 'reason' => 'Delivery correction' )
+		);
+		$rows = ( new MovementRepository( $wpdb ) )->recent( 100 );
+		$row  = current( array_filter( $rows, static function ( array $candidate ) use ( $result ): bool { return (int) $candidate['id'] === $result->movement_id(); } ) );
+
+		$this->assertIsArray( $row );
+		$this->assertSame( 'manual_add', $row['type'] );
+		$this->assertSame( 'Delivery correction', $row['reason'] );
+		$this->assertSame( 'Ingredient A', $row['pool_name'] );
 	}
 }

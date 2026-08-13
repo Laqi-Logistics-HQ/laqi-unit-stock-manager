@@ -10,14 +10,18 @@ namespace LaqiUnitStockManager;
 defined( 'ABSPATH' ) || exit;
 
 use LaqiUnitStockManager\Inventory\StockMutationService;
+use LaqiUnitStockManager\Inventory\MovementRegistry;
+use LaqiUnitStockManager\Inventory\MovementType;
 use LaqiUnitStockManager\Storage\CustomUnitRepository;
 use LaqiUnitStockManager\Storage\MappingRepository;
 use LaqiUnitStockManager\Storage\PoolRepository;
+use LaqiUnitStockManager\Storage\MovementRepository;
 use LaqiUnitStockManager\Consumption\CalculatorRegistry;
 use LaqiUnitStockManager\Availability\AvailabilityService;
 use LaqiUnitStockManager\Admin\ScreenSectionCatalog;
 use LaqiUnitStockManager\Presentation\PoolPresenter;
 use LaqiUnitStockManager\Presentation\QuantityFormatter;
+use LaqiUnitStockManager\Presentation\MovementPresenter;
 use LaqiUnitStockManager\Unit\UnitRegistry;
 
 /**
@@ -38,6 +42,13 @@ final class Container {
 	 * @var UnitRegistry|null
 	 */
 	private $unit_registry;
+
+	/**
+	 * Movement type extensions.
+	 *
+	 * @var MovementRegistry|null
+	 */
+	private $movement_registry;
 
 	/**
 	 * Runtime unit registry, including merchant units.
@@ -97,6 +108,32 @@ final class Container {
 		global $wpdb;
 
 		return new MappingRepository( $wpdb );
+	}
+
+	/** Movement ledger reads. @return MovementRepository */
+	public function movement_repository(): MovementRepository {
+		global $wpdb;
+		return new MovementRepository( $wpdb );
+	}
+
+	/** Extensible movement types. @return MovementRegistry */
+	public function movement_registry(): MovementRegistry {
+		if ( null === $this->movement_registry ) {
+			$this->movement_registry = new MovementRegistry();
+			$this->movement_registry->register( new MovementType( 'opening', __( 'Opening balance', 'laqi-unit-stock-manager' ) ) );
+			$this->movement_registry->register( new MovementType( 'order_reduction', __( 'Order reduction', 'laqi-unit-stock-manager' ) ) );
+			$this->movement_registry->register( new MovementType( 'order_restore', __( 'Order restoration', 'laqi-unit-stock-manager' ) ) );
+			$this->movement_registry->register( new MovementType( 'refund_restore', __( 'Refund restoration', 'laqi-unit-stock-manager' ) ) );
+			$this->movement_registry->register( new MovementType( 'manual_set', __( 'Manual stock count', 'laqi-unit-stock-manager' ) ) );
+			$this->movement_registry->register( new MovementType( 'manual_add', __( 'Manual addition', 'laqi-unit-stock-manager' ) ) );
+			$this->movement_registry->register( new MovementType( 'manual_subtract', __( 'Manual subtraction', 'laqi-unit-stock-manager' ) ) );
+		}
+		return $this->movement_registry;
+	}
+
+	/** Shared movement presenter. @return MovementPresenter */
+	public function movement_presenter(): MovementPresenter {
+		return new MovementPresenter( $this->quantity_formatter(), $this->movement_registry() );
 	}
 
 	/**

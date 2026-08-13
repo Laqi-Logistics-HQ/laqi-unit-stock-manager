@@ -72,6 +72,7 @@ final class Plugin {
 		$sections = $container->screen_section_catalog();
 		$sections->register( new Admin\PoolStockSection( $container->pool_repository(), $container->pool_presenter(), $container->mapping_repository(), $container->availability_service(), $container->quantity_formatter(), new MappingDiagnostics() ) );
 		$sections->register( new Admin\SetupSection( $container->pool_repository(), $container->unit_registry(), $container->custom_unit_repository() ) );
+		$sections->register( new Admin\ActivitySection( $container->movement_repository(), $container->movement_presenter() ) );
 		( new Admin\UnitStockPage( $sections ) )->register();
 		( new Admin\StockAdjustmentController( $container->pool_repository(), $container->unit_registry(), $container->stock_mutation_service() ) )->register();
 		( new Admin\SetupController( $container->pool_repository(), $container->mapping_repository(), $container->unit_registry(), $container->stock_mutation_service(), $container->custom_unit_repository() ) )->register();
