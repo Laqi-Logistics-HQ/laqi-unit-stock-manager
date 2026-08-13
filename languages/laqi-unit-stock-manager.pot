@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T14:13:54+00:00\n"
+"POT-Creation-Date: 2026-08-13T14:22:45+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -41,6 +41,53 @@ msgstr ""
 msgid "https://laqi-logistics.com"
 msgstr ""
 
+#: src/Admin/ActivitySection.php:51
+msgid "Activity"
+msgstr ""
+
+#: src/Admin/ActivitySection.php:58
+msgid "The latest pooled-stock changes are shown below. These records are append-only."
+msgstr ""
+
+#: src/Admin/ActivitySection.php:61
+msgid "Date"
+msgstr ""
+
+#: src/Admin/ActivitySection.php:62
+#: src/Admin/PoolStockSection.php:101
+#: src/Admin/SetupSection.php:140
+msgid "Inventory pool"
+msgstr ""
+
+#: src/Admin/ActivitySection.php:63
+msgid "Movement"
+msgstr ""
+
+#: src/Admin/ActivitySection.php:64
+msgid "Change"
+msgstr ""
+
+#: src/Admin/ActivitySection.php:65
+msgid "Balance"
+msgstr ""
+
+#: src/Admin/ActivitySection.php:66
+msgid "Source"
+msgstr ""
+
+#: src/Admin/ActivitySection.php:67
+#: src/Admin/PoolStockSection.php:186
+msgid "Reason"
+msgstr ""
+
+#: src/Admin/ActivitySection.php:71
+msgid "No stock movements recorded yet."
+msgstr ""
+
+#: src/Admin/ActivitySection.php:103
+msgid "System"
+msgstr ""
+
 #: src/Admin/PoolStockSection.php:85
 msgid "Stock"
 msgstr ""
@@ -55,11 +102,6 @@ msgstr ""
 
 #: src/Admin/PoolStockSection.php:97
 msgid "Search"
-msgstr ""
-
-#: src/Admin/PoolStockSection.php:101
-#: src/Admin/SetupSection.php:140
-msgid "Inventory pool"
 msgstr ""
 
 #: src/Admin/PoolStockSection.php:102
@@ -119,10 +161,6 @@ msgstr ""
 msgid "Quantity"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:186
-msgid "Reason"
-msgstr ""
-
 #: src/Admin/PoolStockSection.php:187
 msgid "Reason (optional)"
 msgstr ""
@@ -160,6 +198,7 @@ msgid "Stock unit"
 msgstr ""
 
 #: src/Admin/SetupSection.php:79
+#: src/Container.php:123
 msgid "Opening balance"
 msgstr ""
 
@@ -280,6 +319,30 @@ msgstr ""
 msgid "Inventory stock could not be updated. Check the quantity and try again."
 msgstr ""
 
+#: src/Container.php:124
+msgid "Order reduction"
+msgstr ""
+
+#: src/Container.php:125
+msgid "Order restoration"
+msgstr ""
+
+#: src/Container.php:126
+msgid "Refund restoration"
+msgstr ""
+
+#: src/Container.php:127
+msgid "Manual stock count"
+msgstr ""
+
+#: src/Container.php:128
+msgid "Manual addition"
+msgstr ""
+
+#: src/Container.php:129
+msgid "Manual subtraction"
+msgstr ""
+
 #: src/Diagnostics/MappingDiagnostics.php:28
 msgid "Linked product no longer exists."
 msgstr ""
@@ -292,7 +355,7 @@ msgstr ""
 msgid "This linked item is not currently purchasable."
 msgstr ""
 
-#: src/Plugin.php:153
+#: src/Plugin.php:154
 msgid "Laqi Unit Stock Manager for WooCommerce requires WooCommerce to be installed and active."
 msgstr ""
 

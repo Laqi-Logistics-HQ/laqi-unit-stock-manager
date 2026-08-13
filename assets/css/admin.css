@@ -31,6 +31,11 @@
 	color: #8a2424;
 }
 
+.laqi-lusm-activity-table th,
+.laqi-lusm-activity-table td {
+	vertical-align: middle;
+}
+
 .laqi-lusm-adjustment {
 	display: flex;
 	flex-wrap: wrap;

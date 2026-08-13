@@ -11,6 +11,8 @@ use LaqiUnitStockManager\Domain\Quantity;
 use LaqiUnitStockManager\Presentation\PoolPresenter;
 use LaqiUnitStockManager\Presentation\QuantityFormatter;
 use LaqiUnitStockManager\Unit\UnitRegistry;
+use LaqiUnitStockManager\Inventory\MovementRegistry;
+use LaqiUnitStockManager\Inventory\MovementType;
 
 /**
  * Verifies stable presentation and extension contracts.
@@ -54,5 +56,16 @@ class Test_Admin_Foundation extends WP_UnitTestCase {
 		$catalog->register( $section );
 
 		$this->assertSame( $section, $catalog->all()['forecast'] );
+	}
+
+	/**
+	 * Premium movement types can extend the shared label registry.
+	 */
+	public function test_movement_type_registry_is_extensible(): void {
+		$registry = new MovementRegistry();
+		$registry->register( new MovementType( 'receiving', 'Receiving' ) );
+
+		$this->assertSame( 'Receiving', $registry->label( 'receiving' ) );
+		$this->assertSame( 'Future Type', $registry->label( 'future_type' ) );
 	}
 }
