@@ -20,7 +20,7 @@ use wpdb;
 /** Stores receipt-backed quantities for later FEFO allocation and traceability. */
 final class BatchRepository {
 	const SCHEMA_OPTION = 'laqi_lusm_batch_schema_version';
-	const VERSION       = 2;
+	const VERSION       = 3;
 
 	/** @var wpdb */
 	private $db;
@@ -44,6 +44,7 @@ final class BatchRepository {
 			pool_id bigint(20) unsigned NOT NULL,
 			supplier_id bigint(20) unsigned NOT NULL DEFAULT 0,
 			receipt_movement_id bigint(20) unsigned NOT NULL,
+			source_batch_id bigint(20) unsigned NOT NULL DEFAULT 0,
 			supplier_lot varchar(191) NOT NULL DEFAULT '',
 			quantity_received_base bigint(20) unsigned NOT NULL,
 			quantity_available_base bigint(20) unsigned NOT NULL,
@@ -56,6 +57,7 @@ final class BatchRepository {
 			updated_at datetime NOT NULL,
 			PRIMARY KEY  (id),
 			UNIQUE KEY receipt_movement_id (receipt_movement_id),
+			KEY source_batch_id (source_batch_id),
 			KEY pool_status_expiry (pool_id,status,expiry_date),
 			KEY supplier_lot (supplier_id,supplier_lot)
 			) {$charset};"
@@ -131,6 +133,49 @@ final class BatchRepository {
 			$this->db->query( 'ROLLBACK' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 			throw $error;
 		}
+	}
+
+	/** Create the destination lot for a transfer inside the mutation transaction. @param array<string,mixed> $source Source batch. */
+	public function record_transfer( int $pool_id, int $movement_id, int $quantity, array $source ): int {
+		if ( $pool_id < 1 || $movement_id < 1 || $quantity < 1 ) {
+			throw new InvalidArgumentException( 'The transferred batch is invalid.' );
+		}
+		$existing = $this->for_movement( $movement_id );
+		if ( is_array( $existing ) ) {
+			return (int) $existing['id'];
+		}
+		$received = max( 1, (int) ( $source['quantity_received_base'] ?? $quantity ) );
+		$cost     = (int) floor( max( 0, (int) ( $source['total_cost_minor'] ?? 0 ) ) * $quantity / $received );
+		$now      = current_time( 'mysql', true );
+		$inserted = $this->db->insert(
+			$this->table(),
+			array(
+				'pool_id'                 => $pool_id,
+				'supplier_id'             => max( 0, (int) ( $source['supplier_id'] ?? 0 ) ),
+				'receipt_movement_id'     => $movement_id,
+				'source_batch_id'         => (int) ( $source['id'] ?? 0 ),
+				'supplier_lot'            => substr( (string) ( $source['supplier_lot'] ?? '' ), 0, 191 ),
+				'quantity_received_base'  => $quantity,
+				'quantity_available_base' => $quantity,
+				'total_cost_minor'        => $cost,
+				'currency'                => substr( (string) ( $source['currency'] ?? '' ), 0, 3 ),
+				'received_at'             => $now,
+				'expiry_date'             => empty( $source['expiry_date'] ) ? null : (string) $source['expiry_date'],
+				'status'                  => 'quarantined' === ( $source['status'] ?? '' ) ? 'quarantined' : 'active',
+				'created_at'              => $now,
+				'updated_at'              => $now,
+			),
+			array( '%d', '%d', '%d', '%d', '%s', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s' )
+		);
+		if ( false === $inserted ) {
+			throw new RuntimeException( 'Could not create the transferred batch.' );
+		}
+		$batch_id = (int) $this->db->insert_id;
+		$linked   = $this->db->update( $this->db->prefix . 'laqi_lusm_movements', array( 'batch_id' => $batch_id ), array( 'id' => $movement_id ), array( '%d' ), array( '%d' ) );
+		if ( 1 !== $linked ) {
+			throw new RuntimeException( 'Could not link the transfer movement to its batch.' );
+		}
+		return $batch_id;
 	}
 
 	/** Reject invalid receipt metadata before the pool mutation is attempted. */

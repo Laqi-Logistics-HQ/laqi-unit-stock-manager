@@ -116,6 +116,7 @@ final class StockMutationService {
 
 			do_action( 'laqi_lusm_stock_movement_applying', $pool_id, $delta, $type, $idempotency_key, $context );
 			$result = $this->insert_movement( $moves, $pool_id, $delta, $target, $type, $idempotency_key, $context );
+			do_action( 'laqi_lusm_stock_movement_applied', $pool_id, $delta, $type, $idempotency_key, $context, $result );
 			$this->query_or_fail( 'COMMIT' );
 			do_action( 'laqi_lusm_stock_mutated', array( $pool_id ), array( $result ) );
 			return $result;
@@ -202,7 +203,9 @@ final class StockMutationService {
 				$balance = (int) $this->db->get_var( $this->db->prepare( "SELECT quantity_base FROM {$pools} WHERE id = %d", $pool_id ) );
 				$context = isset( $command['context'] ) && is_array( $command['context'] ) ? $command['context'] : array();
 				do_action( 'laqi_lusm_stock_movement_applying', $pool_id, $delta, (string) $command['type'], (string) $command['idempotency_key'], $context );
-				$results[] = $this->insert_movement( $moves, $pool_id, $delta, $balance, (string) $command['type'], (string) $command['idempotency_key'], $context );
+				$result    = $this->insert_movement( $moves, $pool_id, $delta, $balance, (string) $command['type'], (string) $command['idempotency_key'], $context );
+				$results[] = $result;
+				do_action( 'laqi_lusm_stock_movement_applied', $pool_id, $delta, (string) $command['type'], (string) $command['idempotency_key'], $context, $result );
 			}
 
 			$this->query_or_fail( 'COMMIT' );
