@@ -78,6 +78,7 @@ else :
 			foreach ( $incoming as $delivery ) :
 				?>
 	<tr><td><?php echo esc_html( mysql2date( get_option( 'date_format' ), $delivery['expected_date'] ) ); ?></td><td><?php echo esc_html( $delivery['supplier_name'] ); ?></td><td><?php echo esc_html( $delivery['pack_count'] . ' × ' . $delivery['pack_name'] ); ?></td><td><?php echo esc_html( $delivery['pool_name'] ); ?></td><td><?php echo esc_html( $this->formatter->format( new Quantity( $delivery['family'], (int) $delivery['quantity_base'] ), $delivery['display_unit'] ) ); ?></td><td><?php echo esc_html( $delivery['reference'] ); ?></td><td><form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="laqi_lusm_receive_incoming_stock" /><input type="hidden" name="incoming_id" value="<?php echo esc_attr( (string) $delivery['id'] ); ?>" /><?php wp_nonce_field( 'laqi_lusm_receive_incoming_stock_' . $delivery['id'] ); ?><?php submit_button( __( 'Mark received', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?></form></td></tr><?php endforeach; ?></tbody></table><?php endif; ?></section>
+		<section class="card"><h2><?php esc_html_e( 'CSV exchange', 'laqi-unit-stock-manager' ); ?></h2><p><?php esc_html_e( 'Export or import the versioned supplier, pack, incoming-delivery, and reorder-policy schema.', 'laqi-unit-stock-manager' ); ?></p><form method="get" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="laqi_lusm_export_operations" /><?php wp_nonce_field( 'laqi_lusm_export_operations' ); ?><?php submit_button( __( 'Export operations CSV', 'laqi-unit-stock-manager' ), 'secondary', '', false ); ?></form><form method="post" enctype="multipart/form-data" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="laqi_lusm_import_operations" /><?php wp_nonce_field( 'laqi_lusm_import_operations' ); ?><label for="laqi-lusm-operations-csv"><?php esc_html_e( 'Operations CSV', 'laqi-unit-stock-manager' ); ?></label><input type="file" id="laqi-lusm-operations-csv" name="operations_csv" accept=".csv,text/csv" required /><?php submit_button( __( 'Import operations CSV', 'laqi-unit-stock-manager' ), 'secondary' ); ?></form></section>
 		<section class="card"><h2><?php esc_html_e( 'Recent receipts', 'laqi-unit-stock-manager' ); ?></h2><table class="widefat striped"><thead><tr><th><?php esc_html_e( 'Received', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Supplier', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Pack', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Pool', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Quantity', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Reference', 'laqi-unit-stock-manager' ); ?></th></tr></thead><tbody>
 		<?php
 		foreach ( $this->suppliers->receipts() as $receipt ) :
@@ -94,13 +95,15 @@ else :
 			'stock_received'     => __( 'Supplier stock received.', 'laqi-unit-stock-manager' ),
 			'incoming_scheduled' => __( 'Incoming stock scheduled.', 'laqi-unit-stock-manager' ),
 			'incoming_received'  => __( 'Incoming stock moved into on-hand inventory.', 'laqi-unit-stock-manager' ),
+			'csv_imported'       => sprintf( /* translators: 1: created rows, 2: skipped rows. */ __( 'CSV imported: %1$d created, %2$d already present.', 'laqi-unit-stock-manager' ), isset( $_GET['created'] ) ? absint( $_GET['created'] ) : 0, isset( $_GET['skipped'] ) ? absint( $_GET['skipped'] ) : 0 ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			'csv_error'          => __( 'The operations CSV could not be imported.', 'laqi-unit-stock-manager' ),
 			'receiving_error'    => __( 'The receiving operation could not be completed.', 'laqi-unit-stock-manager' ),
 		);
 		if ( isset( $messages[ $result ] ) ) {
 			wp_admin_notice(
 				$messages[ $result ],
 				array(
-					'type'        => 'receiving_error' === $result ? 'error' : 'success',
+					'type'        => in_array( $result, array( 'receiving_error', 'csv_error' ), true ) ? 'error' : 'success',
 					'dismissible' => true,
 				)
 			); } }

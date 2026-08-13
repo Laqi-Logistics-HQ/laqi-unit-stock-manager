@@ -144,6 +144,22 @@ final class PoolRepository {
 		return $this->hydrate( $row );
 	}
 
+	/** Find a pool by stable SKU, falling back to its exact name.
+	 *
+	 * @param string $internal_sku Internal SKU.
+	 * @param string $name Exact name.
+	 * @return Pool|null
+	 */
+	public function find_by_identity( string $internal_sku, string $name ): ?Pool {
+		$table = Schema::table( 'pools' );
+		if ( '' !== $internal_sku ) {
+			$row = $this->db->get_row( $this->db->prepare( "SELECT * FROM {$table} WHERE internal_sku = %s ORDER BY id ASC LIMIT 1", $internal_sku ), ARRAY_A );
+		} else {
+			$row = $this->db->get_row( $this->db->prepare( "SELECT * FROM {$table} WHERE name = %s ORDER BY id ASC LIMIT 1", $name ), ARRAY_A );
+		}
+		return is_array( $row ) ? $this->hydrate( $row ) : null;
+	}
+
 	/**
 	 * Find pools for the stock-management screen.
 	 *
