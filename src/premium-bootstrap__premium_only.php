@@ -40,6 +40,8 @@ require_once __DIR__ . '/Premium__premium_only/Batches/BatchAllocationRepository
 require_once __DIR__ . '/Premium__premium_only/Batches/BatchMovementAllocator.php';
 require_once __DIR__ . '/Premium__premium_only/Batches/ExpiredBatchAvailability.php';
 require_once __DIR__ . '/Premium__premium_only/Batches/BatchOperationsService.php';
+require_once __DIR__ . '/Premium__premium_only/Batches/BatchTransferReceiver.php';
+require_once __DIR__ . '/Premium__premium_only/Batches/BatchTransferService.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/BatchOperationsController.php';
 require_once __DIR__ . '/Premium__premium_only/Receiving/ReceivingService.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/ReceivingController.php';
@@ -101,8 +103,10 @@ add_action(
 		$batch_allocations = new Premium\Batches\BatchAllocationRepository( $wpdb );
 		$batch_allocations->install();
 		( new Premium\Batches\BatchMovementAllocator( $batch_allocations ) )->register();
+		( new Premium\Batches\BatchTransferReceiver( $batches ) )->register();
 		( new Premium\Batches\ExpiredBatchAvailability( $batches ) )->register();
 		$batch_operations   = new Premium\Batches\BatchOperationsService( $batches, $container->stock_mutation_service() );
+		$batch_transfers    = new Premium\Batches\BatchTransferService( $batches, $container->pool_repository(), $container->stock_mutation_service() );
 		$material_economics = new Premium\Costing\MaterialEconomicsService( $material_costs );
 		$reservations       = new Premium\Reservations\ReservationRepository( $wpdb );
 		$reservations->install();
@@ -126,6 +130,8 @@ add_action(
 		$csv_exchange = new Premium\Exchange\OperationsCsvService( $csv_mappers );
 		$loss_types->register( $container->movement_registry() );
 		$container->movement_registry()->register( new Inventory\MovementType( 'supplier_receipt', __( 'Supplier receipt', 'laqi-unit-stock-manager' ) ) );
+		$container->movement_registry()->register( new Inventory\MovementType( 'batch_transfer_out', __( 'Batch transfer out', 'laqi-unit-stock-manager' ) ) );
+		$container->movement_registry()->register( new Inventory\MovementType( 'batch_transfer_in', __( 'Batch transfer in', 'laqi-unit-stock-manager' ) ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\MovementLedgerSection( $container->movement_repository(), $container->movement_presenter(), new Admin\PaginationRenderer() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\StockLossSection( $container->pool_repository(), $container->quantity_formatter(), $loss_types ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\LowStockAlertsSection( $alert_policies, $container->pool_repository(), $container->quantity_formatter(), $alert_deliveries ) );
@@ -142,7 +148,7 @@ add_action(
 		( new Premium\Admin\ForecastController( $forecast_policies, $container->pool_repository() ) )->register();
 		( new Premium\Admin\StockReportController( $report_settings, $report_scheduler ) )->register();
 		( new Premium\Admin\ReceivingController( $suppliers, $container->pool_repository(), $container->unit_registry(), $receiving ) )->register();
-		( new Premium\Admin\BatchOperationsController( $batch_operations, $batches, $container->unit_registry() ) )->register();
+		( new Premium\Admin\BatchOperationsController( $batch_operations, $batches, $container->unit_registry(), $batch_transfers ) )->register();
 		( new Premium\Admin\ReorderController( $reorder_policies, $container->pool_repository(), $suppliers, $container->unit_registry() ) )->register();
 		( new Premium\Admin\CsvExchangeController( $csv_exchange ) )->register();
 		( new Premium\Admin\SupplyStateController( $stock_hold_service, $container->pool_repository(), $container->unit_registry(), $safety_stock ) )->register();

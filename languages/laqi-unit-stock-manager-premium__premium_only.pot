@@ -1,1253 +1,1316 @@
+# Copyright (C) 2026 Laqi Logistics
+# This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: \n"
+"Project-Id-Version: Laqi Unit Stock Manager for WooCommerce 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/laqi-unit-stock-manager\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T21:57:03+00:00\n"
+"POT-Creation-Date: 2026-08-13T22:10:46+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
 
-#: Admin/BatchOperationsController.php:72
+#. Plugin Name of the plugin
+#: laqi-unit-stock-manager.php
+msgid "Laqi Unit Stock Manager for WooCommerce"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: laqi-unit-stock-manager.php
+msgid "https://laqi-logistics.com/plugins/laqi-unit-stock-manager/"
+msgstr ""
+
+#. Description of the plugin
+#: laqi-unit-stock-manager.php
+msgid "Laqi Unit Stock Manager for WooCommerce for WordPress / WooCommerce."
+msgstr ""
+
+#. Author of the plugin
+#: laqi-unit-stock-manager.php
+msgid "Laqi Logistics"
+msgstr ""
+
+#. Author URI of the plugin
+#: laqi-unit-stock-manager.php
+msgid "https://laqi-logistics.com"
+msgstr ""
+
+#: src/premium-bootstrap__premium_only.php:132
+msgid "Supplier receipt"
+msgstr ""
+
+#: src/premium-bootstrap__premium_only.php:133
+msgid "Batch transfer out"
+msgstr ""
+
+#: src/premium-bootstrap__premium_only.php:134
+msgid "Batch transfer in"
+msgstr ""
+
+#: src/Premium__premium_only/Admin/BatchOperationsController.php:90
 msgid "You are not allowed to manage batches."
 msgstr ""
 
-#: Admin/CsvExchangeController.php:35
+#: src/Premium__premium_only/Admin/CsvExchangeController.php:35
 msgid "The operations export could not be created."
 msgstr ""
 
-#: Admin/CsvExchangeController.php:56
+#: src/Premium__premium_only/Admin/CsvExchangeController.php:56
 msgid "You are not allowed to exchange stock operations."
 msgstr ""
 
-#: Admin/ForecastController.php:42
+#: src/Premium__premium_only/Admin/ForecastController.php:42
 msgid "You are not allowed to manage stock forecasts."
 msgstr ""
 
-#: Admin/ForecastSection.php:61
+#: src/Premium__premium_only/Admin/ForecastSection.php:61
 msgid "Forecast"
 msgstr ""
 
-#: Admin/ForecastSection.php:73
-#: Admin/ForecastSection.php:82
+#: src/Premium__premium_only/Admin/ForecastSection.php:73
+#: src/Premium__premium_only/Admin/ForecastSection.php:82
 msgid "Demand window"
 msgstr ""
 
-#: Admin/ForecastSection.php:73
+#: src/Premium__premium_only/Admin/ForecastSection.php:73
 msgid "Forecasts use completed sales consumption only. Restocks, restores, manual adjustments, and physical losses are excluded."
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/ForecastSection.php:73
-#: Admin/ForecastSection.php:82
-#: Admin/LowStockAlertsSection.php:75
-#: Admin/LowStockAlertsSection.php:86
-#: Admin/LowStockAlertsSection.php:105
-#: Admin/MovementLedgerExportController.php:86
-#: Admin/MovementLedgerSection.php:81
-#: Admin/ReceivingSection.php:79
-#: Admin/ReorderSection.php:66
-#: Admin/ReservationsSection.php:40
-#: Admin/StockLossSection.php:70
-#: Admin/StockScenarioSection.php:53
-#: Reports/StockReportBuilder.php:62
+#: src/Premium__premium_only/Admin/ForecastSection.php:73
+#: src/Premium__premium_only/Admin/ForecastSection.php:82
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:75
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:86
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:105
+#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:86
+#: src/Premium__premium_only/Admin/MovementLedgerSection.php:81
+#: src/Premium__premium_only/Admin/ReceivingSection.php:79
+#: src/Premium__premium_only/Admin/ReorderSection.php:66
+#: src/Premium__premium_only/Admin/ReservationsSection.php:40
+#: src/Premium__premium_only/Admin/StockLossSection.php:70
+#: src/Premium__premium_only/Admin/StockScenarioSection.php:53
+#: src/Premium__premium_only/Reports/StockReportBuilder.php:62
 msgid "Inventory pool"
 msgstr ""
 
-#: Admin/ForecastSection.php:73
-#: Admin/LowStockAlertsSection.php:75
-#: Admin/StockLossSection.php:70
-#: Admin/StockScenarioSection.php:53
+#: src/Premium__premium_only/Admin/ForecastSection.php:73
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:75
+#: src/Premium__premium_only/Admin/StockLossSection.php:70
+#: src/Premium__premium_only/Admin/StockScenarioSection.php:53
 msgid "Search inventory pools"
 msgstr ""
 
-#: Admin/ForecastSection.php:77
-#: Admin/LowStockAlertsSection.php:79
-#: Admin/ReorderSection.php:70
-#: Admin/ReservationsSection.php:44
-#: Admin/StockLossSection.php:74
-#: Admin/StockScenarioSection.php:57
+#: src/Premium__premium_only/Admin/ForecastSection.php:77
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:79
+#: src/Premium__premium_only/Admin/ReorderSection.php:70
+#: src/Premium__premium_only/Admin/ReservationsSection.php:44
+#: src/Premium__premium_only/Admin/StockLossSection.php:74
+#: src/Premium__premium_only/Admin/StockScenarioSection.php:57
 msgid "Choose pool"
 msgstr ""
 
-#: Admin/ForecastSection.php:81
+#: src/Premium__premium_only/Admin/ForecastSection.php:81
 msgid "Demand window (days)"
 msgstr ""
 
-#: Admin/ForecastSection.php:81
+#: src/Premium__premium_only/Admin/ForecastSection.php:81
 msgid "Save forecast window"
 msgstr ""
 
-#: Admin/ForecastSection.php:82
+#: src/Premium__premium_only/Admin/ForecastSection.php:82
 msgid "Search forecasts"
 msgstr ""
 
-#: Admin/ForecastSection.php:82
-#: Admin/MovementLedgerSection.php:79
+#: src/Premium__premium_only/Admin/ForecastSection.php:82
+#: src/Premium__premium_only/Admin/MovementLedgerSection.php:79
 msgid "Search"
 msgstr ""
 
-#: Admin/ForecastSection.php:82
+#: src/Premium__premium_only/Admin/ForecastSection.php:82
 msgid "Average daily use"
 msgstr ""
 
-#: Admin/ForecastSection.php:82
-#: Reports/StockReportBuilder.php:67
+#: src/Premium__premium_only/Admin/ForecastSection.php:82
+#: src/Premium__premium_only/Reports/StockReportBuilder.php:67
 msgid "Days remaining"
 msgstr ""
 
-#: Admin/ForecastSection.php:82
-#: Reports/StockReportBuilder.php:68
+#: src/Premium__premium_only/Admin/ForecastSection.php:82
+#: src/Premium__premium_only/Reports/StockReportBuilder.php:68
 msgid "Estimated stock-out"
 msgstr ""
 
-#: Admin/ForecastSection.php:82
+#: src/Premium__premium_only/Admin/ForecastSection.php:82
 msgid "Confidence"
 msgstr ""
 
 #. translators: %d: days.
-#: Admin/ForecastSection.php:101
+#: src/Premium__premium_only/Admin/ForecastSection.php:101
 #, php-format
 msgid "%d days"
 msgstr ""
 
 #. translators: 1: first, 2: last, 3: total.
-#: Admin/ForecastSection.php:105
+#: src/Premium__premium_only/Admin/ForecastSection.php:105
 #, php-format
 msgid "Showing %1$d-%2$d of %3$d forecasts."
 msgstr ""
 
 #. translators: 1: first, 2: last, 3: total.
-#: Admin/ForecastSection.php:106
+#: src/Premium__premium_only/Admin/ForecastSection.php:106
 msgid "Forecast pages"
 msgstr ""
 
-#: Admin/ForecastSection.php:125
+#: src/Premium__premium_only/Admin/ForecastSection.php:125
 msgid "Insufficient data: at least 7 observed days and 3 sales days are required."
 msgstr ""
 
-#: Admin/ForecastSection.php:128
+#: src/Premium__premium_only/Admin/ForecastSection.php:128
 msgid "No sales demand in the observed window."
 msgstr ""
 
-#: Admin/ForecastSection.php:138
+#: src/Premium__premium_only/Admin/ForecastSection.php:138
 msgid "Forecast window saved."
 msgstr ""
 
-#: Admin/ForecastSection.php:145
+#: src/Premium__premium_only/Admin/ForecastSection.php:145
 msgid "The forecast settings could not be saved."
 msgstr ""
 
-#: Admin/LowStockAlertController.php:60
+#: src/Premium__premium_only/Admin/LowStockAlertController.php:60
 msgid "You are not allowed to manage stock alerts."
 msgstr ""
 
-#: Admin/LowStockAlertsSection.php:64
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:64
 msgid "Alerts"
 msgstr ""
 
-#: Admin/LowStockAlertsSection.php:75
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:75
 msgid "Configure low-stock alert"
 msgstr ""
 
-#: Admin/LowStockAlertsSection.php:75
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:75
 msgid "Warning and critical emails follow the site timezone. Optional reminders repeat while stock remains low, outside quiet hours."
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/LowStockAlertsSection.php:85
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:85
 #, php-format
 msgid "Warning threshold (%s)"
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/LowStockAlertsSection.php:85
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:85
 #, php-format
 msgid "Critical threshold (%s)"
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/LowStockAlertsSection.php:85
-#: Admin/StockReportSection.php:63
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:85
+#: src/Premium__premium_only/Admin/StockReportSection.php:63
 msgid "Email recipients"
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/LowStockAlertsSection.php:85
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:85
 msgid "Reminder interval (hours)"
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/LowStockAlertsSection.php:85
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:85
 msgid "Quiet hours start (0-23)"
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/LowStockAlertsSection.php:85
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:85
 msgid "Quiet hours end (0-23)"
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/LowStockAlertsSection.php:85
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:85
 msgid "Webhook URL (optional HTTPS)"
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/LowStockAlertsSection.php:85
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:85
 msgid "Webhook signing secret"
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/LowStockAlertsSection.php:85
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:85
 msgid "Leave blank to keep the saved secret"
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/LowStockAlertsSection.php:85
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:85
 msgid "Save alert"
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/LowStockAlertsSection.php:86
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:86
 msgid "Configured pool alerts"
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/LowStockAlertsSection.php:86
-#: Admin/MovementLedgerExportController.php:89
-#: Admin/MovementLedgerSection.php:81
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:86
+#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:89
+#: src/Premium__premium_only/Admin/MovementLedgerSection.php:81
 msgid "Balance"
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/LowStockAlertsSection.php:86
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:86
 msgid "Warning"
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/LowStockAlertsSection.php:86
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:86
 msgid "Critical"
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/LowStockAlertsSection.php:86
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:86
 msgid "Status"
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/LowStockAlertsSection.php:86
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:86
 msgid "Last sent"
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/LowStockAlertsSection.php:86
-#: Admin/StockReportSection.php:85
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:86
+#: src/Premium__premium_only/Admin/StockReportSection.php:85
 msgid "Recipients"
 msgstr ""
 
-#: Admin/LowStockAlertsSection.php:104
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:104
 msgid "Never"
 msgstr ""
 
-#: Admin/LowStockAlertsSection.php:105
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:105
 msgid "Recent alert deliveries"
 msgstr ""
 
-#: Admin/LowStockAlertsSection.php:105
-#: Admin/MovementLedgerSection.php:81
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:105
+#: src/Premium__premium_only/Admin/MovementLedgerSection.php:81
 msgid "Date"
 msgstr ""
 
-#: Admin/LowStockAlertsSection.php:105
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:105
 msgid "Channel"
 msgstr ""
 
-#: Admin/LowStockAlertsSection.php:105
-#: Admin/StockReportSection.php:85
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:105
+#: src/Premium__premium_only/Admin/StockReportSection.php:85
 msgid "Result"
 msgstr ""
 
-#: Admin/LowStockAlertsSection.php:105
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:105
 msgid "Details"
 msgstr ""
 
-#: Admin/LowStockAlertsSection.php:109
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:109
 msgid "Delivered"
 msgstr ""
 
-#: Admin/LowStockAlertsSection.php:109
-#: Admin/StockReportSection.php:93
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:109
+#: src/Premium__premium_only/Admin/StockReportSection.php:93
 msgid "Failed"
 msgstr ""
 
-#: Admin/LowStockAlertsSection.php:119
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:119
 msgid "Low-stock alert saved."
 msgstr ""
 
-#: Admin/LowStockAlertsSection.php:126
+#: src/Premium__premium_only/Admin/LowStockAlertsSection.php:126
 msgid "The low-stock alert could not be saved. Check the threshold and recipients."
 msgstr ""
 
-#: Admin/MaterialCostsSection.php:31
+#: src/Premium__premium_only/Admin/MaterialCostsSection.php:31
 msgid "Costs"
 msgstr ""
 
-#: Admin/MaterialCostsSection.php:36
+#: src/Premium__premium_only/Admin/MaterialCostsSection.php:36
 msgid "Current unit economics"
 msgstr ""
 
-#: Admin/MaterialCostsSection.php:36
+#: src/Premium__premium_only/Admin/MaterialCostsSection.php:36
 msgid "Material costs use the weighted average from priced receipts. They are informational and never change product prices."
 msgstr ""
 
-#: Admin/MaterialCostsSection.php:36
-#: Admin/StockScenarioSection.php:84
+#: src/Premium__premium_only/Admin/MaterialCostsSection.php:36
+#: src/Premium__premium_only/Admin/StockScenarioSection.php:84
 msgid "Product or variation"
 msgstr ""
 
-#: Admin/MaterialCostsSection.php:36
+#: src/Premium__premium_only/Admin/MaterialCostsSection.php:36
 msgid "Material cost per sold item"
 msgstr ""
 
-#: Admin/MaterialCostsSection.php:36
+#: src/Premium__premium_only/Admin/MaterialCostsSection.php:36
 msgid "Current price"
 msgstr ""
 
-#: Admin/MaterialCostsSection.php:36
+#: src/Premium__premium_only/Admin/MaterialCostsSection.php:36
 msgid "Gross margin before other costs"
 msgstr ""
 
 #. translators: %d: WooCommerce product ID.
-#: Admin/MaterialCostsSection.php:44
+#: src/Premium__premium_only/Admin/MaterialCostsSection.php:44
 #, php-format
 msgid "Unavailable product #%d"
 msgstr ""
 
 #. translators: %d: WooCommerce product ID.
-#: Admin/MaterialCostsSection.php:45
+#: src/Premium__premium_only/Admin/MaterialCostsSection.php:45
 msgid "No priced receipt yet"
 msgstr ""
 
-#: Admin/MovementLedgerExportController.php:51
+#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:51
 msgid "You are not allowed to export the stock ledger."
 msgstr ""
 
-#: Admin/MovementLedgerExportController.php:62
+#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:62
 msgid "The stock ledger export could not be created."
 msgstr ""
 
-#: Admin/MovementLedgerExportController.php:84
+#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:84
 msgid "Movement ID"
 msgstr ""
 
-#: Admin/MovementLedgerExportController.php:85
+#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:85
 msgid "Date (UTC)"
 msgstr ""
 
-#: Admin/MovementLedgerExportController.php:87
-#: Admin/MovementLedgerSection.php:81
+#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:87
+#: src/Premium__premium_only/Admin/MovementLedgerSection.php:81
 msgid "Movement"
 msgstr ""
 
-#: Admin/MovementLedgerExportController.php:88
-#: Admin/MovementLedgerSection.php:81
+#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:88
+#: src/Premium__premium_only/Admin/MovementLedgerSection.php:81
 msgid "Change"
 msgstr ""
 
-#: Admin/MovementLedgerExportController.php:90
+#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:90
 msgid "Source type"
 msgstr ""
 
-#: Admin/MovementLedgerExportController.php:91
+#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:91
 msgid "Source ID"
 msgstr ""
 
-#: Admin/MovementLedgerExportController.php:92
+#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:92
 msgid "Actor ID"
 msgstr ""
 
-#: Admin/MovementLedgerExportController.php:93
-#: Admin/MovementLedgerSection.php:81
+#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:93
+#: src/Premium__premium_only/Admin/MovementLedgerSection.php:81
 msgid "Actor"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/MovementLedgerExportController.php:94
-#: Admin/MovementLedgerSection.php:81
-#: Admin/ReservationsSection.php:48
+#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:94
+#: src/Premium__premium_only/Admin/MovementLedgerSection.php:81
+#: src/Premium__premium_only/Admin/ReservationsSection.php:48
 msgid "Reason"
 msgstr ""
 
-#: Admin/MovementLedgerExportController.php:114
-#: Admin/MovementLedgerSection.php:127
+#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:114
+#: src/Premium__premium_only/Admin/MovementLedgerSection.php:127
 msgid "System or deleted user"
 msgstr ""
 
-#: Admin/MovementLedgerSection.php:57
+#: src/Premium__premium_only/Admin/MovementLedgerSection.php:57
 msgid "Ledger"
 msgstr ""
 
-#: Admin/MovementLedgerSection.php:79
+#: src/Premium__premium_only/Admin/MovementLedgerSection.php:79
 msgid "Search stock movements"
 msgstr ""
 
-#: Admin/MovementLedgerSection.php:79
+#: src/Premium__premium_only/Admin/MovementLedgerSection.php:79
 msgid "Search pools, movements, sources, actors, or reasons"
 msgstr ""
 
-#: Admin/MovementLedgerSection.php:79
+#: src/Premium__premium_only/Admin/MovementLedgerSection.php:79
 msgid "Export CSV"
 msgstr ""
 
-#: Admin/MovementLedgerSection.php:81
+#: src/Premium__premium_only/Admin/MovementLedgerSection.php:81
 msgid "Source"
 msgstr ""
 
-#: Admin/MovementLedgerSection.php:87
+#: src/Premium__premium_only/Admin/MovementLedgerSection.php:87
 msgid "No matching movements found."
 msgstr ""
 
 #. translators: 1: first row, 2: last row, 3: total matching movements.
-#: Admin/MovementLedgerSection.php:94
+#: src/Premium__premium_only/Admin/MovementLedgerSection.php:94
 #, php-format
 msgid "Showing %1$d-%2$d of %3$d matching movements."
 msgstr ""
 
-#: Admin/MovementLedgerSection.php:97
+#: src/Premium__premium_only/Admin/MovementLedgerSection.php:97
 msgid "Ledger pages"
 msgstr ""
 
-#: Admin/ReceivingController.php:150
+#: src/Premium__premium_only/Admin/ReceivingController.php:150
 msgid "You are not allowed to manage receiving."
 msgstr ""
 
-#: Admin/ReceivingSection.php:59
+#: src/Premium__premium_only/Admin/ReceivingSection.php:59
 msgid "Receiving"
 msgstr ""
 
-#: Admin/ReceivingSection.php:67
+#: src/Premium__premium_only/Admin/ReceivingSection.php:67
 msgid "Active"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReceivingSection.php:68
-#: Admin/ReservationsSection.php:48
-#: Admin/ReservationsSection.php:49
-#: Admin/ReservationsSection.php:62
+#: src/Premium__premium_only/Admin/ReceivingSection.php:68
+#: src/Premium__premium_only/Admin/ReservationsSection.php:48
+#: src/Premium__premium_only/Admin/ReservationsSection.php:49
+#: src/Premium__premium_only/Admin/ReservationsSection.php:62
 msgid "Quarantined"
 msgstr ""
 
-#: Admin/ReceivingSection.php:69
+#: src/Premium__premium_only/Admin/ReceivingSection.php:69
 msgid "Depleted"
 msgstr ""
 
-#: Admin/ReceivingSection.php:70
+#: src/Premium__premium_only/Admin/ReceivingSection.php:70
 msgid "Recalled"
 msgstr ""
 
-#: Admin/ReceivingSection.php:74
+#: src/Premium__premium_only/Admin/ReceivingSection.php:74
 msgid "Add supplier"
 msgstr ""
 
-#: Admin/ReceivingSection.php:74
+#: src/Premium__premium_only/Admin/ReceivingSection.php:74
 msgid "Supplier name"
 msgstr ""
 
-#: Admin/ReceivingSection.php:74
+#: src/Premium__premium_only/Admin/ReceivingSection.php:74
 msgid "Email"
 msgstr ""
 
-#: Admin/ReceivingSection.php:74
+#: src/Premium__premium_only/Admin/ReceivingSection.php:74
 msgid "Lead time (days)"
 msgstr ""
 
-#: Admin/ReceivingSection.php:75
+#: src/Premium__premium_only/Admin/ReceivingSection.php:75
 msgid "Define supplier pack"
 msgstr ""
 
-#: Admin/ReceivingSection.php:75
+#: src/Premium__premium_only/Admin/ReceivingSection.php:75
 msgid "Examples include a sack, drum, case, or pallet. The quantity is stored exactly for the selected pool."
 msgstr ""
 
-#: Admin/ReceivingSection.php:75
-#: Admin/ReceivingSection.php:98
-#: Admin/ReceivingSection.php:103
-#: Admin/ReceivingSection.php:140
+#: src/Premium__premium_only/Admin/ReceivingSection.php:75
+#: src/Premium__premium_only/Admin/ReceivingSection.php:98
+#: src/Premium__premium_only/Admin/ReceivingSection.php:103
+#: src/Premium__premium_only/Admin/ReceivingSection.php:140
 msgid "Supplier"
 msgstr ""
 
-#: Admin/ReceivingSection.php:79
+#: src/Premium__premium_only/Admin/ReceivingSection.php:79
 msgid "Pack name"
 msgstr ""
 
-#: Admin/ReceivingSection.php:79
+#: src/Premium__premium_only/Admin/ReceivingSection.php:79
 msgid "25 kg sack"
 msgstr ""
 
-#: Admin/ReceivingSection.php:79
+#: src/Premium__premium_only/Admin/ReceivingSection.php:79
 msgid "Quantity in the pool display unit"
 msgstr ""
 
-#: Admin/ReceivingSection.php:79
+#: src/Premium__premium_only/Admin/ReceivingSection.php:79
 msgid "Define pack"
 msgstr ""
 
-#: Admin/ReceivingSection.php:80
+#: src/Premium__premium_only/Admin/ReceivingSection.php:80
 msgid "Receive stock now"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReceivingSection.php:80
-#: Admin/ReceivingSection.php:85
-#: Admin/ReorderSection.php:80
+#: src/Premium__premium_only/Admin/ReceivingSection.php:80
+#: src/Premium__premium_only/Admin/ReceivingSection.php:85
+#: src/Premium__premium_only/Admin/ReorderSection.php:80
 msgid "Supplier pack"
 msgstr ""
 
-#: Admin/ReceivingSection.php:84
+#: src/Premium__premium_only/Admin/ReceivingSection.php:84
 msgid "Packages received"
 msgstr ""
 
-#: Admin/ReceivingSection.php:84
+#: src/Premium__premium_only/Admin/ReceivingSection.php:84
 msgid "Supplier lot (optional)"
 msgstr ""
 
-#: Admin/ReceivingSection.php:84
+#: src/Premium__premium_only/Admin/ReceivingSection.php:84
 msgid "Expiry date (optional)"
 msgstr ""
 
-#: Admin/ReceivingSection.php:84
+#: src/Premium__premium_only/Admin/ReceivingSection.php:84
 msgid "Total material cost (optional)"
 msgstr ""
 
-#: Admin/ReceivingSection.php:84
+#: src/Premium__premium_only/Admin/ReceivingSection.php:84
 msgid "used for weighted-average material economics only; retail prices are never changed."
 msgstr ""
 
-#: Admin/ReceivingSection.php:84
+#: src/Premium__premium_only/Admin/ReceivingSection.php:84
 msgid "Delivery reference"
 msgstr ""
 
-#: Admin/ReceivingSection.php:84
+#: src/Premium__premium_only/Admin/ReceivingSection.php:84
 msgid "Receive into stock"
 msgstr ""
 
-#: Admin/ReceivingSection.php:85
-#: Admin/ReceivingSection.php:89
+#: src/Premium__premium_only/Admin/ReceivingSection.php:85
+#: src/Premium__premium_only/Admin/ReceivingSection.php:89
 msgid "Schedule incoming stock"
 msgstr ""
 
-#: Admin/ReceivingSection.php:85
+#: src/Premium__premium_only/Admin/ReceivingSection.php:85
 msgid "Incoming quantities remain separate from on-hand stock until you confirm their arrival."
 msgstr ""
 
-#: Admin/ReceivingSection.php:89
+#: src/Premium__premium_only/Admin/ReceivingSection.php:89
 msgid "Packages expected"
 msgstr ""
 
-#: Admin/ReceivingSection.php:89
+#: src/Premium__premium_only/Admin/ReceivingSection.php:89
 msgid "Expected arrival"
 msgstr ""
 
-#: Admin/ReceivingSection.php:89
+#: src/Premium__premium_only/Admin/ReceivingSection.php:89
 msgid "Order or delivery reference"
 msgstr ""
 
-#: Admin/ReceivingSection.php:90
+#: src/Premium__premium_only/Admin/ReceivingSection.php:90
 msgid "Incoming deliveries"
 msgstr ""
 
-#: Admin/ReceivingSection.php:94
+#: src/Premium__premium_only/Admin/ReceivingSection.php:94
 msgid "No incoming stock is currently scheduled."
 msgstr ""
 
-#: Admin/ReceivingSection.php:98
+#: src/Premium__premium_only/Admin/ReceivingSection.php:98
 msgid "Expected"
 msgstr ""
 
-#: Admin/ReceivingSection.php:98
-#: Admin/ReceivingSection.php:140
+#: src/Premium__premium_only/Admin/ReceivingSection.php:98
+#: src/Premium__premium_only/Admin/ReceivingSection.php:140
 msgid "Pack"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReceivingSection.php:98
-#: Admin/ReceivingSection.php:103
-#: Admin/ReceivingSection.php:140
-#: Admin/ReorderSection.php:80
-#: Admin/ReservationsSection.php:49
+#: src/Premium__premium_only/Admin/ReceivingSection.php:98
+#: src/Premium__premium_only/Admin/ReceivingSection.php:103
+#: src/Premium__premium_only/Admin/ReceivingSection.php:140
+#: src/Premium__premium_only/Admin/ReorderSection.php:80
+#: src/Premium__premium_only/Admin/ReservationsSection.php:49
 msgid "Pool"
 msgstr ""
 
-#: Admin/ReceivingSection.php:98
+#: src/Premium__premium_only/Admin/ReceivingSection.php:98
 msgid "Incoming quantity"
 msgstr ""
 
-#: Admin/ReceivingSection.php:98
-#: Admin/ReceivingSection.php:140
+#: src/Premium__premium_only/Admin/ReceivingSection.php:98
+#: src/Premium__premium_only/Admin/ReceivingSection.php:140
 msgid "Reference"
 msgstr ""
 
-#: Admin/ReceivingSection.php:98
+#: src/Premium__premium_only/Admin/ReceivingSection.php:98
 msgid "Action"
 msgstr ""
 
-#: Admin/ReceivingSection.php:102
-#: Admin/ReceivingSection.php:103
+#: src/Premium__premium_only/Admin/ReceivingSection.php:102
+#: src/Premium__premium_only/Admin/ReceivingSection.php:103
 msgid "Supplier lot"
 msgstr ""
 
-#: Admin/ReceivingSection.php:102
+#: src/Premium__premium_only/Admin/ReceivingSection.php:102
 msgid "Expiry date"
 msgstr ""
 
-#: Admin/ReceivingSection.php:102
+#: src/Premium__premium_only/Admin/ReceivingSection.php:102
 msgid "Mark received"
 msgstr ""
 
-#: Admin/ReceivingSection.php:103
+#: src/Premium__premium_only/Admin/ReceivingSection.php:103
 msgid "Received batches and lots"
 msgstr ""
 
-#: Admin/ReceivingSection.php:103
+#: src/Premium__premium_only/Admin/ReceivingSection.php:103
 msgid "Each receipt creates a traceable batch. Empty supplier-lot and expiry fields remain valid and can be completed by later batch workflows."
 msgstr ""
 
-#: Admin/ReceivingSection.php:103
-#: Admin/ReceivingSection.php:140
+#: src/Premium__premium_only/Admin/ReceivingSection.php:103
+#: src/Premium__premium_only/Admin/ReceivingSection.php:140
 msgid "Received"
 msgstr ""
 
-#: Admin/ReceivingSection.php:103
+#: src/Premium__premium_only/Admin/ReceivingSection.php:103
 msgid "Expiry"
 msgstr ""
 
-#: Admin/ReceivingSection.php:103
+#: src/Premium__premium_only/Admin/ReceivingSection.php:103
 msgid "Received quantity"
 msgstr ""
 
-#: Admin/ReceivingSection.php:103
+#: src/Premium__premium_only/Admin/ReceivingSection.php:103
 msgid "Available in batch"
 msgstr ""
 
-#: Admin/ReceivingSection.php:103
+#: src/Premium__premium_only/Admin/ReceivingSection.php:103
 msgid "Recall"
 msgstr ""
 
-#: Admin/ReceivingSection.php:105
+#: src/Premium__premium_only/Admin/ReceivingSection.php:105
 msgid "Not supplied"
 msgstr ""
 
-#: Admin/ReceivingSection.php:105
+#: src/Premium__premium_only/Admin/ReceivingSection.php:105
 msgid "No expiry"
 msgstr ""
 
-#: Admin/ReceivingSection.php:109
+#: src/Premium__premium_only/Admin/ReceivingSection.php:109
 msgid "Reason (optional)"
 msgstr ""
 
-#: Admin/ReceivingSection.php:109
+#: src/Premium__premium_only/Admin/ReceivingSection.php:109
 msgid "Quarantine batch"
 msgstr ""
 
-#: Admin/ReceivingSection.php:109
+#: src/Premium__premium_only/Admin/ReceivingSection.php:109
 msgid "Release batch"
 msgstr ""
 
-#: Admin/ReceivingSection.php:109
+#: src/Premium__premium_only/Admin/ReceivingSection.php:109
 msgid "Counted quantity"
 msgstr ""
 
-#: Admin/ReceivingSection.php:109
+#: src/Premium__premium_only/Admin/ReceivingSection.php:109
 msgid "Save batch count"
 msgstr ""
 
-#: Admin/ReceivingSection.php:109
+#: src/Premium__premium_only/Admin/ReceivingSection.php:109
 msgid "Write off batch"
 msgstr ""
 
-#: Admin/ReceivingSection.php:113
+#: src/Premium__premium_only/Admin/ReceivingSection.php:109
+msgid "Destination pool"
+msgstr ""
+
+#. translators: %s: source pool display unit.
+#: src/Premium__premium_only/Admin/ReceivingSection.php:109
+#, php-format
+msgid "Transfer quantity (%s)"
+msgstr ""
+
+#. translators: %s: source pool display unit.
+#: src/Premium__premium_only/Admin/ReceivingSection.php:109
+msgid "Transfer reason"
+msgstr ""
+
+#. translators: %s: source pool display unit.
+#: src/Premium__premium_only/Admin/ReceivingSection.php:109
+msgid "Transfer batch stock"
+msgstr ""
+
+#: src/Premium__premium_only/Admin/ReceivingSection.php:113
 msgid "Write off recalled stock"
 msgstr ""
 
-#: Admin/ReceivingSection.php:130
+#: src/Premium__premium_only/Admin/ReceivingSection.php:130
 msgid "Review recall"
 msgstr ""
 
-#: Admin/ReceivingSection.php:133
+#: src/Premium__premium_only/Admin/ReceivingSection.php:133
 msgid "Recall confirmed"
 msgstr ""
 
-#: Admin/ReceivingSection.php:139
+#: src/Premium__premium_only/Admin/ReceivingSection.php:139
 msgid "CSV exchange"
 msgstr ""
 
-#: Admin/ReceivingSection.php:139
+#: src/Premium__premium_only/Admin/ReceivingSection.php:139
 msgid "Export or import the versioned supplier, pack, incoming-delivery, and reorder-policy schema."
 msgstr ""
 
-#: Admin/ReceivingSection.php:139
+#: src/Premium__premium_only/Admin/ReceivingSection.php:139
 msgid "Export operations CSV"
 msgstr ""
 
-#: Admin/ReceivingSection.php:139
+#: src/Premium__premium_only/Admin/ReceivingSection.php:139
 msgid "Operations CSV"
 msgstr ""
 
-#: Admin/ReceivingSection.php:139
+#: src/Premium__premium_only/Admin/ReceivingSection.php:139
 msgid "Import operations CSV"
 msgstr ""
 
-#: Admin/ReceivingSection.php:140
+#: src/Premium__premium_only/Admin/ReceivingSection.php:140
 msgid "Recent receipts"
 msgstr ""
 
-#: Admin/ReceivingSection.php:140
+#: src/Premium__premium_only/Admin/ReceivingSection.php:140
 msgid "Quantity"
 msgstr ""
 
-#: Admin/ReceivingSection.php:159
+#: src/Premium__premium_only/Admin/ReceivingSection.php:159
 msgid "Review batch recall"
 msgstr ""
 
 #. translators: %s: supplier lot or batch number.
-#: Admin/ReceivingSection.php:159
+#: src/Premium__premium_only/Admin/ReceivingSection.php:159
 #, php-format
 msgid "Review the affected orders for batch %s before confirming."
 msgstr ""
 
 #. translators: %s: supplier lot or batch number.
-#: Admin/ReceivingSection.php:159
+#: src/Premium__premium_only/Admin/ReceivingSection.php:159
 msgid "Confirming a recall makes all remaining batch stock unavailable. Customers are never contacted automatically."
 msgstr ""
 
-#: Admin/ReceivingSection.php:163
+#: src/Premium__premium_only/Admin/ReceivingSection.php:163
 msgid "No orders currently contain outstanding quantity from this batch."
 msgstr ""
 
-#: Admin/ReceivingSection.php:164
+#: src/Premium__premium_only/Admin/ReceivingSection.php:164
 msgid "Order"
 msgstr ""
 
-#: Admin/ReceivingSection.php:164
+#: src/Premium__premium_only/Admin/ReceivingSection.php:164
 msgid "Quantity from batch"
 msgstr ""
 
-#: Admin/ReceivingSection.php:164
+#: src/Premium__premium_only/Admin/ReceivingSection.php:164
 msgid "Last allocated"
 msgstr ""
 
-#: Admin/ReceivingSection.php:179
+#: src/Premium__premium_only/Admin/ReceivingSection.php:179
 msgid "Recall reason"
 msgstr ""
 
-#: Admin/ReceivingSection.php:179
+#: src/Premium__premium_only/Admin/ReceivingSection.php:179
 msgid "Confirm batch recall"
 msgstr ""
 
-#: Admin/ReceivingSection.php:186
+#: src/Premium__premium_only/Admin/ReceivingSection.php:186
 msgid "Supplier added."
 msgstr ""
 
-#: Admin/ReceivingSection.php:187
+#: src/Premium__premium_only/Admin/ReceivingSection.php:187
 msgid "Supplier pack defined."
 msgstr ""
 
-#: Admin/ReceivingSection.php:188
+#: src/Premium__premium_only/Admin/ReceivingSection.php:188
 msgid "Supplier stock received."
 msgstr ""
 
-#: Admin/ReceivingSection.php:189
+#: src/Premium__premium_only/Admin/ReceivingSection.php:189
 msgid "Incoming stock scheduled."
 msgstr ""
 
-#: Admin/ReceivingSection.php:190
+#: src/Premium__premium_only/Admin/ReceivingSection.php:190
 msgid "Incoming stock moved into on-hand inventory."
 msgstr ""
 
-#: Admin/ReceivingSection.php:191
+#: src/Premium__premium_only/Admin/ReceivingSection.php:191
 msgid "Batch quarantined."
 msgstr ""
 
-#: Admin/ReceivingSection.php:192
+#: src/Premium__premium_only/Admin/ReceivingSection.php:192
 msgid "Batch released."
 msgstr ""
 
-#: Admin/ReceivingSection.php:193
+#: src/Premium__premium_only/Admin/ReceivingSection.php:193
 msgid "Batch written off."
 msgstr ""
 
-#: Admin/ReceivingSection.php:194
+#: src/Premium__premium_only/Admin/ReceivingSection.php:194
 msgid "Batch count saved."
 msgstr ""
 
-#: Admin/ReceivingSection.php:195
+#: src/Premium__premium_only/Admin/ReceivingSection.php:195
 msgid "Batch recall confirmed. Customers were not contacted."
 msgstr ""
 
-#: Admin/ReceivingSection.php:196
+#: src/Premium__premium_only/Admin/ReceivingSection.php:196
+msgid "Batch stock transferred."
+msgstr ""
+
+#: src/Premium__premium_only/Admin/ReceivingSection.php:197
 msgid "The batch operation could not be completed."
 msgstr ""
 
 #. translators: 1: created rows, 2: skipped rows.
-#: Admin/ReceivingSection.php:197
+#: src/Premium__premium_only/Admin/ReceivingSection.php:198
 #, php-format
 msgid "CSV imported: %1$d created, %2$d already present."
 msgstr ""
 
 #. translators: 1: created rows, 2: skipped rows.
-#: Admin/ReceivingSection.php:198
+#: src/Premium__premium_only/Admin/ReceivingSection.php:199
 msgid "The operations CSV could not be imported."
 msgstr ""
 
-#: Admin/ReceivingSection.php:199
+#: src/Premium__premium_only/Admin/ReceivingSection.php:200
 msgid "The receiving operation could not be completed."
 msgstr ""
 
-#: Admin/ReorderController.php:58
+#: src/Premium__premium_only/Admin/ReorderController.php:58
 msgid "You are not allowed to manage reorder suggestions."
 msgstr ""
 
-#: Admin/ReorderSection.php:60
+#: src/Premium__premium_only/Admin/ReorderSection.php:60
 msgid "Reorder"
 msgstr ""
 
-#: Admin/ReorderSection.php:66
+#: src/Premium__premium_only/Admin/ReorderSection.php:66
 msgid "Reorder policy"
 msgstr ""
 
-#: Admin/ReorderSection.php:66
+#: src/Premium__premium_only/Admin/ReorderSection.php:66
 msgid "Suggestions cover forecast demand during supplier lead time plus your safety stock, then subtract on-hand and incoming stock."
 msgstr ""
 
-#: Admin/ReorderSection.php:75
+#: src/Premium__premium_only/Admin/ReorderSection.php:75
 msgid "Preferred supplier pack"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReorderSection.php:79
+#: src/Premium__premium_only/Admin/ReorderSection.php:79
 #, php-format
 msgid "Safety stock (%s)"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReorderSection.php:79
+#: src/Premium__premium_only/Admin/ReorderSection.php:79
 msgid "Save reorder policy"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReorderSection.php:80
+#: src/Premium__premium_only/Admin/ReorderSection.php:80
 msgid "Reorder suggestions"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReorderSection.php:80
-#: Admin/ReservationsSection.php:49
-#: Reports/StockReportBuilder.php:64
+#: src/Premium__premium_only/Admin/ReorderSection.php:80
+#: src/Premium__premium_only/Admin/ReservationsSection.php:49
+#: src/Premium__premium_only/Reports/StockReportBuilder.php:64
 msgid "On hand"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReorderSection.php:80
-#: Admin/ReservationsSection.php:49
+#: src/Premium__premium_only/Admin/ReorderSection.php:80
+#: src/Premium__premium_only/Admin/ReservationsSection.php:49
 msgid "Incoming"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReorderSection.php:80
+#: src/Premium__premium_only/Admin/ReorderSection.php:80
 msgid "Lead-time demand"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReorderSection.php:80
-#: Admin/ReservationsSection.php:49
+#: src/Premium__premium_only/Admin/ReorderSection.php:80
+#: src/Premium__premium_only/Admin/ReservationsSection.php:49
 msgid "Safety stock"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReorderSection.php:80
+#: src/Premium__premium_only/Admin/ReorderSection.php:80
 msgid "Suggestion"
 msgstr ""
 
-#: Admin/ReorderSection.php:90
+#: src/Premium__premium_only/Admin/ReorderSection.php:90
 msgid "Insufficient demand history for a reorder suggestion."
 msgstr ""
 
 #. translators: 1: pack count, 2: pack name.
-#: Admin/ReorderSection.php:94
+#: src/Premium__premium_only/Admin/ReorderSection.php:94
 #, php-format
 msgid "%1$d × %2$s"
 msgstr ""
 
-#: Admin/ReorderSection.php:101
+#: src/Premium__premium_only/Admin/ReorderSection.php:101
 msgid "Reorder policy saved."
 msgstr ""
 
-#: Admin/ReorderSection.php:108
+#: src/Premium__premium_only/Admin/ReorderSection.php:108
 msgid "The reorder policy could not be saved."
 msgstr ""
 
-#: Admin/ReservationsSection.php:35
+#: src/Premium__premium_only/Admin/ReservationsSection.php:35
 msgid "Supply states"
 msgstr ""
 
-#: Admin/ReservationsSection.php:40
+#: src/Premium__premium_only/Admin/ReservationsSection.php:40
 msgid "Place stock on hold"
 msgstr ""
 
-#: Admin/ReservationsSection.php:48
+#: src/Premium__premium_only/Admin/ReservationsSection.php:48
 msgid "State"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReservationsSection.php:48
-#: Admin/ReservationsSection.php:49
-#: Admin/ReservationsSection.php:62
+#: src/Premium__premium_only/Admin/ReservationsSection.php:48
+#: src/Premium__premium_only/Admin/ReservationsSection.php:49
+#: src/Premium__premium_only/Admin/ReservationsSection.php:62
 msgid "Damaged"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReservationsSection.php:48
+#: src/Premium__premium_only/Admin/ReservationsSection.php:48
 #, php-format
 msgid "Quantity (%s)"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReservationsSection.php:48
+#: src/Premium__premium_only/Admin/ReservationsSection.php:48
 msgid "Place on hold"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReservationsSection.php:48
+#: src/Premium__premium_only/Admin/ReservationsSection.php:48
 #, php-format
 msgid "Protected safety stock (%s)"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReservationsSection.php:48
+#: src/Premium__premium_only/Admin/ReservationsSection.php:48
 msgid "This buffer is excluded from storefront availability but remains physically on hand."
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReservationsSection.php:48
+#: src/Premium__premium_only/Admin/ReservationsSection.php:48
 msgid "Save safety stock"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReservationsSection.php:49
+#: src/Premium__premium_only/Admin/ReservationsSection.php:49
 msgid "Supply state summary"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReservationsSection.php:49
+#: src/Premium__premium_only/Admin/ReservationsSection.php:49
 msgid "Reserved"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReservationsSection.php:49
+#: src/Premium__premium_only/Admin/ReservationsSection.php:49
 msgid "Available to sell"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReservationsSection.php:49
+#: src/Premium__premium_only/Admin/ReservationsSection.php:49
 msgid "Projected after incoming"
 msgstr ""
 
-#: Admin/ReservationsSection.php:59
+#: src/Premium__premium_only/Admin/ReservationsSection.php:59
 msgid "Active stock holds"
 msgstr ""
 
-#: Admin/ReservationsSection.php:64
+#: src/Premium__premium_only/Admin/ReservationsSection.php:64
 msgid "Release to available stock"
 msgstr ""
 
-#: Admin/ReservationsSection.php:64
+#: src/Premium__premium_only/Admin/ReservationsSection.php:64
 msgid "Write off permanently"
 msgstr ""
 
-#: Admin/StockLossController.php:54
+#: src/Premium__premium_only/Admin/StockLossController.php:54
 msgid "You are not allowed to record stock losses."
 msgstr ""
 
-#: Admin/StockLossSection.php:58
+#: src/Premium__premium_only/Admin/StockLossSection.php:58
 msgid "Record loss"
 msgstr ""
 
-#: Admin/StockLossSection.php:68
+#: src/Premium__premium_only/Admin/StockLossSection.php:68
 msgid "Record physical stock loss"
 msgstr ""
 
-#: Admin/StockLossSection.php:69
+#: src/Premium__premium_only/Admin/StockLossSection.php:69
 msgid "Choose a pool, then record why a measurable quantity can no longer be sold."
 msgstr ""
 
-#: Admin/StockLossSection.php:76
+#: src/Premium__premium_only/Admin/StockLossSection.php:76
 msgid "Current balance:"
 msgstr ""
 
-#: Admin/StockLossSection.php:77
+#: src/Premium__premium_only/Admin/StockLossSection.php:77
 msgid "Loss type"
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/StockLossSection.php:81
+#: src/Premium__premium_only/Admin/StockLossSection.php:81
 #, php-format
 msgid "Quantity lost (%s)"
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/StockLossSection.php:81
+#: src/Premium__premium_only/Admin/StockLossSection.php:81
 msgid "Notes"
 msgstr ""
 
 #. translators: %s: unit symbol.
-#: Admin/StockLossSection.php:81
+#: src/Premium__premium_only/Admin/StockLossSection.php:81
 msgid "Record stock loss"
 msgstr ""
 
-#: Admin/StockLossSection.php:92
+#: src/Premium__premium_only/Admin/StockLossSection.php:92
 msgid "Stock loss recorded."
 msgstr ""
 
-#: Admin/StockLossSection.php:99
+#: src/Premium__premium_only/Admin/StockLossSection.php:99
 msgid "The stock loss could not be recorded. Check the quantity and try again."
 msgstr ""
 
-#: Admin/StockReportController.php:76
+#: src/Premium__premium_only/Admin/StockReportController.php:76
 msgid "You are not allowed to manage stock reports."
 msgstr ""
 
-#: Admin/StockReportSection.php:39
+#: src/Premium__premium_only/Admin/StockReportSection.php:39
 msgid "Reports"
 msgstr ""
 
-#: Admin/StockReportSection.php:51
+#: src/Premium__premium_only/Admin/StockReportSection.php:51
 msgid "Scheduled stock report"
 msgstr ""
 
-#: Admin/StockReportSection.php:52
+#: src/Premium__premium_only/Admin/StockReportSection.php:52
 msgid "Email a CSV snapshot of every pool, current alert severity, and available forecast."
 msgstr ""
 
-#: Admin/StockReportSection.php:56
+#: src/Premium__premium_only/Admin/StockReportSection.php:56
 msgid "Scheduled delivery"
 msgstr ""
 
-#: Admin/StockReportSection.php:57
+#: src/Premium__premium_only/Admin/StockReportSection.php:57
 msgid "Enable scheduled reports"
 msgstr ""
 
-#: Admin/StockReportSection.php:58
+#: src/Premium__premium_only/Admin/StockReportSection.php:58
 msgid "Frequency"
 msgstr ""
 
-#: Admin/StockReportSection.php:60
+#: src/Premium__premium_only/Admin/StockReportSection.php:60
 msgid "Daily"
 msgstr ""
 
-#: Admin/StockReportSection.php:61
+#: src/Premium__premium_only/Admin/StockReportSection.php:61
 msgid "Weekly"
 msgstr ""
 
-#: Admin/StockReportSection.php:65
+#: src/Premium__premium_only/Admin/StockReportSection.php:65
 msgid "Enter one address per line. Recipients are required only when scheduled delivery is enabled."
 msgstr ""
 
-#: Admin/StockReportSection.php:66
+#: src/Premium__premium_only/Admin/StockReportSection.php:66
 msgid "Save report schedule"
 msgstr ""
 
-#: Admin/StockReportSection.php:70
+#: src/Premium__premium_only/Admin/StockReportSection.php:70
 msgid "Send a snapshot now"
 msgstr ""
 
-#: Admin/StockReportSection.php:71
+#: src/Premium__premium_only/Admin/StockReportSection.php:71
 msgid "Uses the saved recipients and does not change the schedule."
 msgstr ""
 
-#: Admin/StockReportSection.php:75
+#: src/Premium__premium_only/Admin/StockReportSection.php:75
 msgid "Send report now"
 msgstr ""
 
-#: Admin/StockReportSection.php:80
+#: src/Premium__premium_only/Admin/StockReportSection.php:80
 msgid "Delivery history"
 msgstr ""
 
-#: Admin/StockReportSection.php:82
+#: src/Premium__premium_only/Admin/StockReportSection.php:82
 msgid "No reports have been sent yet."
 msgstr ""
 
-#: Admin/StockReportSection.php:85
+#: src/Premium__premium_only/Admin/StockReportSection.php:85
 msgid "Attempted"
 msgstr ""
 
-#: Admin/StockReportSection.php:85
+#: src/Premium__premium_only/Admin/StockReportSection.php:85
 msgid "Trigger"
 msgstr ""
 
-#: Admin/StockReportSection.php:85
+#: src/Premium__premium_only/Admin/StockReportSection.php:85
 msgid "Pools"
 msgstr ""
 
-#: Admin/StockReportSection.php:90
+#: src/Premium__premium_only/Admin/StockReportSection.php:90
 msgid "Manual"
 msgstr ""
 
-#: Admin/StockReportSection.php:90
+#: src/Premium__premium_only/Admin/StockReportSection.php:90
 msgid "Scheduled"
 msgstr ""
 
-#: Admin/StockReportSection.php:93
+#: src/Premium__premium_only/Admin/StockReportSection.php:93
 msgid "Sent"
 msgstr ""
 
-#: Admin/StockReportSection.php:108
+#: src/Premium__premium_only/Admin/StockReportSection.php:108
 msgid "Stock report schedule saved."
 msgstr ""
 
-#: Admin/StockReportSection.php:109
+#: src/Premium__premium_only/Admin/StockReportSection.php:109
 msgid "Stock report sent."
 msgstr ""
 
-#: Admin/StockReportSection.php:110
+#: src/Premium__premium_only/Admin/StockReportSection.php:110
 msgid "The stock report could not be saved or sent."
 msgstr ""
 
-#: Admin/StockScenarioSection.php:46
+#: src/Premium__premium_only/Admin/StockScenarioSection.php:46
 msgid "Planner"
 msgstr ""
 
-#: Admin/StockScenarioSection.php:52
+#: src/Premium__premium_only/Admin/StockScenarioSection.php:52
 msgid "Stock scenario planner"
 msgstr ""
 
-#: Admin/StockScenarioSection.php:52
+#: src/Premium__premium_only/Admin/StockScenarioSection.php:52
 msgid "Model a promotion or sales mix without changing stock, mappings, or forecasts."
 msgstr ""
 
 #. translators: %s: pool name.
-#: Admin/StockScenarioSection.php:76
+#: src/Premium__premium_only/Admin/StockScenarioSection.php:76
 #, php-format
 msgid "Scenario for %s"
 msgstr ""
 
 #. translators: %s: formatted stock.
-#: Admin/StockScenarioSection.php:76
+#: src/Premium__premium_only/Admin/StockScenarioSection.php:76
 #, php-format
 msgid "Current on hand: %s"
 msgstr ""
 
-#: Admin/StockScenarioSection.php:80
+#: src/Premium__premium_only/Admin/StockScenarioSection.php:80
 msgid "This pool has no active product mappings to model."
 msgstr ""
 
-#: Admin/StockScenarioSection.php:84
+#: src/Premium__premium_only/Admin/StockScenarioSection.php:84
 msgid "Use per sale"
 msgstr ""
 
-#: Admin/StockScenarioSection.php:84
+#: src/Premium__premium_only/Admin/StockScenarioSection.php:84
 msgid "Expected sales"
 msgstr ""
 
-#: Admin/StockScenarioSection.php:91
+#: src/Premium__premium_only/Admin/StockScenarioSection.php:91
 msgid "Promotion uplift (%)"
 msgstr ""
 
-#: Admin/StockScenarioSection.php:91
+#: src/Premium__premium_only/Admin/StockScenarioSection.php:91
 msgid "Calculate scenario"
 msgstr ""
 
-#: Admin/StockScenarioSection.php:95
+#: src/Premium__premium_only/Admin/StockScenarioSection.php:95
 msgid "The current stock covers this scenario."
 msgstr ""
 
-#: Admin/StockScenarioSection.php:95
+#: src/Premium__premium_only/Admin/StockScenarioSection.php:95
 msgid "This scenario exceeds current stock."
 msgstr ""
 
-#: Admin/StockScenarioSection.php:95
+#: src/Premium__premium_only/Admin/StockScenarioSection.php:95
 msgid "Scenario demand"
 msgstr ""
 
-#: Admin/StockScenarioSection.php:95
+#: src/Premium__premium_only/Admin/StockScenarioSection.php:95
 msgid "Projected balance"
 msgstr ""
 
-#: Admin/StockScenarioSection.php:99
+#: src/Premium__premium_only/Admin/StockScenarioSection.php:99
 msgid "Projected days remaining"
 msgstr ""
 
-#: Admin/SupplyStateController.php:84
+#: src/Premium__premium_only/Admin/SupplyStateController.php:84
 msgid "You are not allowed to manage supply states."
 msgstr ""
 
 #. translators: 1: severity, 2: inventory pool name.
-#: Alerts/LowStockAlertEvaluator.php:139
+#: src/Premium__premium_only/Alerts/LowStockAlertEvaluator.php:139
 #, php-format
 msgid "%1$s stock: %2$s"
 msgstr ""
 
 #. translators: 1: pool name, 2: severity, 3: current balance.
-#: Alerts/LowStockAlertEvaluator.php:140
+#: src/Premium__premium_only/Alerts/LowStockAlertEvaluator.php:140
 #, php-format
 msgid "%1$s is at %2$s stock with a current balance of %3$s."
 msgstr ""
 
-#: Inventory/StockLossTypeCatalog.php:20
+#: src/Premium__premium_only/Inventory/StockLossTypeCatalog.php:20
 msgid "Spillage"
 msgstr ""
 
-#: Inventory/StockLossTypeCatalog.php:21
+#: src/Premium__premium_only/Inventory/StockLossTypeCatalog.php:21
 msgid "Cutting or processing loss"
 msgstr ""
 
-#: Inventory/StockLossTypeCatalog.php:22
+#: src/Premium__premium_only/Inventory/StockLossTypeCatalog.php:22
 msgid "Evaporation"
 msgstr ""
 
-#: Inventory/StockLossTypeCatalog.php:23
+#: src/Premium__premium_only/Inventory/StockLossTypeCatalog.php:23
 msgid "Damage"
 msgstr ""
 
-#: Inventory/StockLossTypeCatalog.php:24
+#: src/Premium__premium_only/Inventory/StockLossTypeCatalog.php:24
 msgid "Samples or internal use"
 msgstr ""
 
-#: Reports/StockReportBuilder.php:61
+#: src/Premium__premium_only/Reports/StockReportBuilder.php:61
 msgid "Pool ID"
 msgstr ""
 
-#: Reports/StockReportBuilder.php:63
+#: src/Premium__premium_only/Reports/StockReportBuilder.php:63
 msgid "Internal SKU"
 msgstr ""
 
-#: Reports/StockReportBuilder.php:65
+#: src/Premium__premium_only/Reports/StockReportBuilder.php:65
 msgid "Unit"
 msgstr ""
 
-#: Reports/StockReportBuilder.php:66
+#: src/Premium__premium_only/Reports/StockReportBuilder.php:66
 msgid "Alert status"
 msgstr ""
 
-#: Reports/StockReportBuilder.php:69
+#: src/Premium__premium_only/Reports/StockReportBuilder.php:69
 msgid "Forecast confidence"
 msgstr ""
 
-#: Reports/StockReportBuilder.php:119
+#: src/Premium__premium_only/Reports/StockReportBuilder.php:119
 msgid "Unavailable"
 msgstr ""
 
-#: Reports/StockReportScheduler.php:51
+#: src/Premium__premium_only/Reports/StockReportScheduler.php:51
 msgid "Once weekly"
 msgstr ""
 
-#: Reports/StockReportScheduler.php:104
+#: src/Premium__premium_only/Reports/StockReportScheduler.php:104
 msgid "Unit stock report"
 msgstr ""
 
-#: Reports/StockReportScheduler.php:104
+#: src/Premium__premium_only/Reports/StockReportScheduler.php:104
 msgid "Your scheduled unit stock snapshot is attached."
 msgstr ""

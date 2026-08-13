@@ -153,6 +153,10 @@ continue to use the authoritative stock movement and allocation journals.
 The recall review derives affected orders from the immutable allocation journal,
 requires explicit merchant confirmation and a reason, quarantines the remaining
 lot as recalled, and never contacts customers automatically.
+Compatible-pool transfers use one multi-pool mutation transaction: the source
+lot decrement, paired transfer movements, destination balance, derived lot, and
+source-batch lineage either all commit or all roll back. Lot, expiry, quarantine
+state, currency, and proportional receipt cost follow the transferred quantity.
 
 Every Action Scheduler hook added by the plugin must also be added to the list in
 `Plugin::on_deactivate()`. Deactivation must cancel all plugin-owned scheduled
