@@ -15,7 +15,6 @@
  * Requires Plugins:  woocommerce
  * WC requires at least: 7.1
  * WC tested up to:   10.9
- * Update URI:        false
  *
  * @package LaqiUnitStockManager
  */

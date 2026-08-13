@@ -1,0 +1,100 @@
+<?php
+/**
+ * Merchant-defined unit persistence.
+ *
+ * @package LaqiUnitStockManager
+ */
+
+namespace LaqiUnitStockManager\Storage;
+
+defined( 'ABSPATH' ) || exit;
+
+use LaqiUnitStockManager\Unit\UnitDefinition;
+use LaqiUnitStockManager\Unit\UnitRegistry;
+use RuntimeException;
+use wpdb;
+
+/**
+ * Stores and loads custom units without changing the conversion engine.
+ */
+final class CustomUnitRepository {
+
+	/**
+	 * WordPress database connection.
+	 *
+	 * @var wpdb
+	 */
+	private $db;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param wpdb $db WordPress database connection.
+	 */
+	public function __construct( wpdb $db ) {
+		$this->db = $db;
+	}
+
+	/**
+	 * Create and register a merchant-defined unit.
+	 *
+	 * @param UnitRegistry $registry         Unit registry.
+	 * @param string       $key              Stable custom key.
+	 * @param string       $label            Merchant-facing label.
+	 * @param string       $symbol           Merchant-facing symbol.
+	 * @param string       $reference_value  Exact reference quantity.
+	 * @param string       $reference_unit   Existing unit key.
+	 * @return UnitDefinition
+	 * @throws RuntimeException When persistence fails.
+	 */
+	public function create( UnitRegistry $registry, string $key, string $label, string $symbol, string $reference_value, string $reference_unit ): UnitDefinition {
+		$definition = $registry->register_custom( $key, $reference_value, $reference_unit );
+		$now        = current_time( 'mysql', true );
+		$inserted   = $this->db->insert(
+			Schema::table( 'units' ),
+			array(
+				'unit_key'        => $definition->key(),
+				'label'           => $label,
+				'symbol'          => $symbol,
+				'family'          => $definition->family(),
+				'base_factor'     => $definition->base_factor(),
+				'reference_value' => $reference_value,
+				'reference_unit'  => $reference_unit,
+				'active'          => 1,
+				'created_at'      => $now,
+				'updated_at'      => $now,
+			),
+			array( '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%d', '%s', '%s' )
+		);
+
+		if ( false === $inserted ) {
+			throw new RuntimeException( 'Could not save the custom stock unit.' );
+		}
+
+		return $definition;
+	}
+
+	/**
+	 * Register every active custom unit into a runtime registry.
+	 *
+	 * @param UnitRegistry $registry Unit registry.
+	 * @return void
+	 */
+	public function register_all( UnitRegistry $registry ): void {
+		$rows = $this->db->get_results(
+			'SELECT unit_key, family, base_factor FROM ' . Schema::table( 'units' ) . ' WHERE active = 1 ORDER BY id ASC', // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			ARRAY_A
+		); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+
+		foreach ( $rows as $row ) {
+			$registry->register(
+				new UnitDefinition(
+					(string) $row['unit_key'],
+					(string) $row['family'],
+					(int) $row['base_factor'],
+					'custom'
+				)
+			);
+		}
+	}
+}
