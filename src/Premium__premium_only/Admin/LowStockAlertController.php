@@ -66,15 +66,20 @@ final class LowStockAlertController {
 			if ( null === $pool ) {
 				throw new \InvalidArgumentException( 'Unknown pool.' );
 			}
-			$value    = isset( $_POST['threshold'] ) ? sanitize_text_field( wp_unslash( $_POST['threshold'] ) ) : '';
-			$quantity = $this->units->normalize( $value, $pool->display_unit() );
-			$raw      = isset( $_POST['recipients'] ) ? sanitize_textarea_field( wp_unslash( $_POST['recipients'] ) ) : '';
-			$emails   = preg_split( '/[\s,;]+/', $raw, -1, PREG_SPLIT_NO_EMPTY );
-			$emails   = array_values( array_unique( array_filter( array_map( 'sanitize_email', is_array( $emails ) ? $emails : array() ), 'is_email' ) ) );
-			if ( $quantity->amount() < 0 || array() === $emails ) {
+			$value          = isset( $_POST['threshold'] ) ? sanitize_text_field( wp_unslash( $_POST['threshold'] ) ) : '';
+			$quantity       = $this->units->normalize( $value, $pool->display_unit() );
+			$critical_value = isset( $_POST['critical_threshold'] ) ? sanitize_text_field( wp_unslash( $_POST['critical_threshold'] ) ) : '0';
+			$critical       = $this->units->normalize( $critical_value, $pool->display_unit() );
+			$raw            = isset( $_POST['recipients'] ) ? sanitize_textarea_field( wp_unslash( $_POST['recipients'] ) ) : '';
+			$emails         = preg_split( '/[\s,;]+/', $raw, -1, PREG_SPLIT_NO_EMPTY );
+			$emails         = array_values( array_unique( array_filter( array_map( 'sanitize_email', is_array( $emails ) ? $emails : array() ), 'is_email' ) ) );
+			$reminder_hours = isset( $_POST['reminder_hours'] ) ? absint( $_POST['reminder_hours'] ) : 0;
+			$quiet_start    = isset( $_POST['quiet_start'] ) && '' !== $_POST['quiet_start'] ? min( 23, absint( $_POST['quiet_start'] ) ) : -1;
+			$quiet_end      = isset( $_POST['quiet_end'] ) && '' !== $_POST['quiet_end'] ? min( 23, absint( $_POST['quiet_end'] ) ) : -1;
+			if ( $quantity->amount() < 0 || $critical->amount() < 0 || $critical->amount() > $quantity->amount() || array() === $emails ) {
 				throw new \InvalidArgumentException( 'A non-negative threshold and recipient are required.' );
 			}
-			$this->policies->save( $pool_id, $quantity->amount(), $emails );
+			$this->policies->save( $pool_id, $quantity->amount(), $emails, $critical->amount(), $reminder_hours, $quiet_start, $quiet_end );
 			do_action( 'laqi_lusm_stock_mutated', array( $pool_id ), array() );
 			$this->redirect( $pool_id, 'alert_saved' );
 		} catch ( Throwable $error ) {
