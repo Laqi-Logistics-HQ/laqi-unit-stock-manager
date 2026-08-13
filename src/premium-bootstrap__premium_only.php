@@ -35,6 +35,7 @@ require_once __DIR__ . '/Premium__premium_only/Admin/StockReportSection.php';
 require_once __DIR__ . '/Premium__premium_only/Planning/StockScenarioPlanner.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/StockScenarioSection.php';
 require_once __DIR__ . '/Premium__premium_only/Receiving/SupplierRepository.php';
+require_once __DIR__ . '/Premium__premium_only/Batches/BatchRepository.php';
 require_once __DIR__ . '/Premium__premium_only/Receiving/ReceivingService.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/ReceivingController.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/ReceivingSection.php';
@@ -90,6 +91,8 @@ add_action(
 		$suppliers->install();
 		$material_costs = new Premium\Costing\MaterialCostRepository( $wpdb );
 		$material_costs->install();
+		$batches = new Premium\Batches\BatchRepository( $wpdb );
+		$batches->install();
 		$material_economics = new Premium\Costing\MaterialEconomicsService( $material_costs );
 		$reservations       = new Premium\Reservations\ReservationRepository( $wpdb );
 		$reservations->install();
@@ -102,7 +105,7 @@ add_action(
 		$supply_projections = new Premium\Supply\SupplyProjectionService( $stock_holds, $safety_stock );
 		$stock_hold_service = new Premium\Supply\StockHoldService( $stock_holds, $container->pool_repository(), $container->stock_mutation_service() );
 		$stock_hold_service->register();
-		$receiving           = new Premium\Receiving\ReceivingService( $suppliers, $container->stock_mutation_service(), $material_costs );
+		$receiving           = new Premium\Receiving\ReceivingService( $suppliers, $container->stock_mutation_service(), $material_costs, $batches );
 		$reorder_policies    = new Premium\Replenishment\ReorderPolicyRepository( $wpdb );
 		$reorder_suggestions = new Premium\Replenishment\ReorderSuggestionService( $container->pool_repository(), $reorder_policies, $forecast_policies, $forecast_service, $suppliers );
 		$csv_mappers         = new Premium\Exchange\CsvRowMapperRegistry();
@@ -119,7 +122,7 @@ add_action(
 		$container->screen_section_catalog()->register( new Premium\Admin\ForecastSection( $container->pool_repository(), $forecast_policies, $forecast_service, $container->quantity_formatter(), new Admin\PaginationRenderer() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\StockReportSection( $report_settings ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\StockScenarioSection( $container->pool_repository(), $scenario_planner, $container->quantity_formatter() ) );
-		$container->screen_section_catalog()->register( new Premium\Admin\ReceivingSection( $suppliers, $container->pool_repository(), $container->quantity_formatter() ) );
+		$container->screen_section_catalog()->register( new Premium\Admin\ReceivingSection( $suppliers, $container->pool_repository(), $container->quantity_formatter(), $batches ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ReorderSection( $container->pool_repository(), $suppliers, $reorder_policies, $reorder_suggestions, $container->quantity_formatter() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\MaterialCostsSection( $material_economics, $container->mapping_repository() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ReservationsSection( $stock_holds, $container->pool_repository(), $container->quantity_formatter(), $safety_stock, $supply_projections ) );
