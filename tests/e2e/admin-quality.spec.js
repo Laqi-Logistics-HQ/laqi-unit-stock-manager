@@ -4,8 +4,8 @@ const { test, expect } = require( '@playwright/test' );
 const plugin = {
 	slug: 'laqi-unit-stock-manager',
 	adminPath: '/wp-admin/admin.php?page=laqi-unit-stock-manager',
-	scope: '.laqi-unit-stock-manager',
-	ready: '.laqi-unit-stock-manager h1',
+	scope: '.laqi-lusm-wrap',
+	ready: '.laqi-lusm-wrap h1',
 };
 
 async function logIn( page ) {

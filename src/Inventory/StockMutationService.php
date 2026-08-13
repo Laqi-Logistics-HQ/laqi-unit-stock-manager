@@ -65,6 +65,65 @@ final class StockMutationService {
 	}
 
 	/**
+	 * Set one pool to an absolute balance under the same transaction lock.
+	 *
+	 * @param int    $pool_id         Pool ID.
+	 * @param int    $target          Target normalized balance.
+	 * @param string $type            Registered movement type.
+	 * @param string $idempotency_key Stable event key.
+	 * @param array  $context         Optional source/reason/metadata fields.
+	 * @return MovementResult
+	 * @throws \InvalidArgumentException When required movement data is invalid.
+	 * @throws InsufficientStockException When a negative target is prohibited.
+	 * @throws RuntimeException When persistence fails.
+	 * @throws \Throwable When transactional work fails and is rolled back.
+	 */
+	public function set_balance( int $pool_id, int $target, string $type, string $idempotency_key, array $context = array() ): MovementResult {
+		if ( $pool_id < 1 || '' === $type || '' === $idempotency_key ) {
+			throw new \InvalidArgumentException( 'An absolute stock movement requires a pool, type, and idempotency key.' );
+		}
+
+		$pools = Schema::table( 'pools' );
+		$moves = Schema::table( 'movements' );
+		$this->query_or_fail( 'START TRANSACTION' );
+
+		try {
+			$existing = $this->db->get_row(
+				$this->db->prepare( "SELECT id, balance_base FROM {$moves} WHERE idempotency_key = %s FOR UPDATE", $idempotency_key ),
+				ARRAY_A
+			);
+			if ( is_array( $existing ) ) {
+				$this->query_or_fail( 'COMMIT' );
+				return new MovementResult( (int) $existing['id'], (int) $existing['balance_base'], true );
+			}
+
+			$pool = $this->db->get_row( $this->db->prepare( "SELECT quantity_base, allow_backorders FROM {$pools} WHERE id = %d FOR UPDATE", $pool_id ), ARRAY_A );
+			if ( ! is_array( $pool ) ) {
+				throw new RuntimeException( 'The inventory pool does not exist.' );
+			}
+			if ( $target < 0 && ! (bool) $pool['allow_backorders'] ) {
+				throw new InsufficientStockException( 'This inventory pool does not allow a negative balance.' );
+			}
+
+			$current = (int) $pool['quantity_base'];
+			if ( ( $current < 0 && $target > PHP_INT_MAX + $current ) || ( $current > 0 && $target < PHP_INT_MIN + $current ) ) {
+				throw new \InvalidArgumentException( 'The absolute stock adjustment is too large to record safely.' );
+			}
+			$delta = $target - $current;
+			if ( false === $this->db->query( $this->db->prepare( "UPDATE {$pools} SET quantity_base = %d, version = version + 1, updated_at = UTC_TIMESTAMP() WHERE id = %d", $target, $pool_id ) ) ) {
+				throw new RuntimeException( 'Could not set the inventory-pool balance.' );
+			}
+
+			$result = $this->insert_movement( $moves, $pool_id, $delta, $target, $type, $idempotency_key, $context );
+			$this->query_or_fail( 'COMMIT' );
+			return $result;
+		} catch ( \Throwable $error ) {
+			$this->db->query( 'ROLLBACK' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			throw $error;
+		}
+	}
+
+	/**
 	 * Apply several pool movements in one database transaction.
 	 *
 	 * Pools are locked in ID order to keep concurrent order batches from
@@ -138,31 +197,9 @@ final class StockMutationService {
 					throw new InsufficientStockException( 'An inventory pool does not contain enough available stock.' );
 				}
 
-				$balance  = (int) $this->db->get_var( $this->db->prepare( "SELECT quantity_base FROM {$pools} WHERE id = %d", $pool_id ) );
-				$context  = isset( $command['context'] ) && is_array( $command['context'] ) ? $command['context'] : array();
-				$inserted = $this->db->insert(
-					$moves,
-					array(
-						'pool_id'         => $pool_id,
-						'batch_id'        => isset( $context['batch_id'] ) ? (int) $context['batch_id'] : 0,
-						'type'            => (string) $command['type'],
-						'delta_base'      => $delta,
-						'balance_base'    => $balance,
-						'source_type'     => isset( $context['source_type'] ) ? (string) $context['source_type'] : '',
-						'source_id'       => isset( $context['source_id'] ) ? (int) $context['source_id'] : 0,
-						'idempotency_key' => (string) $command['idempotency_key'],
-						'actor_id'        => isset( $context['actor_id'] ) ? (int) $context['actor_id'] : 0,
-						'reason'          => isset( $context['reason'] ) ? (string) $context['reason'] : null,
-						'metadata_json'   => isset( $context['metadata'] ) ? wp_json_encode( $context['metadata'] ) : null,
-						'created_at'      => current_time( 'mysql', true ),
-					),
-					array( '%d', '%d', '%s', '%d', '%d', '%s', '%d', '%s', '%d', '%s', '%s', '%s' )
-				);
-
-				if ( false === $inserted ) {
-					throw new RuntimeException( 'Could not record a stock movement.' );
-				}
-				$results[] = new MovementResult( (int) $this->db->insert_id, $balance );
+				$balance   = (int) $this->db->get_var( $this->db->prepare( "SELECT quantity_base FROM {$pools} WHERE id = %d", $pool_id ) );
+				$context   = isset( $command['context'] ) && is_array( $command['context'] ) ? $command['context'] : array();
+				$results[] = $this->insert_movement( $moves, $pool_id, $delta, $balance, (string) $command['type'], (string) $command['idempotency_key'], $context );
 			}
 
 			$this->query_or_fail( 'COMMIT' );
@@ -171,6 +208,46 @@ final class StockMutationService {
 			$this->db->query( 'ROLLBACK' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 			throw $error;
 		}
+	}
+
+	/**
+	 * Persist one ledger row.
+	 *
+	 * @param string $table           Movement table.
+	 * @param int    $pool_id         Pool ID.
+	 * @param int    $delta           Signed normalized change.
+	 * @param int    $balance         Resulting balance.
+	 * @param string $type            Movement type.
+	 * @param string $idempotency_key Stable event key.
+	 * @param array  $context         Optional movement context.
+	 * @return MovementResult
+	 * @throws RuntimeException When persistence fails.
+	 */
+	private function insert_movement( string $table, int $pool_id, int $delta, int $balance, string $type, string $idempotency_key, array $context ): MovementResult {
+		$inserted = $this->db->insert(
+			$table,
+			array(
+				'pool_id'         => $pool_id,
+				'batch_id'        => isset( $context['batch_id'] ) ? (int) $context['batch_id'] : 0,
+				'type'            => $type,
+				'delta_base'      => $delta,
+				'balance_base'    => $balance,
+				'source_type'     => isset( $context['source_type'] ) ? (string) $context['source_type'] : '',
+				'source_id'       => isset( $context['source_id'] ) ? (int) $context['source_id'] : 0,
+				'idempotency_key' => $idempotency_key,
+				'actor_id'        => isset( $context['actor_id'] ) ? (int) $context['actor_id'] : 0,
+				'reason'          => isset( $context['reason'] ) ? (string) $context['reason'] : null,
+				'metadata_json'   => isset( $context['metadata'] ) ? wp_json_encode( $context['metadata'] ) : null,
+				'created_at'      => current_time( 'mysql', true ),
+			),
+			array( '%d', '%d', '%s', '%d', '%d', '%s', '%d', '%s', '%d', '%s', '%s', '%s' )
+		);
+
+		if ( false === $inserted ) {
+			throw new RuntimeException( 'Could not record a stock movement.' );
+		}
+
+		return new MovementResult( (int) $this->db->insert_id, $balance );
 	}
 
 	/**

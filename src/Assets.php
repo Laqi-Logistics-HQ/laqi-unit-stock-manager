@@ -41,9 +41,9 @@ final class Assets {
 	 * @return void
 	 */
 	public function enqueue_admin( string $hook_suffix ): void {
-		// TODO: only load on this plugin's own screens — bail early unless
-		// $hook_suffix matches one of this plugin's admin pages.
-		unset( $hook_suffix );
+		if ( 'woocommerce_page_laqi-unit-stock-manager' !== $hook_suffix ) {
+			return;
+		}
 
 		wp_enqueue_style(
 			'laqi-unit-stock-manager-admin',

@@ -2,3 +2,37 @@
  * Laqi Unit Stock Manager for WooCommerce — admin styles.
  * Enqueued as the 'laqi-unit-stock-manager-admin' handle (see src/Assets.php).
  */
+.laqi-lusm-search {
+	display: flex;
+	gap: 0.5rem;
+	margin: 1rem 0;
+}
+
+.laqi-lusm-search input[type="search"] {
+	min-width: min(24rem, 70vw);
+}
+
+.laqi-lusm-stock-table th,
+.laqi-lusm-stock-table td {
+	vertical-align: middle;
+}
+
+.laqi-lusm-adjustment {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	align-items: center;
+}
+
+@media screen and (max-width: 782px) {
+	.laqi-lusm-stock-table thead {
+		display: none;
+	}
+
+	.laqi-lusm-stock-table tr,
+	.laqi-lusm-stock-table th,
+	.laqi-lusm-stock-table td {
+		display: block;
+		width: auto;
+	}
+}

@@ -139,4 +139,21 @@ class Test_Stock_Mutation_Service extends WP_UnitTestCase {
 		}
 		$wpdb->delete( Schema::table( 'pools' ), array( 'id' => $second ), array( '%d' ) );
 	}
+
+	/**
+	 * Absolute adjustments calculate their ledger delta while holding the lock.
+	 */
+	public function test_set_balance_records_exact_delta_and_is_idempotent(): void {
+		global $wpdb;
+
+		$service = new StockMutationService( $wpdb );
+		$key     = 'manual-set:' . $this->pool_id;
+		$first   = $service->set_balance( $this->pool_id, 5000000000000, 'manual_set', $key, array( 'reason' => 'Counted stock' ) );
+		$second  = $service->set_balance( $this->pool_id, 4000000000000, 'manual_set', $key );
+
+		$this->assertSame( 5000000000000, $first->balance() );
+		$this->assertTrue( $second->is_duplicate() );
+		$this->assertSame( -5000000000000, (int) $wpdb->get_var( $wpdb->prepare( 'SELECT delta_base FROM ' . Schema::table( 'movements' ) . ' WHERE id = %d', $first->movement_id() ) ) );
+		$this->assertSame( 'Counted stock', $wpdb->get_var( $wpdb->prepare( 'SELECT reason FROM ' . Schema::table( 'movements' ) . ' WHERE id = %d', $first->movement_id() ) ) );
+	}
 }

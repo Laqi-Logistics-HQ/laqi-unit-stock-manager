@@ -15,12 +15,22 @@ use LaqiUnitStockManager\Storage\MappingRepository;
 use LaqiUnitStockManager\Storage\PoolRepository;
 use LaqiUnitStockManager\Consumption\CalculatorRegistry;
 use LaqiUnitStockManager\Availability\AvailabilityService;
+use LaqiUnitStockManager\Admin\ScreenSectionCatalog;
+use LaqiUnitStockManager\Presentation\PoolPresenter;
+use LaqiUnitStockManager\Presentation\QuantityFormatter;
 use LaqiUnitStockManager\Unit\UnitRegistry;
 
 /**
  * Builds and memoizes shared Free services for Free and Pro modules.
  */
 final class Container {
+
+	/**
+	 * Admin section extensions.
+	 *
+	 * @var ScreenSectionCatalog|null
+	 */
+	private $screen_sections;
 
 	/**
 	 * Runtime unit registry.
@@ -109,5 +119,26 @@ final class Container {
 			$this->pool_repository(),
 			$this->calculator_registry()
 		);
+	}
+
+	/**
+	 * Shared normalized inventory-pool presenter.
+	 *
+	 * @return PoolPresenter
+	 */
+	public function pool_presenter(): PoolPresenter {
+		return new PoolPresenter( new QuantityFormatter( $this->unit_registry() ) );
+	}
+
+	/**
+	 * Extensible Unit Stock screen section catalog.
+	 *
+	 * @return ScreenSectionCatalog
+	 */
+	public function screen_section_catalog(): ScreenSectionCatalog {
+		if ( null === $this->screen_sections ) {
+			$this->screen_sections = new ScreenSectionCatalog();
+		}
+		return $this->screen_sections;
 	}
 }
