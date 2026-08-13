@@ -45,5 +45,8 @@ final class Assets {
 			array(),
 			LAQI_LUSM_VERSION
 		);
+
+		wp_enqueue_script( 'wc-enhanced-select' );
+		wp_enqueue_style( 'woocommerce_admin_styles' );
 	}
 }

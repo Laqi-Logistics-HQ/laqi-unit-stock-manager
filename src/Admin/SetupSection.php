@@ -12,7 +12,6 @@ defined( 'ABSPATH' ) || exit;
 use LaqiUnitStockManager\Storage\PoolRepository;
 use LaqiUnitStockManager\Storage\CustomUnitRepository;
 use LaqiUnitStockManager\Unit\UnitRegistry;
-use WC_Product;
 
 /**
  * Renders explicit pool creation and product-consumption forms.
@@ -120,8 +119,7 @@ final class SetupSection implements ScreenSectionInterface {
 
 	/** Render the mapping form. @return void */
 	private function render_mapping_form(): void {
-		$pools    = $this->pools->search( '', 500 );
-		$products = $this->products();
+		$pools = $this->pools->search( '', 500 );
 		if ( array() === $pools ) {
 			echo '<p class="notice notice-info inline">' . esc_html__( 'Create an inventory pool before linking products.', 'laqi-unit-stock-manager' ) . '</p>';
 			return;
@@ -131,12 +129,7 @@ final class SetupSection implements ScreenSectionInterface {
 			<input type="hidden" name="action" value="laqi_lusm_save_mapping" />
 			<?php wp_nonce_field( 'laqi_lusm_save_mapping' ); ?>
 			<label for="laqi-lusm-product"><?php esc_html_e( 'Product or variation', 'laqi-unit-stock-manager' ); ?></label>
-			<select id="laqi-lusm-product" name="purchasable" required>
-				<option value=""><?php esc_html_e( 'Select a product', 'laqi-unit-stock-manager' ); ?></option>
-				<?php foreach ( $products as $product ) : ?>
-					<option value="<?php echo esc_attr( $this->product_value( $product ) ); ?>"><?php echo esc_html( $product->get_formatted_name() ); ?></option>
-				<?php endforeach; ?>
-			</select>
+			<select id="laqi-lusm-product" class="wc-product-search" name="purchasable_id" data-placeholder="<?php esc_attr_e( 'Search for a product or variation', 'laqi-unit-stock-manager' ); ?>" data-action="woocommerce_json_search_products_and_variations" data-allow_clear="true" required></select>
 			<label for="laqi-lusm-pool"><?php esc_html_e( 'Inventory pool', 'laqi-unit-stock-manager' ); ?></label>
 			<select id="laqi-lusm-pool" name="pool_id" required>
 				<?php foreach ( $pools as $pool ) : ?>
@@ -185,39 +178,5 @@ final class SetupSection implements ScreenSectionInterface {
 			echo '<option value="' . esc_attr( $unit->key() ) . '">' . esc_html( $unit->key() . ' (' . $unit->system() . ')' ) . '</option>';
 		}
 		echo '</select>';
-	}
-
-	/** Get selectable products. @return WC_Product[] */
-	private function products(): array {
-		$ids      = get_posts(
-			array(
-				'post_type'   => array( 'product', 'product_variation' ),
-				'post_status' => 'publish',
-				'numberposts' => 50,
-				'orderby'     => 'title',
-				'order'       => 'ASC',
-				'fields'      => 'ids',
-			)
-		);
-		$products = array_filter( array_map( 'wc_get_product', $ids ) );
-
-		return array_values(
-			array_filter(
-				$products,
-				static function ( WC_Product $product ): bool {
-					return $product->is_type( 'simple' ) || $product->is_type( 'variation' );
-				}
-			)
-		);
-	}
-
-	/**
-	 * Encode a purchasable ID pair.
-	 *
-	 * @param WC_Product $product Product.
-	 * @return string
-	 */
-	private function product_value( WC_Product $product ): string {
-		return $product->is_type( 'variation' ) ? $product->get_parent_id() . ':' . $product->get_id() : $product->get_id() . ':0';
 	}
 }

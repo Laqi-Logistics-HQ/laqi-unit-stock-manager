@@ -15,8 +15,8 @@ use LaqiUnitStockManager\Storage\PoolRepository;
 use LaqiUnitStockManager\Storage\CustomUnitRepository;
 use LaqiUnitStockManager\Unit\UnitRegistry;
 use Throwable;
-use WC_Product_Variation;
 use LaqiUnitStockManager\WooCommerce\ExistingStockMigrator;
+use LaqiUnitStockManager\WooCommerce\PurchasableResolver;
 
 /**
  * Applies explicit setup decisions through shared domain services.
@@ -58,6 +58,13 @@ final class SetupController {
 	private $stock_migrator;
 
 	/**
+	 * Product and variation resolution.
+	 *
+	 * @var PurchasableResolver
+	 */
+	private $purchasables;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param PoolRepository        $pools     Pool repository.
@@ -66,14 +73,16 @@ final class SetupController {
 	 * @param StockMutationService  $mutations Mutation service.
 	 * @param CustomUnitRepository  $custom_units Custom-unit persistence.
 	 * @param ExistingStockMigrator $stock_migrator Existing stock migration.
+	 * @param PurchasableResolver   $purchasables Product and variation resolution.
 	 */
-	public function __construct( PoolRepository $pools, MappingRepository $mappings, UnitRegistry $units, StockMutationService $mutations, CustomUnitRepository $custom_units, ExistingStockMigrator $stock_migrator ) {
+	public function __construct( PoolRepository $pools, MappingRepository $mappings, UnitRegistry $units, StockMutationService $mutations, CustomUnitRepository $custom_units, ExistingStockMigrator $stock_migrator, PurchasableResolver $purchasables ) {
 		$this->pools          = $pools;
 		$this->mappings       = $mappings;
 		$this->units          = $units;
 		$this->mutations      = $mutations;
 		$this->custom_units   = $custom_units;
 		$this->stock_migrator = $stock_migrator;
+		$this->purchasables   = $purchasables;
 	}
 
 	/** Register setup endpoints. @return void */
@@ -150,13 +159,9 @@ final class SetupController {
 	public function save_mapping(): void {
 		$this->authorize( 'laqi_lusm_save_mapping' );
 		try {
-			$purchasable = isset( $_POST['purchasable'] ) ? sanitize_text_field( wp_unslash( $_POST['purchasable'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			if ( ! preg_match( '/^([1-9][0-9]*):(0|[1-9][0-9]*)$/', $purchasable, $matches ) ) {
-				throw new \InvalidArgumentException( 'A valid product or variation is required.' );
-			}
-			$product_id   = (int) $matches[1];
-			$variation_id = (int) $matches[2];
-			$this->validate_product( $product_id, $variation_id );
+			$purchasable  = $this->purchasables->resolve( isset( $_POST['purchasable_id'] ) ? absint( $_POST['purchasable_id'] ) : 0 ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$product_id   = $purchasable['product_id'];
+			$variation_id = $purchasable['variation_id'];
 
 			$pool_id = isset( $_POST['pool_id'] ) ? absint( $_POST['pool_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$pool    = $this->pools->find( $pool_id );
@@ -179,21 +184,6 @@ final class SetupController {
 		} catch ( Throwable $error ) {
 			unset( $error );
 			$this->redirect( 'setup_error' );
-		}
-	}
-
-	/**
-	 * Validate an exact purchasable object.
-	 *
-	 * @param int $product_id   Simple or parent product ID.
-	 * @param int $variation_id Variation ID or zero.
-	 * @return void
-	 * @throws \InvalidArgumentException When the purchasable object is unsupported.
-	 */
-	private function validate_product( int $product_id, int $variation_id ): void {
-		$product = wc_get_product( $variation_id > 0 ? $variation_id : $product_id );
-		if ( ! $product || ( $variation_id > 0 && ( ! $product instanceof WC_Product_Variation || $product->get_parent_id() !== $product_id ) ) || ( 0 === $variation_id && ! $product->is_type( 'simple' ) ) ) {
-			throw new \InvalidArgumentException( 'Only simple products and valid variations can be linked.' );
 		}
 	}
 

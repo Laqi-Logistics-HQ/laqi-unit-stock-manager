@@ -18,6 +18,8 @@ class Test_Assets extends WP_UnitTestCase {
 		wp_deregister_style( 'laqi-unit-stock-manager-admin' );
 		wp_dequeue_script( 'laqi-unit-stock-manager-admin' );
 		wp_deregister_script( 'laqi-unit-stock-manager-admin' );
+		wp_dequeue_script( 'wc-enhanced-select' );
+		wp_deregister_script( 'wc-enhanced-select' );
 		parent::tear_down();
 	}
 
@@ -31,10 +33,12 @@ class Test_Assets extends WP_UnitTestCase {
 
 	/** The single Unit Stock screen receives its required assets. */
 	public function test_admin_assets_load_on_unit_stock_screen(): void {
+		wp_register_script( 'wc-enhanced-select', false, array(), 'test', true );
 		( new Assets() )->enqueue_admin( 'woocommerce_page_laqi-unit-stock-manager' );
 
 		$this->assertTrue( wp_style_is( 'laqi-unit-stock-manager-admin', 'enqueued' ) );
 		$this->assertFalse( wp_script_is( 'laqi-unit-stock-manager-admin', 'registered' ) );
+		$this->assertTrue( wp_script_is( 'wc-enhanced-select', 'enqueued' ) );
 	}
 
 	/** The plugin registers no storefront enqueue callback or asset handles. */
