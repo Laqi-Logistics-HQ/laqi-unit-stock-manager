@@ -111,14 +111,16 @@ final class PoolRepository {
 	 *
 	 * @param string $search Optional pool or linked-product search.
 	 * @param int    $limit  Maximum rows.
+	 * @param int    $offset Number of matching rows to skip.
 	 * @return Pool[]
 	 */
-	public function search( string $search = '', int $limit = 100 ): array {
-		$table = Schema::table( 'pools' );
-		$limit = max( 1, min( 500, $limit ) );
+	public function search( string $search = '', int $limit = 100, int $offset = 0 ): array {
+		$table  = Schema::table( 'pools' );
+		$limit  = max( 1, min( 500, $limit ) );
+		$offset = max( 0, $offset );
 
 		if ( '' === $search ) {
-			$rows = $this->db->get_results( $this->db->prepare( "SELECT * FROM {$table} ORDER BY name ASC, id ASC LIMIT %d", $limit ), ARRAY_A );
+			$rows = $this->db->get_results( $this->db->prepare( "SELECT * FROM {$table} ORDER BY name ASC, id ASC LIMIT %d OFFSET %d", $limit, $offset ), ARRAY_A );
 		} else {
 			$like       = '%' . $this->db->esc_like( $search ) . '%';
 			$mappings   = Schema::table( 'mappings' );
@@ -139,19 +141,61 @@ final class PoolRepository {
 							product.post_title LIKE %s OR variation.post_title LIKE %s OR product_meta.meta_value LIKE %s
 						)
 					)
-					ORDER BY pool.name ASC, pool.id ASC LIMIT %d",
+					ORDER BY pool.name ASC, pool.id ASC LIMIT %d OFFSET %d",
 					$like,
 					$like,
 					$like,
 					$like,
 					$like,
-					$limit
+					$limit,
+					$offset
 				),
 				ARRAY_A
 			);
 		}
 
 		return array_map( array( $this, 'hydrate' ), $rows );
+	}
+
+	/**
+	 * Count pools matching the stock-management search.
+	 *
+	 * @param string $search Optional pool or linked-product search.
+	 * @return int
+	 */
+	public function count_search( string $search = '' ): int {
+		$table = Schema::table( 'pools' );
+		if ( '' === $search ) {
+			return (int) $this->db->get_var( "SELECT COUNT(*) FROM {$table}" );
+		}
+
+		$like       = '%' . $this->db->esc_like( $search ) . '%';
+		$mappings   = Schema::table( 'mappings' );
+		$components = Schema::table( 'mapping_components' );
+		$posts      = $this->db->posts;
+		$postmeta   = $this->db->postmeta;
+
+		return (int) $this->db->get_var(
+			$this->db->prepare(
+				"SELECT COUNT(*) FROM {$table} pool
+				WHERE pool.name LIKE %s OR pool.internal_sku LIKE %s OR EXISTS (
+					SELECT 1 FROM {$mappings} mapping
+					INNER JOIN {$components} component ON component.mapping_id = mapping.id AND component.pool_id = pool.id
+					LEFT JOIN {$posts} product ON product.ID = mapping.product_id
+					LEFT JOIN {$posts} variation ON variation.ID = mapping.variation_id
+					LEFT JOIN {$postmeta} product_meta ON product_meta.post_id IN (mapping.product_id, mapping.variation_id)
+						AND (product_meta.meta_key = '_sku' OR product_meta.meta_key LIKE 'attribute_%%')
+					WHERE mapping.active = 1 AND (
+						product.post_title LIKE %s OR variation.post_title LIKE %s OR product_meta.meta_value LIKE %s
+					)
+				)",
+				$like,
+				$like,
+				$like,
+				$like,
+				$like
+			)
+		);
 	}
 
 	/**

@@ -39,6 +39,12 @@ class Test_Pool_Search extends WP_UnitTestCase {
 	/** @var string */
 	private $pool_sku;
 
+	/** @var int[] */
+	private $extra_pool_ids = array();
+
+	/** @var string */
+	private $pagination_token;
+
 	/** Install plugin tables. */
 	public static function set_up_before_class(): void {
 		parent::set_up_before_class();
@@ -93,6 +99,11 @@ class Test_Pool_Search extends WP_UnitTestCase {
 		$pool        = $this->pools->create( 'Bulk ingredient', new Quantity( 'mass', 10000000000 ), 'ng', 'g', false, $this->pool_sku );
 		$this->pool_id = $pool->id();
 		( new MappingRepository( $wpdb ) )->create_single_pool( $this->product->get_id(), $this->variation->get_id(), $this->pool_id, 250000000 );
+		$this->pagination_token = 'page-' . wp_generate_uuid4();
+		foreach ( array( 'A', 'B', 'C' ) as $suffix ) {
+			$extra                  = $this->pools->create( 'Pagination ' . $suffix . ' ' . $this->pagination_token, new Quantity( 'mass', 1000000000 ), 'ng', 'g' );
+			$this->extra_pool_ids[] = $extra->id();
+		}
 	}
 
 	/** Remove custom and WooCommerce records. */
@@ -103,6 +114,9 @@ class Test_Pool_Search extends WP_UnitTestCase {
 		$wpdb->delete( Schema::table( 'mapping_components' ), array( 'mapping_id' => $mapping_id ), array( '%d' ) );
 		$wpdb->delete( Schema::table( 'mappings' ), array( 'id' => $mapping_id ), array( '%d' ) );
 		$wpdb->delete( Schema::table( 'pools' ), array( 'id' => $this->pool_id ), array( '%d' ) );
+		foreach ( $this->extra_pool_ids as $extra_pool_id ) {
+			$wpdb->delete( Schema::table( 'pools' ), array( 'id' => $extra_pool_id ), array( '%d' ) );
+		}
 		$this->variation->delete( true );
 		$this->product->delete( true );
 		parent::tear_down();
@@ -119,5 +133,18 @@ class Test_Pool_Search extends WP_UnitTestCase {
 	/** Unrelated catalog text does not leak an inventory pool into results. */
 	public function test_unrelated_search_returns_no_pool(): void {
 		$this->assertSame( array(), $this->pools->search( 'unrelated package' ) );
+	}
+
+	/** Search counts and offsets use the same matching and stable ordering. */
+	public function test_search_results_can_be_paginated(): void {
+		$this->assertSame( 3, $this->pools->count_search( $this->pagination_token ) );
+
+		$first  = $this->pools->search( $this->pagination_token, 1, 0 );
+		$second = $this->pools->search( $this->pagination_token, 1, 1 );
+
+		$this->assertCount( 1, $first );
+		$this->assertCount( 1, $second );
+		$this->assertSame( $this->extra_pool_ids[0], $first[0]->id() );
+		$this->assertSame( $this->extra_pool_ids[1], $second[0]->id() );
 	}
 }

@@ -88,6 +88,10 @@ that screen for scalable AJAX catalog search. Active links are reviewed and
 soft-unlinked in the same tab; historical mapping components remain available
 for immutable order restoration. The plugin has no frontend UI and registers no
 plugin-owned scripts or storefront assets.
+
+The Stock tab searches pool names and internal SKUs together with linked product
+names, variation SKUs, and attributes. Results use repository-backed counts and
+25-row pages, so the admin screen does not silently stop at a fixed catalog size.
 All plugin-owned globals use `laqi_lusm_`; registered handles, slugs,
 HTML IDs, CSS classes, and CSS custom properties use the equivalent hyphenated
 form combining `laqi` with the plugin initials. Do not shorten UI selectors just
