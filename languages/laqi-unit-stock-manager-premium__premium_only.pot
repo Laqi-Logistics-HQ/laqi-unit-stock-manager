@@ -7,7 +7,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T18:16:59+00:00\n"
+"POT-Creation-Date: 2026-08-13T18:31:06+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -38,6 +38,7 @@ msgstr ""
 #: Admin/MovementLedgerExportController.php:86
 #: Admin/MovementLedgerSection.php:81
 #: Admin/StockLossSection.php:70
+#: Reports/StockReportBuilder.php:62
 msgid "Inventory pool"
 msgstr ""
 
@@ -75,10 +76,12 @@ msgid "Average daily use"
 msgstr ""
 
 #: Admin/ForecastSection.php:82
+#: Reports/StockReportBuilder.php:67
 msgid "Days remaining"
 msgstr ""
 
 #: Admin/ForecastSection.php:82
+#: Reports/StockReportBuilder.php:68
 msgid "Estimated stock-out"
 msgstr ""
 
@@ -149,6 +152,7 @@ msgstr ""
 
 #. translators: %s: unit symbol.
 #: Admin/LowStockAlertsSection.php:85
+#: Admin/StockReportSection.php:63
 msgid "Email recipients"
 msgstr ""
 
@@ -221,6 +225,7 @@ msgstr ""
 
 #. translators: %s: unit symbol.
 #: Admin/LowStockAlertsSection.php:86
+#: Admin/StockReportSection.php:85
 msgid "Recipients"
 msgstr ""
 
@@ -242,6 +247,7 @@ msgid "Channel"
 msgstr ""
 
 #: Admin/LowStockAlertsSection.php:105
+#: Admin/StockReportSection.php:85
 msgid "Result"
 msgstr ""
 
@@ -254,6 +260,7 @@ msgid "Delivered"
 msgstr ""
 
 #: Admin/LowStockAlertsSection.php:109
+#: Admin/StockReportSection.php:93
 msgid "Failed"
 msgstr ""
 
@@ -400,6 +407,106 @@ msgstr ""
 msgid "The stock loss could not be recorded. Check the quantity and try again."
 msgstr ""
 
+#: Admin/StockReportController.php:76
+msgid "You are not allowed to manage stock reports."
+msgstr ""
+
+#: Admin/StockReportSection.php:39
+msgid "Reports"
+msgstr ""
+
+#: Admin/StockReportSection.php:51
+msgid "Scheduled stock report"
+msgstr ""
+
+#: Admin/StockReportSection.php:52
+msgid "Email a CSV snapshot of every pool, current alert severity, and available forecast."
+msgstr ""
+
+#: Admin/StockReportSection.php:56
+msgid "Scheduled delivery"
+msgstr ""
+
+#: Admin/StockReportSection.php:57
+msgid "Enable scheduled reports"
+msgstr ""
+
+#: Admin/StockReportSection.php:58
+msgid "Frequency"
+msgstr ""
+
+#: Admin/StockReportSection.php:60
+msgid "Daily"
+msgstr ""
+
+#: Admin/StockReportSection.php:61
+msgid "Weekly"
+msgstr ""
+
+#: Admin/StockReportSection.php:65
+msgid "Enter one address per line. Recipients are required only when scheduled delivery is enabled."
+msgstr ""
+
+#: Admin/StockReportSection.php:66
+msgid "Save report schedule"
+msgstr ""
+
+#: Admin/StockReportSection.php:70
+msgid "Send a snapshot now"
+msgstr ""
+
+#: Admin/StockReportSection.php:71
+msgid "Uses the saved recipients and does not change the schedule."
+msgstr ""
+
+#: Admin/StockReportSection.php:75
+msgid "Send report now"
+msgstr ""
+
+#: Admin/StockReportSection.php:80
+msgid "Delivery history"
+msgstr ""
+
+#: Admin/StockReportSection.php:82
+msgid "No reports have been sent yet."
+msgstr ""
+
+#: Admin/StockReportSection.php:85
+msgid "Attempted"
+msgstr ""
+
+#: Admin/StockReportSection.php:85
+msgid "Trigger"
+msgstr ""
+
+#: Admin/StockReportSection.php:85
+msgid "Pools"
+msgstr ""
+
+#: Admin/StockReportSection.php:90
+msgid "Manual"
+msgstr ""
+
+#: Admin/StockReportSection.php:90
+msgid "Scheduled"
+msgstr ""
+
+#: Admin/StockReportSection.php:93
+msgid "Sent"
+msgstr ""
+
+#: Admin/StockReportSection.php:108
+msgid "Stock report schedule saved."
+msgstr ""
+
+#: Admin/StockReportSection.php:109
+msgid "Stock report sent."
+msgstr ""
+
+#: Admin/StockReportSection.php:110
+msgid "The stock report could not be saved or sent."
+msgstr ""
+
 #. translators: 1: severity, 2: inventory pool name.
 #: Alerts/LowStockAlertEvaluator.php:139
 #, php-format
@@ -430,4 +537,44 @@ msgstr ""
 
 #: Inventory/StockLossTypeCatalog.php:24
 msgid "Samples or internal use"
+msgstr ""
+
+#: Reports/StockReportBuilder.php:61
+msgid "Pool ID"
+msgstr ""
+
+#: Reports/StockReportBuilder.php:63
+msgid "Internal SKU"
+msgstr ""
+
+#: Reports/StockReportBuilder.php:64
+msgid "On hand"
+msgstr ""
+
+#: Reports/StockReportBuilder.php:65
+msgid "Unit"
+msgstr ""
+
+#: Reports/StockReportBuilder.php:66
+msgid "Alert status"
+msgstr ""
+
+#: Reports/StockReportBuilder.php:69
+msgid "Forecast confidence"
+msgstr ""
+
+#: Reports/StockReportBuilder.php:119
+msgid "Unavailable"
+msgstr ""
+
+#: Reports/StockReportScheduler.php:51
+msgid "Once weekly"
+msgstr ""
+
+#: Reports/StockReportScheduler.php:104
+msgid "Unit stock report"
+msgstr ""
+
+#: Reports/StockReportScheduler.php:104
+msgid "Your scheduled unit stock snapshot is attached."
 msgstr ""
