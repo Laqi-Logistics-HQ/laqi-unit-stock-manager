@@ -40,9 +40,13 @@ if [ -z "$VERSION" ]; then
 fi
 [ -n "$VERSION" ] || { echo "could not determine version (pass --version)" >&2; exit 1; }
 
-# A committed lockfile marks a real wp-scripts build. Never package a React/block
-# plugin without the generated runtime its PHP code expects.
-if [ -f package-lock.json ]; then
+# A real npm build script marks a generated runtime. The committed lockfile also
+# supports linting-only plugins, so it is not evidence that build/ must exist.
+HAS_BUILD_SCRIPT=0
+if [ -f package.json ] && node -e 'const p=require("./package.json"); process.exit(p.scripts && p.scripts.build ? 0 : 1)' 2>/dev/null; then
+  HAS_BUILD_SCRIPT=1
+fi
+if [ "$HAS_BUILD_SCRIPT" -eq 1 ]; then
   for REQUIRED_ASSET in build/index.js build/index.asset.php; do
     if [ ! -f "$REQUIRED_ASSET" ]; then
       echo "missing required built asset: $REQUIRED_ASSET (run: npm ci && npm run build)" >&2
@@ -90,6 +94,29 @@ rsync -a --no-owner --no-group --delete \
   --exclude 'package.json' \
   --exclude 'package-lock.json' \
   ./ "$DEST/"
+
+# Update ownership differs by release channel. Shared source intentionally has
+# no Update URI header so the WordPress.org archive receives directory updates.
+# WooCommerce.com owns updates for its paid build. Freemius injects its own
+# update integration when that channel is configured.
+if [ "$CHANNEL" = "woocommerce" ]; then
+  sed -i.bak \
+    "/^[[:space:]]*\*[[:space:]]*Plugin URI:/a\\ * Update URI:        false" \
+    "$DEST/$SLUG.php"
+  rm -f "$DEST/$SLUG.php.bak"
+fi
+
+if [ "$CHANNEL" = "woocommerce" ] && ! grep -q '^[[:space:]]*\*[[:space:]]*Update URI:[[:space:]]*false$' "$DEST/$SLUG.php"; then
+  echo "refusing to package: WooCommerce archive is missing its protected update header" >&2
+  rm -rf "$STAGE"
+  exit 1
+fi
+
+if [ "$CHANNEL" = "wordpressorg" ] && grep -q '^[[:space:]]*\*[[:space:]]*Update URI:' "$DEST/$SLUG.php"; then
+  echo "refusing to package: WordPress.org archive must use directory updates" >&2
+  rm -rf "$STAGE"
+  exit 1
+fi
 
 # Reject package pollution even if a future tool writes to a new path that was
 # not anticipated by the rsync exclusions above.

@@ -7,6 +7,8 @@
 
 namespace LaqiUnitStockManager;
 
+use LaqiUnitStockManager\Storage\Schema;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -39,6 +41,8 @@ final class Plugin {
 	 * @return void
 	 */
 	public function boot(): void {
+		$this->load_premium_features();
+
 		// HPOS / Cart-Checkout-Blocks compatibility must be declared even when
 		// WooCommerce is loading; declare it before bailing on a missing WC.
 		add_action( 'before_woocommerce_init', array( $this, 'declare_woocommerce_compatibility' ) );
@@ -57,6 +61,10 @@ final class Plugin {
 			return;
 		}
 
+		$this->maybe_upgrade_schema();
+		$container = new Container();
+		$container->unit_registry();
+
 		// WordPress privacy tools. Replace the boilerplate's no-data callbacks
 		// when this plugin stores or transmits personal data.
 		( new Privacy() )->register();
@@ -64,8 +72,23 @@ final class Plugin {
 		// Register CSS/JS enqueues (admin + frontend).
 		( new Assets() )->register();
 
-		// TODO: wire up the plugin's own hooks here (admin pages, REST routes,
-		// order/product integrations, etc.).
+		// Pro modules self-register from a physically removable bootstrap. Shared
+		// code never names a Pro class, so the WordPress.org build remains whole
+		// when premium files are stripped.
+		do_action( 'laqi_lusm_booted', $container );
+	}
+
+	/**
+	 * Load optional Pro wiring when the build contains it.
+	 *
+	 * @return void
+	 */
+	private function load_premium_features(): void {
+		$bootstrap = LAQI_LUSM_PATH . 'src/premium-bootstrap__premium_only.php';
+
+		if ( is_readable( $bootstrap ) ) {
+			require_once $bootstrap;
+		}
 	}
 
 	/**
@@ -128,8 +151,18 @@ final class Plugin {
 	 * @return void
 	 */
 	public static function on_activate(): void {
-		// TODO: create DB tables/options, set defaults, flush rewrite rules if a
-		// custom post type / endpoint was registered, etc.
+		Schema::install();
+	}
+
+	/**
+	 * Apply an additive schema upgrade when the installed version is stale.
+	 *
+	 * @return void
+	 */
+	private function maybe_upgrade_schema(): void {
+		if ( Schema::VERSION !== (int) get_option( Schema::VERSION_OPTION, 0 ) ) {
+			Schema::install();
+		}
 	}
 
 	/**
