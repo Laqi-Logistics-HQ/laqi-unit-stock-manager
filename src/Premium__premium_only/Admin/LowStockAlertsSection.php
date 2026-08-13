@@ -13,6 +13,7 @@ use LaqiUnitStockManager\Admin\ScreenSectionInterface;
 use LaqiUnitStockManager\Admin\UnitStockPage;
 use LaqiUnitStockManager\Domain\Quantity;
 use LaqiUnitStockManager\Premium\Alerts\LowStockPolicyRepository;
+use LaqiUnitStockManager\Premium\Alerts\AlertDeliveryRepository;
 use LaqiUnitStockManager\Presentation\QuantityFormatter;
 use LaqiUnitStockManager\Storage\PoolRepository;
 
@@ -33,17 +34,24 @@ final class LowStockAlertsSection implements ScreenSectionInterface {
 	 * @var QuantityFormatter
 	 */
 	private $formatter;
+	/** Delivery history.
+	 *
+	 * @var AlertDeliveryRepository
+	 */
+	private $deliveries;
 
 	/** Constructor.
 	 *
 	 * @param LowStockPolicyRepository $policies  Policies.
 	 * @param PoolRepository           $pools     Pools.
 	 * @param QuantityFormatter        $formatter Formatter.
+	 * @param AlertDeliveryRepository  $deliveries Delivery history.
 	 */
-	public function __construct( LowStockPolicyRepository $policies, PoolRepository $pools, QuantityFormatter $formatter ) {
-		$this->policies  = $policies;
-		$this->pools     = $pools;
-		$this->formatter = $formatter;
+	public function __construct( LowStockPolicyRepository $policies, PoolRepository $pools, QuantityFormatter $formatter, AlertDeliveryRepository $deliveries ) {
+		$this->policies   = $policies;
+		$this->pools      = $pools;
+		$this->formatter  = $formatter;
+		$this->deliveries = $deliveries;
 	}
 
 	/** Section ID. @return string */
@@ -74,7 +82,7 @@ final class LowStockAlertsSection implements ScreenSectionInterface {
 			$threshold          = null !== $policy ? $this->formatter->decimal( new Quantity( $pool->quantity()->family(), (int) $policy['threshold_base'] ), $pool->display_unit() ) : '';
 			$critical_threshold = null !== $policy && isset( $policy['critical_base'] ) ? $this->formatter->decimal( new Quantity( $pool->quantity()->family(), (int) $policy['critical_base'] ), $pool->display_unit() ) : '0';
 			?>
-			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="laqi_lusm_save_low_stock_alert" /><input type="hidden" name="pool_id" value="<?php echo esc_attr( (string) $pool->id() ); ?>" /><?php wp_nonce_field( 'laqi_lusm_save_low_stock_alert_' . $pool->id() ); ?><label for="laqi-lusm-alert-threshold"><?php echo esc_html( sprintf( /* translators: %s: unit symbol. */ __( 'Warning threshold (%s)', 'laqi-unit-stock-manager' ), $pool->display_unit() ) ); ?></label><input id="laqi-lusm-alert-threshold" name="threshold" inputmode="decimal" value="<?php echo esc_attr( $threshold ); ?>" required /><label for="laqi-lusm-alert-critical"><?php echo esc_html( sprintf( /* translators: %s: unit symbol. */ __( 'Critical threshold (%s)', 'laqi-unit-stock-manager' ), $pool->display_unit() ) ); ?></label><input id="laqi-lusm-alert-critical" name="critical_threshold" inputmode="decimal" value="<?php echo esc_attr( $critical_threshold ); ?>" required /><label for="laqi-lusm-alert-recipients"><?php esc_html_e( 'Email recipients', 'laqi-unit-stock-manager' ); ?></label><textarea id="laqi-lusm-alert-recipients" name="recipients" required><?php echo esc_textarea( null !== $policy ? implode( "\n", (array) $policy['recipients'] ) : get_option( 'admin_email' ) ); ?></textarea><label for="laqi-lusm-alert-reminder"><?php esc_html_e( 'Reminder interval (hours)', 'laqi-unit-stock-manager' ); ?></label><input type="number" min="0" id="laqi-lusm-alert-reminder" name="reminder_hours" value="<?php echo esc_attr( null !== $policy && isset( $policy['reminder_hours'] ) ? (string) $policy['reminder_hours'] : '24' ); ?>" /><label for="laqi-lusm-alert-quiet-start"><?php esc_html_e( 'Quiet hours start (0-23)', 'laqi-unit-stock-manager' ); ?></label><input type="number" min="0" max="23" id="laqi-lusm-alert-quiet-start" name="quiet_start" value="<?php echo esc_attr( null !== $policy && isset( $policy['quiet_start'] ) && (int) $policy['quiet_start'] >= 0 ? (string) $policy['quiet_start'] : '' ); ?>" /><label for="laqi-lusm-alert-quiet-end"><?php esc_html_e( 'Quiet hours end (0-23)', 'laqi-unit-stock-manager' ); ?></label><input type="number" min="0" max="23" id="laqi-lusm-alert-quiet-end" name="quiet_end" value="<?php echo esc_attr( null !== $policy && isset( $policy['quiet_end'] ) && (int) $policy['quiet_end'] >= 0 ? (string) $policy['quiet_end'] : '' ); ?>" /><?php submit_button( __( 'Save alert', 'laqi-unit-stock-manager' ) ); ?></form><?php endif; ?></section>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="laqi_lusm_save_low_stock_alert" /><input type="hidden" name="pool_id" value="<?php echo esc_attr( (string) $pool->id() ); ?>" /><?php wp_nonce_field( 'laqi_lusm_save_low_stock_alert_' . $pool->id() ); ?><label for="laqi-lusm-alert-threshold"><?php echo esc_html( sprintf( /* translators: %s: unit symbol. */ __( 'Warning threshold (%s)', 'laqi-unit-stock-manager' ), $pool->display_unit() ) ); ?></label><input id="laqi-lusm-alert-threshold" name="threshold" inputmode="decimal" value="<?php echo esc_attr( $threshold ); ?>" required /><label for="laqi-lusm-alert-critical"><?php echo esc_html( sprintf( /* translators: %s: unit symbol. */ __( 'Critical threshold (%s)', 'laqi-unit-stock-manager' ), $pool->display_unit() ) ); ?></label><input id="laqi-lusm-alert-critical" name="critical_threshold" inputmode="decimal" value="<?php echo esc_attr( $critical_threshold ); ?>" required /><label for="laqi-lusm-alert-recipients"><?php esc_html_e( 'Email recipients', 'laqi-unit-stock-manager' ); ?></label><textarea id="laqi-lusm-alert-recipients" name="recipients" required><?php echo esc_textarea( null !== $policy ? implode( "\n", (array) $policy['recipients'] ) : get_option( 'admin_email' ) ); ?></textarea><label for="laqi-lusm-alert-reminder"><?php esc_html_e( 'Reminder interval (hours)', 'laqi-unit-stock-manager' ); ?></label><input type="number" min="0" id="laqi-lusm-alert-reminder" name="reminder_hours" value="<?php echo esc_attr( null !== $policy && isset( $policy['reminder_hours'] ) ? (string) $policy['reminder_hours'] : '24' ); ?>" /><label for="laqi-lusm-alert-quiet-start"><?php esc_html_e( 'Quiet hours start (0-23)', 'laqi-unit-stock-manager' ); ?></label><input type="number" min="0" max="23" id="laqi-lusm-alert-quiet-start" name="quiet_start" value="<?php echo esc_attr( null !== $policy && isset( $policy['quiet_start'] ) && (int) $policy['quiet_start'] >= 0 ? (string) $policy['quiet_start'] : '' ); ?>" /><label for="laqi-lusm-alert-quiet-end"><?php esc_html_e( 'Quiet hours end (0-23)', 'laqi-unit-stock-manager' ); ?></label><input type="number" min="0" max="23" id="laqi-lusm-alert-quiet-end" name="quiet_end" value="<?php echo esc_attr( null !== $policy && isset( $policy['quiet_end'] ) && (int) $policy['quiet_end'] >= 0 ? (string) $policy['quiet_end'] : '' ); ?>" /><label for="laqi-lusm-alert-webhook-url"><?php esc_html_e( 'Webhook URL (optional HTTPS)', 'laqi-unit-stock-manager' ); ?></label><input type="url" id="laqi-lusm-alert-webhook-url" name="webhook_url" value="<?php echo esc_attr( null !== $policy && isset( $policy['webhook_url'] ) ? $policy['webhook_url'] : '' ); ?>" /><label for="laqi-lusm-alert-webhook-secret"><?php esc_html_e( 'Webhook signing secret', 'laqi-unit-stock-manager' ); ?></label><input type="password" id="laqi-lusm-alert-webhook-secret" name="webhook_secret" autocomplete="new-password" placeholder="<?php echo esc_attr( null !== $policy && ! empty( $policy['webhook_secret'] ) ? __( 'Leave blank to keep the saved secret', 'laqi-unit-stock-manager' ) : '' ); ?>" /><?php submit_button( __( 'Save alert', 'laqi-unit-stock-manager' ) ); ?></form><?php endif; ?></section>
 		<section class="card laqi-lusm-setup-wide"><h2><?php esc_html_e( 'Configured pool alerts', 'laqi-unit-stock-manager' ); ?></h2><table class="widefat striped"><thead><tr><th><?php esc_html_e( 'Inventory pool', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Balance', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Warning', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Critical', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Status', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Last sent', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Recipients', 'laqi-unit-stock-manager' ); ?></th></tr></thead><tbody>
 		<?php
 		foreach ( $this->policies->configured() as $row ) :
@@ -94,6 +102,11 @@ final class LowStockAlertsSection implements ScreenSectionInterface {
 			);
 			?>
 "><?php echo esc_html( $row['name'] ); ?></a></td><td><?php echo esc_html( $this->formatter->format( new Quantity( $row['family'], (int) $row['quantity_base'] ), $row['display_unit'] ) ); ?></td><td><?php echo esc_html( $this->formatter->format( new Quantity( $row['family'], (int) $saved['threshold_base'] ), $row['display_unit'] ) ); ?></td><td><?php echo esc_html( $this->formatter->format( new Quantity( $row['family'], isset( $saved['critical_base'] ) ? (int) $saved['critical_base'] : 0 ), $row['display_unit'] ) ); ?></td><td><?php echo esc_html( ucfirst( isset( $saved['severity'] ) ? $saved['severity'] : ( ! empty( $saved['is_low'] ) ? 'warning' : 'healthy' ) ) ); ?></td><td><?php echo ! empty( $saved['last_sent_at'] ) ? esc_html( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), (int) $saved['last_sent_at'] ) ) : esc_html__( 'Never', 'laqi-unit-stock-manager' ); ?></td><td><?php echo esc_html( implode( ', ', (array) $saved['recipients'] ) ); ?></td></tr><?php endforeach; ?></tbody></table></section>
+		<section class="card laqi-lusm-setup-wide"><h2><?php esc_html_e( 'Recent alert deliveries', 'laqi-unit-stock-manager' ); ?></h2><table class="widefat striped"><thead><tr><th><?php esc_html_e( 'Date', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Inventory pool', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Channel', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Result', 'laqi-unit-stock-manager' ); ?></th><th><?php esc_html_e( 'Details', 'laqi-unit-stock-manager' ); ?></th></tr></thead><tbody>
+		<?php
+		foreach ( $this->deliveries->recent() as $delivery ) :
+			?>
+			<tr><td><?php echo esc_html( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $delivery['created_at'] . ' UTC' ) ) ); ?></td><td><?php echo esc_html( $delivery['pool_name'] ); ?></td><td><?php echo esc_html( ucfirst( $delivery['channel'] ) ); ?></td><td><?php echo (bool) $delivery['success'] ? esc_html__( 'Delivered', 'laqi-unit-stock-manager' ) : esc_html__( 'Failed', 'laqi-unit-stock-manager' ); ?></td><td><?php echo esc_html( $delivery['message'] ); ?></td></tr><?php endforeach; ?></tbody></table></section>
 		</div>
 		<?php
 	}

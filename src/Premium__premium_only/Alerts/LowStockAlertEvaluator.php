@@ -30,17 +30,35 @@ final class LowStockAlertEvaluator {
 	 * @var QuantityFormatter
 	 */
 	private $formatter;
+	/** Delivery channels.
+	 *
+	 * @var AlertChannelRegistry
+	 */
+	private $channels;
+	/** Delivery history.
+	 *
+	 * @var AlertDeliveryRepository
+	 */
+	private $deliveries;
 
 	/** Constructor.
 	 *
 	 * @param LowStockPolicyRepository $policies  Policies.
 	 * @param PoolRepository           $pools     Pools.
 	 * @param QuantityFormatter        $formatter Formatter.
+	 * @param AlertChannelRegistry     $channels Channels.
+	 * @param AlertDeliveryRepository  $deliveries Delivery history.
 	 */
-	public function __construct( LowStockPolicyRepository $policies, PoolRepository $pools, QuantityFormatter $formatter ) {
+	public function __construct( LowStockPolicyRepository $policies, PoolRepository $pools, QuantityFormatter $formatter, ?AlertChannelRegistry $channels = null, ?AlertDeliveryRepository $deliveries = null ) {
+		global $wpdb;
 		$this->policies  = $policies;
 		$this->pools     = $pools;
 		$this->formatter = $formatter;
+		$this->channels  = null !== $channels ? $channels : new AlertChannelRegistry();
+		if ( null === $channels ) {
+			$this->channels->register( new EmailAlertChannel() );
+		}
+		$this->deliveries = null !== $deliveries ? $deliveries : new AlertDeliveryRepository( $wpdb );
 	}
 
 	/** Register mutation and scheduled evaluation. @return void */
@@ -86,14 +104,20 @@ final class LowStockAlertEvaluator {
 			$is_reminder_due = 'healthy' !== $severity && $reminder_hours > 0 && time() >= $last_sent + ( $reminder_hours * HOUR_IN_SECONDS );
 			$should_send     = 'healthy' !== $severity && ( $severity !== $previous || 0 === $last_sent || $is_reminder_due );
 			if ( $should_send && ! $this->is_quiet_time( $policy ) ) {
-				$recipients = array_filter( (array) $policy['recipients'], 'is_email' );
-				if ( array() !== $recipients ) {
-					/* translators: 1: severity, 2: inventory pool name. */
-					$subject = sprintf( __( '%1$s stock: %2$s', 'laqi-unit-stock-manager' ), ucfirst( $severity ), $pool->name() );
-					$message = sprintf( /* translators: 1: pool name, 2: severity, 3: current balance. */ __( '%1$s is at %2$s stock with a current balance of %3$s.', 'laqi-unit-stock-manager' ), $pool->name(), $severity, $this->formatter->format( $pool->quantity(), $pool->display_unit() ) );
-					if ( wp_mail( $recipients, $subject, $message ) ) {
-						$last_sent = time();
+				$event_key = hash( 'sha256', $pool_id . '|' . $severity . '|' . $previous . '|' . $last_sent . '|' . ( $is_reminder_due ? 'reminder' : 'crossing' ) );
+				$event     = $this->event( $event_key, $pool, $severity );
+				$delivered = false;
+				foreach ( $this->channels->enabled( $policy ) as $channel ) {
+					if ( $this->deliveries->succeeded( $event_key, $channel->key() ) ) {
+						$delivered = true;
+						continue;
 					}
+					$result = $channel->deliver( $event, $policy );
+					$this->deliveries->record( $pool_id, $event_key, $channel->key(), $result['success'], $result['message'] );
+					$delivered = $result['success'] || $delivered;
+				}
+				if ( $delivered ) {
+					$last_sent = time();
 				}
 			}
 			$this->policies->set_evaluation_state( $pool_id, $severity, $last_sent );
@@ -101,6 +125,31 @@ final class LowStockAlertEvaluator {
 				do_action( 'laqi_lusm_pool_threshold_crossed', $pool_id, $severity, $policy );
 			}
 		}
+	}
+
+	/** Build a stable channel-neutral event.
+	 *
+	 * @param string                            $event_key Event key.
+	 * @param \LaqiUnitStockManager\Domain\Pool $pool Pool.
+	 * @param string                            $severity Severity.
+	 * @return array<string,mixed>
+	 */
+	private function event( string $event_key, \LaqiUnitStockManager\Domain\Pool $pool, string $severity ): array {
+		/* translators: 1: severity, 2: inventory pool name. */
+		$subject = sprintf( __( '%1$s stock: %2$s', 'laqi-unit-stock-manager' ), ucfirst( $severity ), $pool->name() );
+		$message = sprintf( /* translators: 1: pool name, 2: severity, 3: current balance. */ __( '%1$s is at %2$s stock with a current balance of %3$s.', 'laqi-unit-stock-manager' ), $pool->name(), $severity, $this->formatter->format( $pool->quantity(), $pool->display_unit() ) );
+		return array(
+			'event_id'        => $event_key,
+			'event'           => 'stock.alert',
+			'pool_id'         => $pool->id(),
+			'pool_name'       => $pool->name(),
+			'severity'        => $severity,
+			'balance_base'    => $pool->quantity()->amount(),
+			'display_balance' => $this->formatter->format( $pool->quantity(), $pool->display_unit() ),
+			'occurred_at'     => gmdate( 'c' ),
+			'subject'         => $subject,
+			'message'         => $message,
+		);
 	}
 
 	/** Resolve current severity.

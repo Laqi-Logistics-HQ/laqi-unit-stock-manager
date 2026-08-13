@@ -12,6 +12,8 @@ use LaqiUnitStockManager\Storage\MovementRepository;
 use LaqiUnitStockManager\Container;
 use LaqiUnitStockManager\Premium\Alerts\LowStockPolicyRepository;
 use LaqiUnitStockManager\Premium\Alerts\LowStockAlertEvaluator;
+use LaqiUnitStockManager\Premium\Alerts\AlertDeliveryRepository;
+use LaqiUnitStockManager\Premium\Alerts\WebhookAlertChannel;
 
 /**
  * Tests the single authoritative stock mutation path.
@@ -250,6 +252,7 @@ class Test_Stock_Mutation_Service extends WP_UnitTestCase {
 		$service->apply( $this->pool_id, 4000000000000, 'manual_add', 'alert-recover:' . $this->pool_id );
 		$service->apply( $this->pool_id, -3000000000000, 'manual_subtract', 'alert-low-again:' . $this->pool_id );
 		$this->assertSame( 2, $sent );
+		$this->assertSame( 'email', ( new AlertDeliveryRepository( $wpdb ) )->recent( 1 )[0]['channel'] );
 	}
 
 	/** Alert severity escalates and scheduled reminders respect delivery state. */
@@ -303,5 +306,26 @@ class Test_Stock_Mutation_Service extends WP_UnitTestCase {
 		$policies->save( $this->pool_id, 9000000000000, array( 'stock@example.com' ), 5000000000000, 24 );
 		$evaluator->evaluate( array( $this->pool_id ) );
 		$this->assertSame( 1, $sent );
+	}
+
+	/** Webhook alerts send signed JSON and return the HTTP outcome. */
+	public function test_webhook_alert_channel_signs_normalized_payload(): void {
+		$captured = array();
+		add_filter(
+			'pre_http_request',
+			static function ( $preempt, array $args, string $url ) use ( &$captured ) {
+				$captured = array( 'args' => $args, 'url' => $url );
+				return array( 'headers' => array(), 'body' => '', 'response' => array( 'code' => 202, 'message' => 'Accepted' ), 'cookies' => array(), 'filename' => null );
+			},
+			10,
+			3
+		);
+		$event  = array( 'event_id' => 'evt-1', 'event' => 'stock.alert', 'severity' => 'critical' );
+		$result = ( new WebhookAlertChannel() )->deliver( $event, array( 'webhook_url' => 'https://example.com/stock-hook', 'webhook_secret' => 'test-secret' ) );
+		$this->assertTrue( $result['success'] );
+		$this->assertSame( 'https://example.com/stock-hook', $captured['url'] );
+		$this->assertSame( 'application/json', $captured['args']['headers']['Content-Type'] );
+		$this->assertSame( 'sha256=' . hash_hmac( 'sha256', wp_json_encode( $event ), 'test-secret' ), $captured['args']['headers']['X-Laqi-Signature'] );
+		$this->assertSame( $event, json_decode( $captured['args']['body'], true ) );
 	}
 }
