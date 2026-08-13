@@ -52,6 +52,7 @@ class Test_WooCommerce_Wiring extends WP_UnitTestCase {
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_place_stock_hold' ) );
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_release_stock_hold' ) );
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_write_off_stock_hold' ) );
+		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_save_safety_stock' ) );
 		$this->assertNotFalse( has_action( \LaqiUnitStockManager\Premium\Alerts\LowStockAlertEvaluator::CRON_HOOK ) );
 		$this->assertNotFalse( has_action( \LaqiUnitStockManager\Premium\Reports\StockReportScheduler::CRON_HOOK ) );
 		$this->assertNotFalse( has_action( 'laqi_lusm_mapping_changed' ) );

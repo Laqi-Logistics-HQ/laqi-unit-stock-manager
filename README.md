@@ -126,8 +126,10 @@ erasure request anonymizes that association while retaining the stock ledger.
 Premium supply-state modules may reduce on-hand stock to an available-to-sell
 quantity through `laqi_lusm_pool_available_quantity`. The filter receives the
 current normalized on-hand integer and pool ID; implementations must return a
-normalized integer and must not mutate stock. Order reservations use this
-contract, leaving the Free availability and mutation services edition-neutral.
+normalized integer and must not mutate stock. Order reservations, non-saleable
+holds, and merchant-defined safety stock compose through this contract, while
+the reusable projection service reports current and post-incoming availability.
+The Free availability and mutation services remain edition-neutral.
 
 Every Action Scheduler hook added by the plugin must also be added to the list in
 `Plugin::on_deactivate()`. Deactivation must cancel all plugin-owned scheduled

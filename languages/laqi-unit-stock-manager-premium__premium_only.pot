@@ -7,7 +7,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T20:25:18+00:00\n"
+"POT-Creation-Date: 2026-08-13T20:50:39+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -47,7 +47,7 @@ msgstr ""
 #: Admin/MovementLedgerSection.php:81
 #: Admin/ReceivingSection.php:57
 #: Admin/ReorderSection.php:66
-#: Admin/ReservationsSection.php:34
+#: Admin/ReservationsSection.php:40
 #: Admin/StockLossSection.php:70
 #: Admin/StockScenarioSection.php:53
 #: Reports/StockReportBuilder.php:62
@@ -64,7 +64,7 @@ msgstr ""
 #: Admin/ForecastSection.php:77
 #: Admin/LowStockAlertsSection.php:79
 #: Admin/ReorderSection.php:70
-#: Admin/ReservationsSection.php:38
+#: Admin/ReservationsSection.php:44
 #: Admin/StockLossSection.php:74
 #: Admin/StockScenarioSection.php:57
 msgid "Choose pool"
@@ -374,7 +374,7 @@ msgstr ""
 #. translators: %s: unit.
 #: Admin/MovementLedgerExportController.php:94
 #: Admin/MovementLedgerSection.php:81
-#: Admin/ReservationsSection.php:42
+#: Admin/ReservationsSection.php:48
 msgid "Reason"
 msgstr ""
 
@@ -544,7 +544,7 @@ msgstr ""
 #: Admin/ReceivingSection.php:76
 #: Admin/ReceivingSection.php:82
 #: Admin/ReorderSection.php:80
-#: Admin/ReservationsSection.php:43
+#: Admin/ReservationsSection.php:49
 msgid "Pool"
 msgstr ""
 
@@ -670,14 +670,14 @@ msgstr ""
 
 #. translators: %s: unit.
 #: Admin/ReorderSection.php:80
-#: Admin/ReservationsSection.php:43
+#: Admin/ReservationsSection.php:49
 #: Reports/StockReportBuilder.php:64
 msgid "On hand"
 msgstr ""
 
 #. translators: %s: unit.
 #: Admin/ReorderSection.php:80
-#: Admin/ReservationsSection.php:43
+#: Admin/ReservationsSection.php:49
 msgid "Incoming"
 msgstr ""
 
@@ -688,6 +688,7 @@ msgstr ""
 
 #. translators: %s: unit.
 #: Admin/ReorderSection.php:80
+#: Admin/ReservationsSection.php:49
 msgid "Safety stock"
 msgstr ""
 
@@ -714,67 +715,88 @@ msgstr ""
 msgid "The reorder policy could not be saved."
 msgstr ""
 
-#: Admin/ReservationsSection.php:29
+#: Admin/ReservationsSection.php:35
 msgid "Supply states"
 msgstr ""
 
-#: Admin/ReservationsSection.php:34
+#: Admin/ReservationsSection.php:40
 msgid "Place stock on hold"
 msgstr ""
 
-#: Admin/ReservationsSection.php:42
+#: Admin/ReservationsSection.php:48
 msgid "State"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReservationsSection.php:42
-#: Admin/ReservationsSection.php:43
-#: Admin/ReservationsSection.php:57
+#: Admin/ReservationsSection.php:48
+#: Admin/ReservationsSection.php:49
+#: Admin/ReservationsSection.php:62
 msgid "Quarantined"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReservationsSection.php:42
-#: Admin/ReservationsSection.php:43
-#: Admin/ReservationsSection.php:57
+#: Admin/ReservationsSection.php:48
+#: Admin/ReservationsSection.php:49
+#: Admin/ReservationsSection.php:62
 msgid "Damaged"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReservationsSection.php:42
+#: Admin/ReservationsSection.php:48
 #, php-format
 msgid "Quantity (%s)"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReservationsSection.php:42
+#: Admin/ReservationsSection.php:48
 msgid "Place on hold"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReservationsSection.php:43
+#: Admin/ReservationsSection.php:48
+#, php-format
+msgid "Protected safety stock (%s)"
+msgstr ""
+
+#. translators: %s: unit.
+#: Admin/ReservationsSection.php:48
+msgid "This buffer is excluded from storefront availability but remains physically on hand."
+msgstr ""
+
+#. translators: %s: unit.
+#: Admin/ReservationsSection.php:48
+msgid "Save safety stock"
+msgstr ""
+
+#. translators: %s: unit.
+#: Admin/ReservationsSection.php:49
 msgid "Supply state summary"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReservationsSection.php:43
+#: Admin/ReservationsSection.php:49
 msgid "Reserved"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReservationsSection.php:43
+#: Admin/ReservationsSection.php:49
 msgid "Available to sell"
 msgstr ""
 
-#: Admin/ReservationsSection.php:54
+#. translators: %s: unit.
+#: Admin/ReservationsSection.php:49
+msgid "Projected after incoming"
+msgstr ""
+
+#: Admin/ReservationsSection.php:59
 msgid "Active stock holds"
 msgstr ""
 
-#: Admin/ReservationsSection.php:59
+#: Admin/ReservationsSection.php:64
 msgid "Release to available stock"
 msgstr ""
 
-#: Admin/ReservationsSection.php:59
+#: Admin/ReservationsSection.php:64
 msgid "Write off permanently"
 msgstr ""
 
@@ -990,7 +1012,7 @@ msgstr ""
 msgid "Projected days remaining"
 msgstr ""
 
-#: Admin/SupplyStateController.php:66
+#: Admin/SupplyStateController.php:84
 msgid "You are not allowed to manage supply states."
 msgstr ""
 

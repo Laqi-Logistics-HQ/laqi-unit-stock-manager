@@ -57,7 +57,7 @@ final class ReservationRepository {
 		$this->db->query( 'START TRANSACTION' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		try {
 			foreach ( $demand as $pool_id => $quantity ) {
-				$pool = $this->db->get_row( $this->db->prepare( 'SELECT quantity_base, allow_backorders FROM ' . $this->db->prefix . 'laqi_lusm_pools WHERE id = %d FOR UPDATE', $pool_id ), ARRAY_A );
+				$pool = $this->db->get_row( $this->db->prepare( 'SELECT quantity_base, allow_backorders, policy_json FROM ' . $this->db->prefix . 'laqi_lusm_pools WHERE id = %d FOR UPDATE', $pool_id ), ARRAY_A );
 				if ( ! is_array( $pool ) || (int) $pool['allow_backorders'] ) {
 					continue; }
 				$existing = $this->db->get_row( $this->db->prepare( 'SELECT quantity_base, status FROM ' . $this->table() . ' WHERE order_id = %d AND pool_id = %d', $order_id, $pool_id ), ARRAY_A );
@@ -65,7 +65,9 @@ final class ReservationRepository {
 					if ( (int) $existing['quantity_base'] === (int) $quantity && in_array( $existing['status'], array( 'active', 'converted' ), true ) ) {
 						continue;
 					} throw new RuntimeException( 'The order reservation already has different demand.' ); }
-				if ( (int) $pool['quantity_base'] - $this->reserved_quantity( (int) $pool_id ) < (int) $quantity ) {
+				$held   = (int) $this->db->get_var( $this->db->prepare( 'SELECT COALESCE(SUM(quantity_base),0) FROM ' . $this->db->prefix . 'laqi_lusm_stock_holds WHERE pool_id = %d AND status = %s', $pool_id, 'active' ) );
+				$safety = $this->safety_stock( (string) $pool['policy_json'] );
+				if ( (int) $pool['quantity_base'] - $this->reserved_quantity( (int) $pool_id ) - $held - $safety < (int) $quantity ) {
 					throw new RuntimeException( 'The pooled stock cannot satisfy this reservation.' ); }
 				$now      = current_time( 'mysql', true );
 				$inserted = $this->db->insert(
@@ -114,4 +116,7 @@ final class ReservationRepository {
 		return is_array( $rows ) ? $rows : array(); }
 	/** Table name. */ private function table(): string {
 		return $this->db->prefix . 'laqi_lusm_reservations'; }
+	/** Safety stock from the shared policy envelope. */ private function safety_stock( string $json ): int {
+		$policy = json_decode( $json, true );
+		return is_array( $policy ) ? max( 0, (int) ( $policy['availability']['safety_stock_base'] ?? 0 ) ) : 0; }
 }

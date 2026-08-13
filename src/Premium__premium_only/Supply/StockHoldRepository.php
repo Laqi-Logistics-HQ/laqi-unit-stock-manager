@@ -47,9 +47,10 @@ final class StockHoldRepository {
 		}
 		$this->db->query( 'START TRANSACTION' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		try {
-			$pool     = $this->db->get_row( $this->db->prepare( 'SELECT quantity_base FROM ' . $this->db->prefix . 'laqi_lusm_pools WHERE id = %d FOR UPDATE', $pool_id ), ARRAY_A );
+			$pool     = $this->db->get_row( $this->db->prepare( 'SELECT quantity_base, policy_json FROM ' . $this->db->prefix . 'laqi_lusm_pools WHERE id = %d FOR UPDATE', $pool_id ), ARRAY_A );
 			$reserved = (int) $this->db->get_var( $this->db->prepare( 'SELECT COALESCE(SUM(quantity_base),0) FROM ' . $this->db->prefix . 'laqi_lusm_reservations WHERE pool_id=%d AND status=%s AND expires_at>%s', $pool_id, 'active', current_time( 'mysql', true ) ) );
-			if ( ! is_array( $pool ) || (int) $pool['quantity_base'] - $reserved - $this->held_quantity( $pool_id ) < $quantity ) {
+			$safety   = is_array( $pool ) ? $this->safety_stock( (string) $pool['policy_json'] ) : 0;
+			if ( ! is_array( $pool ) || (int) $pool['quantity_base'] - $reserved - $this->held_quantity( $pool_id ) - $safety < $quantity ) {
 				throw new \InvalidArgumentException( 'Insufficient available stock for this hold.' ); }
 			$inserted = $this->db->insert(
 				$this->table(),
@@ -111,4 +112,7 @@ final class StockHoldRepository {
 		return is_array( $rows ) ? $rows : array(); }
 	/** Table. */ private function table(): string {
 		return $this->db->prefix . 'laqi_lusm_stock_holds'; }
+	/** Safety stock from the shared policy envelope. */ private function safety_stock( string $json ): int {
+		$policy = json_decode( $json, true );
+		return is_array( $policy ) ? max( 0, (int) ( $policy['availability']['safety_stock_base'] ?? 0 ) ) : 0; }
 }
