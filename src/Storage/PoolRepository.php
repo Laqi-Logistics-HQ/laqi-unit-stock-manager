@@ -109,7 +109,7 @@ final class PoolRepository {
 	/**
 	 * Find pools for the stock-management screen.
 	 *
-	 * @param string $search Optional name or internal SKU search.
+	 * @param string $search Optional pool or linked-product search.
 	 * @param int    $limit  Maximum rows.
 	 * @return Pool[]
 	 */
@@ -120,9 +120,33 @@ final class PoolRepository {
 		if ( '' === $search ) {
 			$rows = $this->db->get_results( $this->db->prepare( "SELECT * FROM {$table} ORDER BY name ASC, id ASC LIMIT %d", $limit ), ARRAY_A );
 		} else {
-			$like = '%' . $this->db->esc_like( $search ) . '%';
-			$rows = $this->db->get_results(
-				$this->db->prepare( "SELECT * FROM {$table} WHERE name LIKE %s OR internal_sku LIKE %s ORDER BY name ASC, id ASC LIMIT %d", $like, $like, $limit ),
+			$like       = '%' . $this->db->esc_like( $search ) . '%';
+			$mappings   = Schema::table( 'mappings' );
+			$components = Schema::table( 'mapping_components' );
+			$posts      = $this->db->posts;
+			$postmeta   = $this->db->postmeta;
+			$rows       = $this->db->get_results(
+				$this->db->prepare(
+					"SELECT DISTINCT pool.* FROM {$table} pool
+					WHERE pool.name LIKE %s OR pool.internal_sku LIKE %s OR EXISTS (
+						SELECT 1 FROM {$mappings} mapping
+						INNER JOIN {$components} component ON component.mapping_id = mapping.id AND component.pool_id = pool.id
+						LEFT JOIN {$posts} product ON product.ID = mapping.product_id
+						LEFT JOIN {$posts} variation ON variation.ID = mapping.variation_id
+						LEFT JOIN {$postmeta} product_meta ON product_meta.post_id IN (mapping.product_id, mapping.variation_id)
+							AND (product_meta.meta_key = '_sku' OR product_meta.meta_key LIKE 'attribute_%%')
+						WHERE mapping.active = 1 AND (
+							product.post_title LIKE %s OR variation.post_title LIKE %s OR product_meta.meta_value LIKE %s
+						)
+					)
+					ORDER BY pool.name ASC, pool.id ASC LIMIT %d",
+					$like,
+					$like,
+					$like,
+					$like,
+					$like,
+					$limit
+				),
 				ARRAY_A
 			);
 		}

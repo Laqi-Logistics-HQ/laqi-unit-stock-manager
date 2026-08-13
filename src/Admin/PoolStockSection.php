@@ -93,7 +93,7 @@ final class PoolStockSection implements ScreenSectionInterface {
 		<form method="get" class="laqi-lusm-search">
 			<input type="hidden" name="page" value="laqi-unit-stock-manager" />
 			<label class="screen-reader-text" for="laqi-lusm-search"><?php esc_html_e( 'Search inventory pools', 'laqi-unit-stock-manager' ); ?></label>
-			<input id="laqi-lusm-search" type="search" name="s" value="<?php echo esc_attr( $search ); ?>" placeholder="<?php esc_attr_e( 'Search pools or SKU', 'laqi-unit-stock-manager' ); ?>" />
+			<input id="laqi-lusm-search" type="search" name="s" value="<?php echo esc_attr( $search ); ?>" placeholder="<?php esc_attr_e( 'Search pools, products, SKUs, or attributes', 'laqi-unit-stock-manager' ); ?>" />
 			<?php submit_button( __( 'Search', 'laqi-unit-stock-manager' ), 'secondary', '', false ); ?>
 		</form>
 		<table class="widefat striped laqi-lusm-stock-table">
