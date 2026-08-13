@@ -36,9 +36,9 @@ src/Assets.php        # registers + enqueues CSS/JS, wires JS translations
 assets/css/           # admin.css, frontend.css (enqueued, version-busted)
 assets/js/            # admin.js, frontend.js (use wp.i18n.__ for translatable strings)
 languages/            # .pot / .po / .mo / .json — see languages/README.md
-bin/build.sh          # build distributable zip per channel (woocommerce|freemius)
+bin/build.sh          # build distributable zip per channel (woocommerce|freemius|wordpressorg)
 bin/install-wp-tests.sh # provision pinned WordPress test suites for CI
-.github/workflows/    # quality.yml + gated dual-channel release.yml
+.github/workflows/    # quality.yml + gated three-channel release.yml
 tests/                # PHPUnit (WordPress test suite)
 phpcs.xml.dist        # WordPress standards + PHP 7.4 compatibility
 composer.json         # PSR-4 autoload + dev tooling
@@ -52,11 +52,13 @@ This plugin is its own git repo. To ship a version, publish a **GitHub Release**
 - `laqi-unit-stock-manager-<version>-woocommerce.zip` — the active channel (WooCommerce.com
   handles updates/licensing; the Freemius SDK is stripped).
 - `laqi-unit-stock-manager-<version>-freemius.zip` — ready for when the Freemius SDK is added.
+- `laqi-unit-stock-manager-<version>-wordpressorg.zip` — complete Free edition with
+  every `__premium_only` file physically removed.
 
 The workflow is **OFF until** you set the repo variable
 `RELEASE_BUILDS_ENABLED=true` (`gh variable set RELEASE_BUILDS_ENABLED --body true`).
 Every pull request still runs `quality.yml`: coding standards, PHP syntax,
-PHPUnit across the supported PHP/WordPress matrix, and both channel archive
+PHPUnit across the supported PHP/WordPress matrix, and all three channel archive
 checks. It also starts a real WordPress/WooCommerce environment and runs an
 authenticated Playwright + axe admin-quality gate. Customize the plugin URL and
 root selectors in `tests/e2e/admin-quality.spec.js` when scaffolding a plugin.
@@ -71,6 +73,7 @@ composer install --no-dev --optimize-autoloader
 npm ci
 npm run build
 bash bin/build.sh --channel woocommerce
+bash bin/build.sh --channel wordpressorg
 ```
 
 The WooCommerce build excludes the complete Composer runtime and uses the
