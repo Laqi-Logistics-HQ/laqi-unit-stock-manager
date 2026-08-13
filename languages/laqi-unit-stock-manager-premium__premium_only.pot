@@ -7,7 +7,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T18:42:11+00:00\n"
+"POT-Creation-Date: 2026-08-13T18:54:07+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -37,6 +37,7 @@ msgstr ""
 #: Admin/LowStockAlertsSection.php:105
 #: Admin/MovementLedgerExportController.php:86
 #: Admin/MovementLedgerSection.php:81
+#: Admin/ReceivingSection.php:56
 #: Admin/StockLossSection.php:70
 #: Admin/StockScenarioSection.php:53
 #: Reports/StockReportBuilder.php:62
@@ -360,6 +361,119 @@ msgstr ""
 
 #: Admin/MovementLedgerSection.php:97
 msgid "Ledger pages"
+msgstr ""
+
+#: Admin/ReceivingController.php:115
+msgid "You are not allowed to manage receiving."
+msgstr ""
+
+#: Admin/ReceivingSection.php:45
+msgid "Receiving"
+msgstr ""
+
+#: Admin/ReceivingSection.php:51
+msgid "Add supplier"
+msgstr ""
+
+#: Admin/ReceivingSection.php:51
+msgid "Supplier name"
+msgstr ""
+
+#: Admin/ReceivingSection.php:51
+msgid "Email"
+msgstr ""
+
+#: Admin/ReceivingSection.php:51
+msgid "Lead time (days)"
+msgstr ""
+
+#: Admin/ReceivingSection.php:52
+msgid "Define supplier pack"
+msgstr ""
+
+#: Admin/ReceivingSection.php:52
+msgid "Examples include a sack, drum, case, or pallet. The quantity is stored exactly for the selected pool."
+msgstr ""
+
+#: Admin/ReceivingSection.php:52
+#: Admin/ReceivingSection.php:62
+msgid "Supplier"
+msgstr ""
+
+#: Admin/ReceivingSection.php:56
+msgid "Pack name"
+msgstr ""
+
+#: Admin/ReceivingSection.php:56
+msgid "25 kg sack"
+msgstr ""
+
+#: Admin/ReceivingSection.php:56
+msgid "Quantity in the pool display unit"
+msgstr ""
+
+#: Admin/ReceivingSection.php:56
+msgid "Define pack"
+msgstr ""
+
+#: Admin/ReceivingSection.php:57
+msgid "Receive stock"
+msgstr ""
+
+#: Admin/ReceivingSection.php:57
+msgid "Supplier pack"
+msgstr ""
+
+#: Admin/ReceivingSection.php:61
+msgid "Packages received"
+msgstr ""
+
+#: Admin/ReceivingSection.php:61
+msgid "Delivery reference"
+msgstr ""
+
+#: Admin/ReceivingSection.php:61
+msgid "Receive into stock"
+msgstr ""
+
+#: Admin/ReceivingSection.php:62
+msgid "Recent receipts"
+msgstr ""
+
+#: Admin/ReceivingSection.php:62
+msgid "Received"
+msgstr ""
+
+#: Admin/ReceivingSection.php:62
+msgid "Pack"
+msgstr ""
+
+#: Admin/ReceivingSection.php:62
+msgid "Pool"
+msgstr ""
+
+#: Admin/ReceivingSection.php:62
+msgid "Quantity"
+msgstr ""
+
+#: Admin/ReceivingSection.php:62
+msgid "Reference"
+msgstr ""
+
+#: Admin/ReceivingSection.php:73
+msgid "Supplier added."
+msgstr ""
+
+#: Admin/ReceivingSection.php:74
+msgid "Supplier pack defined."
+msgstr ""
+
+#: Admin/ReceivingSection.php:75
+msgid "Supplier stock received."
+msgstr ""
+
+#: Admin/ReceivingSection.php:76
+msgid "The receiving operation could not be completed."
 msgstr ""
 
 #: Admin/StockLossController.php:54
