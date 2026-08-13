@@ -50,6 +50,10 @@
 	vertical-align: middle;
 }
 
+.laqi-lusm-table-scroll {
+	overflow-x: auto;
+}
+
 .laqi-lusm-adjustment {
 	display: flex;
 	flex-wrap: wrap;

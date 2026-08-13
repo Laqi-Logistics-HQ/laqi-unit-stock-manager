@@ -59,6 +59,7 @@ final class MovementPresenter {
 			'source_type'     => (string) $row['source_type'],
 			'source_id'       => (int) $row['source_id'],
 			'actor_id'        => (int) $row['actor_id'],
+			'actor_name'      => isset( $row['actor_name'] ) ? (string) $row['actor_name'] : '',
 			'reason'          => (string) $row['reason'],
 			'created_at'      => (string) $row['created_at'],
 		);
