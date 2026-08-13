@@ -53,6 +53,9 @@ require_once __DIR__ . '/Premium__premium_only/Admin/CsvExchangeController.php';
 require_once __DIR__ . '/Premium__premium_only/Costing/MaterialCostRepository.php';
 require_once __DIR__ . '/Premium__premium_only/Costing/MaterialEconomicsService.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/MaterialCostsSection.php';
+require_once __DIR__ . '/Premium__premium_only/Reservations/ReservationRepository.php';
+require_once __DIR__ . '/Premium__premium_only/Reservations/OrderReservationService.php';
+require_once __DIR__ . '/Premium__premium_only/Admin/ReservationsSection.php';
 
 /**
  * Give physically separate paid modules the completed shared composition root.
@@ -81,7 +84,11 @@ add_action(
 		$suppliers->install();
 		$material_costs = new Premium\Costing\MaterialCostRepository( $wpdb );
 		$material_costs->install();
-		$material_economics  = new Premium\Costing\MaterialEconomicsService( $material_costs );
+		$material_economics = new Premium\Costing\MaterialEconomicsService( $material_costs );
+		$reservations       = new Premium\Reservations\ReservationRepository( $wpdb );
+		$reservations->install();
+		$reservation_service = new Premium\Reservations\OrderReservationService( $reservations );
+		$reservation_service->register();
 		$receiving           = new Premium\Receiving\ReceivingService( $suppliers, $container->stock_mutation_service(), $material_costs );
 		$reorder_policies    = new Premium\Replenishment\ReorderPolicyRepository( $wpdb );
 		$reorder_suggestions = new Premium\Replenishment\ReorderSuggestionService( $container->pool_repository(), $reorder_policies, $forecast_policies, $forecast_service, $suppliers );
@@ -102,6 +109,7 @@ add_action(
 		$container->screen_section_catalog()->register( new Premium\Admin\ReceivingSection( $suppliers, $container->pool_repository(), $container->quantity_formatter() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ReorderSection( $container->pool_repository(), $suppliers, $reorder_policies, $reorder_suggestions, $container->quantity_formatter() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\MaterialCostsSection( $material_economics, $container->mapping_repository() ) );
+		$container->screen_section_catalog()->register( new Premium\Admin\ReservationsSection( $reservations, $container->quantity_formatter() ) );
 		( new Premium\Admin\MovementLedgerExportController( $container->movement_repository(), $container->movement_presenter() ) )->register();
 		( new Premium\Admin\StockLossController( $container->stock_adjustment_service(), $loss_types ) )->register();
 		( new Premium\Admin\LowStockAlertController( $alert_policies, $container->pool_repository(), $container->unit_registry() ) )->register();
@@ -115,6 +123,7 @@ add_action(
 		$alert_evaluator->register();
 		register_deactivation_hook( LAQI_LUSM_FILE, array( $alert_evaluator, 'unschedule' ) );
 		register_deactivation_hook( LAQI_LUSM_FILE, array( $report_scheduler, 'unschedule' ) );
+		register_deactivation_hook( LAQI_LUSM_FILE, array( $reservation_service, 'unschedule' ) );
 		do_action( 'laqi_lusm_premium_ready', $container );
 	}
 );
