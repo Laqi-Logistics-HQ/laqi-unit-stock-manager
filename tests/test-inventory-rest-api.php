@@ -17,6 +17,8 @@ class Test_Inventory_REST_API extends WP_UnitTestCase {
 
 	/** @var int */
 	private $pool_id;
+	/** @var string */
+	private $pool_name;
 
 	/** @var int */
 	private $user_id;
@@ -33,7 +35,8 @@ class Test_Inventory_REST_API extends WP_UnitTestCase {
 		global $wpdb;
 		$this->user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
 		wp_set_current_user( $this->user_id );
-		$this->pool_id = ( new PoolRepository( $wpdb ) )->create( 'REST pool', new Quantity( 'count', 10 ), 'unit', 'unit' )->id();
+		$this->pool_name = 'REST pool ' . wp_generate_uuid4();
+		$this->pool_id   = ( new PoolRepository( $wpdb ) )->create( $this->pool_name, new Quantity( 'count', 10 ), 'unit', 'unit' )->id();
 	}
 
 	/** Remove custom records. */
@@ -48,7 +51,7 @@ class Test_Inventory_REST_API extends WP_UnitTestCase {
 	/** Pool listing uses the versioned normalized presenter shape. */
 	public function test_authorized_user_can_list_pools(): void {
 		$request = new WP_REST_Request( 'GET', '/laqi-lusm/v1/pools' );
-		$request->set_query_params( array( 'search' => 'REST pool' ) );
+		$request->set_query_params( array( 'search' => $this->pool_name ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 

@@ -71,4 +71,21 @@ final class ReceivingService {
 		$this->suppliers->record_receipt( $pack, $pack_count, $quantity, $result->movement_id(), $actor_id, $reference );
 		return $result;
 	}
+
+	/** Convert pending incoming stock into on-hand stock.
+	 *
+	 * @param int $incoming_id Incoming delivery ID.
+	 * @param int $actor_id Actor ID.
+	 * @return MovementResult
+	 * @throws InvalidArgumentException When delivery is no longer pending.
+	 */
+	public function receive_incoming( int $incoming_id, int $actor_id ): MovementResult {
+		$incoming = $this->suppliers->incoming( $incoming_id );
+		if ( null === $incoming ) {
+			throw new InvalidArgumentException( 'The incoming delivery is not pending.' );
+		}
+		$result = $this->receive( (int) $incoming['pack_id'], (int) $incoming['pack_count'], (string) $incoming['reference'], $actor_id, 'incoming:' . $incoming_id );
+		$this->suppliers->mark_incoming_received( $incoming_id, $result->movement_id() );
+		return $result;
+	}
 }

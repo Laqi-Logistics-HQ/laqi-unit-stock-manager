@@ -33,7 +33,7 @@ final class SupplierRepository {
 
 	/** Install premium receiving tables. @return void */
 	public function install(): void {
-		if ( 1 === (int) get_option( self::SCHEMA_OPTION, 0 ) ) {
+		if ( 2 === (int) get_option( self::SCHEMA_OPTION, 0 ) ) {
 			return;
 		}
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -41,6 +41,7 @@ final class SupplierRepository {
 		$suppliers = $this->table( 'suppliers' );
 		$packs     = $this->table( 'supplier_packs' );
 		$receipts  = $this->table( 'receipts' );
+		$incoming  = $this->table( 'incoming_deliveries' );
 		dbDelta(
 			"CREATE TABLE {$suppliers} (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -86,7 +87,26 @@ final class SupplierRepository {
 			KEY pool_created (pool_id,created_at)
 		) {$charset};"
 		);
-		update_option( self::SCHEMA_OPTION, 1, false );
+		dbDelta(
+			"CREATE TABLE {$incoming} (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			supplier_id bigint(20) unsigned NOT NULL,
+			pack_id bigint(20) unsigned NOT NULL,
+			pool_id bigint(20) unsigned NOT NULL,
+			pack_count bigint(20) unsigned NOT NULL,
+			quantity_base bigint(20) unsigned NOT NULL,
+			expected_date date NOT NULL,
+			reference varchar(191) NOT NULL DEFAULT '',
+			status varchar(20) NOT NULL DEFAULT 'pending',
+			movement_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			created_at datetime NOT NULL,
+			received_at datetime NULL,
+			PRIMARY KEY  (id),
+			KEY pool_status_date (pool_id,status,expected_date),
+			KEY status_date (status,expected_date)
+		) {$charset};"
+		);
+		update_option( self::SCHEMA_OPTION, 2, false );
 	}
 
 	/** Create a supplier.
@@ -227,6 +247,98 @@ final class SupplierRepository {
 	public function receipts( int $limit = 25 ): array {
 		$rows = $this->db->get_results( $this->db->prepare( 'SELECT r.*, s.name AS supplier_name, p.name AS pack_name, i.name AS pool_name, i.display_unit, i.family FROM ' . $this->table( 'receipts' ) . ' r INNER JOIN ' . $this->table( 'suppliers' ) . ' s ON s.id = r.supplier_id INNER JOIN ' . $this->table( 'supplier_packs' ) . ' p ON p.id = r.pack_id INNER JOIN ' . $this->db->prefix . 'laqi_lusm_pools i ON i.id = r.pool_id ORDER BY r.id DESC LIMIT %d', max( 1, min( 100, $limit ) ) ), ARRAY_A );
 		return is_array( $rows ) ? $rows : array();
+	}
+
+	/** Schedule expected supplier stock.
+	 *
+	 * @param int    $pack_id Pack ID.
+	 * @param int    $pack_count Pack count.
+	 * @param string $expected_date Expected local date.
+	 * @param string $reference Delivery reference.
+	 * @return int
+	 * @throws InvalidArgumentException For invalid input.
+	 * @throws RuntimeException When persistence fails.
+	 */
+	public function create_incoming( int $pack_id, int $pack_count, string $expected_date, string $reference ): int {
+		$pack = $this->pack( $pack_id );
+		$date = \DateTimeImmutable::createFromFormat( '!Y-m-d', $expected_date );
+		if ( null === $pack || $pack_count < 1 || $pack_count > 1000000 || false === $date || $date->format( 'Y-m-d' ) !== $expected_date ) {
+			throw new InvalidArgumentException( 'The incoming delivery is invalid.' );
+		}
+		$pack_quantity = (int) $pack['quantity_base'];
+		if ( $pack_quantity > intdiv( PHP_INT_MAX, $pack_count ) ) {
+			throw new InvalidArgumentException( 'The incoming delivery is too large.' );
+		}
+		$inserted = $this->db->insert(
+			$this->table( 'incoming_deliveries' ),
+			array(
+				'supplier_id'   => (int) $pack['supplier_id'],
+				'pack_id'       => $pack_id,
+				'pool_id'       => (int) $pack['pool_id'],
+				'pack_count'    => $pack_count,
+				'quantity_base' => $pack_quantity * $pack_count,
+				'expected_date' => $expected_date,
+				'reference'     => substr( $reference, 0, 191 ),
+				'created_at'    => current_time( 'mysql', true ),
+			),
+			array( '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s' )
+		);
+		if ( false === $inserted ) {
+			throw new RuntimeException( 'Could not schedule the incoming delivery.' );
+		}
+		return (int) $this->db->insert_id;
+	}
+
+	/** One pending incoming delivery.
+	 *
+	 * @param int $incoming_id Incoming ID.
+	 * @return array<string,mixed>|null
+	 */
+	public function incoming( int $incoming_id ): ?array {
+		$row = $this->db->get_row( $this->db->prepare( 'SELECT * FROM ' . $this->table( 'incoming_deliveries' ) . ' WHERE id = %d AND status = %s', $incoming_id, 'pending' ), ARRAY_A );
+		return is_array( $row ) ? $row : null;
+	}
+
+	/** Pending incoming deliveries. @return array<int,array<string,mixed>> */
+	public function incoming_deliveries(): array {
+		$rows = $this->db->get_results( 'SELECT d.*, s.name AS supplier_name, p.name AS pack_name, i.name AS pool_name, i.display_unit, i.family FROM ' . $this->table( 'incoming_deliveries' ) . ' d INNER JOIN ' . $this->table( 'suppliers' ) . ' s ON s.id = d.supplier_id INNER JOIN ' . $this->table( 'supplier_packs' ) . ' p ON p.id = d.pack_id INNER JOIN ' . $this->db->prefix . "laqi_lusm_pools i ON i.id = d.pool_id WHERE d.status = 'pending' ORDER BY d.expected_date ASC, d.id ASC", ARRAY_A );
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/** Exact pending incoming quantity for a pool.
+	 *
+	 * @param int $pool_id Pool ID.
+	 * @return int
+	 */
+	public function incoming_quantity( int $pool_id ): int {
+		return (int) $this->db->get_var( $this->db->prepare( 'SELECT COALESCE(SUM(quantity_base), 0) FROM ' . $this->table( 'incoming_deliveries' ) . ' WHERE pool_id = %d AND status = %s', $pool_id, 'pending' ) );
+	}
+
+	/** Mark expected stock as received.
+	 *
+	 * @param int $incoming_id Incoming ID.
+	 * @param int $movement_id Movement ID.
+	 * @return void
+	 * @throws RuntimeException When state cannot be changed.
+	 */
+	public function mark_incoming_received( int $incoming_id, int $movement_id ): void {
+		$updated = $this->db->update(
+			$this->table( 'incoming_deliveries' ),
+			array(
+				'status'      => 'received',
+				'movement_id' => $movement_id,
+				'received_at' => current_time( 'mysql', true ),
+			),
+			array(
+				'id'     => $incoming_id,
+				'status' => 'pending',
+			),
+			array( '%s', '%d', '%s' ),
+			array( '%d', '%s' )
+		);
+		if ( 1 !== $updated ) {
+			throw new RuntimeException( 'The incoming delivery is no longer pending.' );
+		}
 	}
 
 	/** Resolve a premium receiving table.
