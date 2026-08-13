@@ -107,6 +107,36 @@ final class MovementRepository {
 		);
 	}
 
+	/** Summarize sales consumption for forecasting modules.
+	 *
+	 * Replenishment, restoration, manual changes, and typed losses are excluded.
+	 * Negative order edits count because they represent additional sold demand.
+	 *
+	 * @param int $pool_id Pool ID.
+	 * @param int $days Calendar window.
+	 * @return array{consumed_base:int,first_at:string,demand_days:int}
+	 */
+	public function consumption_summary( int $pool_id, int $days ): array {
+		$days = max( 7, min( 365, $days ) );
+		$row  = $this->db->get_row(
+			$this->db->prepare(
+				'SELECT COALESCE(SUM(CASE WHEN delta_base < 0 AND type IN ("order_reduction", "order_edit") THEN ABS(delta_base) ELSE 0 END), 0) AS consumed_base, COALESCE(MIN(created_at), "") AS first_at, COUNT(DISTINCT CASE WHEN delta_base < 0 AND type IN ("order_reduction", "order_edit") THEN DATE(created_at) ELSE NULL END) AS demand_days FROM ' . Schema::table( 'movements' ) . ' WHERE pool_id = %d AND created_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)',
+				$pool_id,
+				$days
+			),
+			ARRAY_A
+		);
+		return is_array( $row ) ? array(
+			'consumed_base' => (int) $row['consumed_base'],
+			'first_at'      => (string) $row['first_at'],
+			'demand_days'   => (int) $row['demand_days'],
+		) : array(
+			'consumed_base' => 0,
+			'first_at'      => '',
+			'demand_days'   => 0,
+		);
+	}
+
 	/**
 	 * Get movements attributed to one WordPress user.
 	 *
