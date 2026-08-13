@@ -131,6 +131,12 @@ holds, and merchant-defined safety stock compose through this contract, while
 the reusable projection service reports current and post-incoming availability.
 The Free availability and mutation services remain edition-neutral.
 
+Paid receiving creates one idempotent batch record per supplier-receipt movement,
+including the supplier lot, optional expiry, receipt cost snapshot, received and
+remaining normalized quantities. The batch repository exposes dated stock in
+earliest-expiry-first order with undated receipts last; allocation and recall
+modules build on that contract without changing the original pool ledger.
+
 Every Action Scheduler hook added by the plugin must also be added to the list in
 `Plugin::on_deactivate()`. Deactivation must cancel all plugin-owned scheduled
 work; uninstall must repeat that cleanup and remove plugin-owned data.

@@ -98,12 +98,14 @@ final class ReceivingController {
 		$this->authorize( 'laqi_lusm_receive_supplier_pack' );
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Verified above.
 		try {
-			$pack_id   = isset( $_POST['pack_id'] ) ? absint( $_POST['pack_id'] ) : 0;
-			$count     = isset( $_POST['pack_count'] ) ? absint( $_POST['pack_count'] ) : 0;
-			$reference = isset( $_POST['reference'] ) ? sanitize_text_field( wp_unslash( $_POST['reference'] ) ) : '';
-			$cost      = isset( $_POST['total_cost'] ) ? wc_format_decimal( sanitize_text_field( wp_unslash( $_POST['total_cost'] ) ), wc_get_price_decimals() ) : '';
-			$minor     = '' === $cost ? 0 : (int) round( (float) $cost * ( 10 ** wc_get_price_decimals() ) );
-			$this->receiving->receive( $pack_id, $count, $reference, get_current_user_id(), 'receipt:' . get_current_user_id() . ':' . wp_generate_uuid4(), $minor, get_woocommerce_currency() );
+			$pack_id      = isset( $_POST['pack_id'] ) ? absint( $_POST['pack_id'] ) : 0;
+			$count        = isset( $_POST['pack_count'] ) ? absint( $_POST['pack_count'] ) : 0;
+			$reference    = isset( $_POST['reference'] ) ? sanitize_text_field( wp_unslash( $_POST['reference'] ) ) : '';
+			$supplier_lot = isset( $_POST['supplier_lot'] ) ? sanitize_text_field( wp_unslash( $_POST['supplier_lot'] ) ) : '';
+			$expiry_date  = isset( $_POST['expiry_date'] ) ? sanitize_text_field( wp_unslash( $_POST['expiry_date'] ) ) : '';
+			$cost         = isset( $_POST['total_cost'] ) ? wc_format_decimal( sanitize_text_field( wp_unslash( $_POST['total_cost'] ) ), wc_get_price_decimals() ) : '';
+			$minor        = '' === $cost ? 0 : (int) round( (float) $cost * ( 10 ** wc_get_price_decimals() ) );
+			$this->receiving->receive( $pack_id, $count, $reference, get_current_user_id(), 'receipt:' . get_current_user_id() . ':' . wp_generate_uuid4(), $minor, get_woocommerce_currency(), $supplier_lot, $expiry_date );
 			$this->redirect( 'stock_received' );
 		} catch ( Throwable $error ) {
 			unset( $error );
@@ -129,7 +131,9 @@ final class ReceivingController {
 		$incoming_id = isset( $_POST['incoming_id'] ) ? absint( $_POST['incoming_id'] ) : 0;
 		$this->authorize( 'laqi_lusm_receive_incoming_stock_' . $incoming_id );
 		try {
-			$this->receiving->receive_incoming( $incoming_id, get_current_user_id() );
+			$supplier_lot = isset( $_POST['supplier_lot'] ) ? sanitize_text_field( wp_unslash( $_POST['supplier_lot'] ) ) : '';
+			$expiry_date  = isset( $_POST['expiry_date'] ) ? sanitize_text_field( wp_unslash( $_POST['expiry_date'] ) ) : '';
+			$this->receiving->receive_incoming( $incoming_id, get_current_user_id(), $supplier_lot, $expiry_date );
 			$this->redirect( 'incoming_received' );
 		} catch ( Throwable $error ) {
 			unset( $error );
