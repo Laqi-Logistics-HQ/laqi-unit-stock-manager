@@ -140,6 +140,15 @@ jobs:
 
           premium_bootstrap='laqi-unit-stock-manager/src/premium-bootstrap__premium_only.php'
           if [ "${{ matrix.channel }}" = "wordpressorg" ]; then
+            expected_name='Laqi Unit Stock Manager for WooCommerce'
+          else
+            expected_name='Laqi Unit Stock Manager Pro for WooCommerce'
+          fi
+          if ! unzip -p "$archive" laqi-unit-stock-manager/laqi-unit-stock-manager.php | grep -Fx " * Plugin Name:       $expected_name" > /dev/null; then
+            echo "::error::Archive has the wrong Plugins-screen edition name."
+            exit 1
+          fi
+          if [ "${{ matrix.channel }}" = "wordpressorg" ]; then
             if grep -q '__premium_only' <<< "$contents"; then
               echo "::error::WordPress.org archive contains paid-only files."
               exit 1

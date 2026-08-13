@@ -187,6 +187,19 @@ jobs:
           freemius_contents="$(unzip -Z1 "$freemius_archive")"
           free_contents="$(unzip -Z1 "$free_archive")"
 
+          if ! unzip -p "$woo_archive" laqi-unit-stock-manager/laqi-unit-stock-manager.php | grep '^ \* Plugin Name:       Laqi Unit Stock Manager Pro for WooCommerce$' > /dev/null; then
+            echo "::error::WooCommerce archive is missing the Pro plugin name."
+            exit 1
+          fi
+          if ! unzip -p "$freemius_archive" laqi-unit-stock-manager/laqi-unit-stock-manager.php | grep '^ \* Plugin Name:       Laqi Unit Stock Manager Pro for WooCommerce$' > /dev/null; then
+            echo "::error::Freemius archive is missing the Pro plugin name."
+            exit 1
+          fi
+          if ! unzip -p "$free_archive" laqi-unit-stock-manager/laqi-unit-stock-manager.php | grep '^ \* Plugin Name:       Laqi Unit Stock Manager for WooCommerce$' > /dev/null; then
+            echo "::error::WordPress.org archive is missing the Free plugin name."
+            exit 1
+          fi
+
           for forbidden in .wp-env.json playwright.config.js docs/ tests/ test-results/ .github/ package.json package-lock.json; do
             if grep -q "^laqi-unit-stock-manager/${forbidden}" <<< "$woo_contents$freemius_contents$free_contents"; then
               echo "::error::Release archive contains development-only path: $forbidden"

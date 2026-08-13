@@ -14,11 +14,22 @@
 
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
-// TODO: delete plugin data, e.g.:
-// delete_option( 'laqi_lusm_settings' );
-// delete_site_option( 'laqi_lusm_settings' ); // multisite/network.
-//
-// For custom tables, drop them via $wpdb here. Never delete merchant-owned
-// WooCommerce orders/products. Remove plugin-owned personal data unless a
-// documented legal or operational retention reason applies, and keep the
-// exporter/eraser in src/Privacy.php consistent with that decision.
+$laqi_lusm_self     = wp_normalize_path( __DIR__ );
+$laqi_lusm_root     = wp_normalize_path( defined( 'WP_PLUGIN_DIR' ) ? WP_PLUGIN_DIR : dirname( $laqi_lusm_self ) );
+$laqi_lusm_editions = glob( $laqi_lusm_root . '/*/laqi-unit-stock-manager.php' );
+
+if ( is_array( $laqi_lusm_editions ) ) {
+	foreach ( $laqi_lusm_editions as $laqi_lusm_edition ) {
+		if ( wp_normalize_path( dirname( $laqi_lusm_edition ) ) !== $laqi_lusm_self ) {
+			return;
+		}
+	}
+}
+
+global $wpdb;
+foreach ( array( 'movements', 'mapping_components', 'mappings', 'units', 'pools' ) as $laqi_lusm_suffix ) {
+	$laqi_lusm_table = $wpdb->prefix . 'laqi_lusm_' . $laqi_lusm_suffix;
+	$wpdb->query( "DROP TABLE IF EXISTS {$laqi_lusm_table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+}
+delete_option( 'laqi_lusm_schema_version' );
+delete_site_option( 'laqi_lusm_schema_version' );
