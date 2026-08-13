@@ -5,7 +5,8 @@ is its slug (`laqi-unit-stock-manager`) and `Domain Path` points here.
 
 | File | What it is | Tracked? |
 |------|-----------|----------|
-| `laqi-unit-stock-manager.pot` | Template of all translatable strings (generated) | yes |
+| `laqi-unit-stock-manager.pot` | Free/shared translatable strings (generated) | yes |
+| `laqi-unit-stock-manager-premium__premium_only.pot` | Paid-module strings, physically removed from Free | yes |
 | `laqi-unit-stock-manager-<locale>.po` | A translator's working file for one locale | yes |
 | `laqi-unit-stock-manager-<locale>.mo` | Compiled PHP translations (loaded at runtime) | yes |
 | `laqi-unit-stock-manager-<locale>-<handle>.json` | Compiled JS translations for script `<handle>` | yes |
@@ -20,7 +21,8 @@ cd /path/to/wordpress_localhost
 WORK="docker.exe compose exec -u www-data -w /var/www/html/wp-content/plugins/laqi-unit-stock-manager php-fpm"
 
 # 1. Extract every translatable string (PHP + JS) into the .pot template.
-$WORK wp i18n make-pot . languages/laqi-unit-stock-manager.pot --domain=laqi-unit-stock-manager --exclude=build,node_modules,vendor
+$WORK wp i18n make-pot . languages/laqi-unit-stock-manager.pot --domain=laqi-unit-stock-manager --exclude=build,node_modules,vendor,src/Premium__premium_only
+$WORK wp i18n make-pot src/Premium__premium_only languages/laqi-unit-stock-manager-premium__premium_only.pot --domain=laqi-unit-stock-manager
 
 # 2. After translating .po files, compile them:
 $WORK wp i18n make-mo   languages                 # .po -> .mo  (PHP strings)

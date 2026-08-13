@@ -194,4 +194,16 @@ class Test_Stock_Mutation_Service extends WP_UnitTestCase {
 		$this->assertSame( $second->movement_id(), (int) $repository->recent( 1, 0 )[0]['id'] );
 		$this->assertSame( $first->movement_id(), (int) $repository->recent( 1, 1 )[0]['id'] );
 	}
+
+	/** Operational modules can search ledger context without another data path. */
+	public function test_movement_repository_searches_pool_type_source_and_reason(): void {
+		global $wpdb;
+		$service = new StockMutationService( $wpdb );
+		$result  = $service->apply( $this->pool_id, 10, 'manual_add', 'search-ledger:' . $this->pool_id, array( 'source_type' => 'delivery', 'reason' => 'Damaged replacement' ) );
+		$repo    = new MovementRepository( $wpdb );
+		foreach ( array( 'Ingredient A', 'manual_add', 'delivery', 'Damaged replacement' ) as $term ) {
+			$this->assertSame( $result->movement_id(), (int) $repo->search( $term, 1 )[0]['id'] );
+			$this->assertGreaterThanOrEqual( 1, $repo->count_search( $term ) );
+		}
+	}
 }

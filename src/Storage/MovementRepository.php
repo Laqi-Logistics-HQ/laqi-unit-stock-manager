@@ -59,6 +59,51 @@ final class MovementRepository {
 	}
 
 	/**
+	 * Search immutable movements for registered operational modules.
+	 *
+	 * @param string $term   Pool, type, source, or reason search.
+	 * @param int    $limit  Maximum rows.
+	 * @param int    $offset Matching rows to skip.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function search( string $term, int $limit = 50, int $offset = 0 ): array {
+		$limit  = max( 1, min( 100, $limit ) );
+		$offset = max( 0, $offset );
+		$like   = '%' . $this->db->esc_like( $term ) . '%';
+		$rows   = $this->db->get_results(
+			$this->db->prepare(
+				'SELECT m.id, m.pool_id, m.type, m.delta_base, m.balance_base, m.source_type, m.source_id, m.actor_id, m.reason, m.created_at, p.name AS pool_name, p.family, p.display_unit FROM ' . Schema::table( 'movements' ) . ' m LEFT JOIN ' . Schema::table( 'pools' ) . ' p ON p.id = m.pool_id WHERE p.name LIKE %s OR m.type LIKE %s OR m.source_type LIKE %s OR m.reason LIKE %s ORDER BY m.id DESC LIMIT %d OFFSET %d',
+				$like,
+				$like,
+				$like,
+				$like,
+				$limit,
+				$offset
+			),
+			ARRAY_A
+		);
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/** Count movements matching an operational search.
+	 *
+	 * @param string $term Search.
+	 * @return int
+	 */
+	public function count_search( string $term ): int {
+		$like = '%' . $this->db->esc_like( $term ) . '%';
+		return (int) $this->db->get_var(
+			$this->db->prepare(
+				'SELECT COUNT(*) FROM ' . Schema::table( 'movements' ) . ' m LEFT JOIN ' . Schema::table( 'pools' ) . ' p ON p.id = m.pool_id WHERE p.name LIKE %s OR m.type LIKE %s OR m.source_type LIKE %s OR m.reason LIKE %s',
+				$like,
+				$like,
+				$like,
+				$like
+			)
+		);
+	}
+
+	/**
 	 * Get movements attributed to one WordPress user.
 	 *
 	 * @param int $actor_id User ID.
