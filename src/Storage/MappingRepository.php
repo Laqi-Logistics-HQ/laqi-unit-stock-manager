@@ -185,6 +185,77 @@ final class MappingRepository {
 	}
 
 	/**
+	 * Find active mappings for setup management.
+	 *
+	 * @param int $limit Maximum mappings.
+	 * @return ProductMapping[]
+	 */
+	public function active( int $limit = 500 ): array {
+		$limit = max( 1, min( 500, $limit ) );
+		$rows  = $this->db->get_results(
+			$this->db->prepare(
+				'SELECT product_id, variation_id FROM ' . Schema::table( 'mappings' ) . ' WHERE active = 1 ORDER BY updated_at DESC, id DESC LIMIT %d',
+				$limit
+			),
+			ARRAY_A
+		);
+		$items = array();
+		foreach ( $rows as $row ) {
+			$mapping = $this->find_for_product( (int) $row['product_id'], (int) $row['variation_id'] );
+			if ( null !== $mapping ) {
+				$items[] = $mapping;
+			}
+		}
+
+		return $items;
+	}
+
+	/**
+	 * Deactivate a mapping while retaining its versioned record.
+	 *
+	 * Existing order snapshots remain authoritative for later restoration.
+	 *
+	 * @param int $mapping_id Mapping ID.
+	 * @return ProductMapping
+	 * @throws \InvalidArgumentException When the mapping is not active.
+	 * @throws RuntimeException When persistence fails.
+	 */
+	public function deactivate( int $mapping_id ): ProductMapping {
+		$row = $this->db->get_row(
+			$this->db->prepare( 'SELECT product_id, variation_id FROM ' . Schema::table( 'mappings' ) . ' WHERE id = %d AND active = 1', $mapping_id ),
+			ARRAY_A
+		);
+		if ( ! is_array( $row ) ) {
+			throw new \InvalidArgumentException( 'The product mapping is not active.' );
+		}
+
+		$mapping = $this->find_for_product( (int) $row['product_id'], (int) $row['variation_id'] );
+		if ( null === $mapping ) {
+			throw new \InvalidArgumentException( 'The product mapping is not active.' );
+		}
+
+		$updated = $this->db->update(
+			Schema::table( 'mappings' ),
+			array(
+				'active'     => 0,
+				'version'    => $mapping->version() + 1,
+				'updated_at' => current_time( 'mysql', true ),
+			),
+			array(
+				'id'     => $mapping_id,
+				'active' => 1,
+			),
+			array( '%d', '%d', '%s' ),
+			array( '%d', '%d' )
+		);
+		if ( 1 !== $updated ) {
+			throw new RuntimeException( 'Could not deactivate the product mapping.' );
+		}
+
+		return $mapping;
+	}
+
+	/**
 	 * Find active mappings consuming one inventory pool.
 	 *
 	 * @param int $pool_id Pool ID.

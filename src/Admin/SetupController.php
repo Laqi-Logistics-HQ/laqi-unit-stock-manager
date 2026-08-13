@@ -89,7 +89,22 @@ final class SetupController {
 	public function register(): void {
 		add_action( 'admin_post_laqi_lusm_create_pool', array( $this, 'create_pool' ) );
 		add_action( 'admin_post_laqi_lusm_save_mapping', array( $this, 'save_mapping' ) );
+		add_action( 'admin_post_laqi_lusm_unlink_mapping', array( $this, 'unlink_mapping' ) );
 		add_action( 'admin_post_laqi_lusm_create_unit', array( $this, 'create_unit' ) );
+	}
+
+	/** Deactivate a product mapping without changing historical snapshots. @return void */
+	public function unlink_mapping(): void {
+		$mapping_id = isset( $_POST['mapping_id'] ) ? absint( $_POST['mapping_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$this->authorize( 'laqi_lusm_unlink_mapping_' . $mapping_id );
+		try {
+			$mapping = $this->mappings->deactivate( $mapping_id );
+			do_action( 'laqi_lusm_mapping_changed', $mapping->product_id(), $mapping->variation_id(), 0 );
+			$this->redirect( 'mapping_unlinked' );
+		} catch ( Throwable $error ) {
+			unset( $error );
+			$this->redirect( 'setup_error' );
+		}
 	}
 
 	/**

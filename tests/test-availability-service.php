@@ -123,4 +123,25 @@ class Test_Availability_Service extends WP_UnitTestCase {
 		$this->assertSame( 20, $this->service->saleable_quantity( 100, 101 ) );
 		$this->assertSame( 1, (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . Schema::table( 'mapping_components' ) . ' WHERE mapping_id = (SELECT id FROM ' . Schema::table( 'mappings' ) . ' WHERE product_id = %d AND variation_id = %d)', 100, 101 ) ) );
 	}
+
+	/**
+	 * Unlinking keeps the versioned definition but removes it from availability.
+	 */
+	public function test_mapping_can_be_deactivated_without_deleting_components(): void {
+		global $wpdb;
+
+		$maps    = new MappingRepository( $wpdb );
+		$mapping = $maps->find_for_product( 100, 101 );
+		$this->assertNotNull( $mapping );
+		$this->assertContains( $mapping->id(), array_map( static function ( $item ): int { return $item->id(); }, $maps->active() ) );
+
+		$deactivated = $maps->deactivate( $mapping->id() );
+
+		$this->assertSame( $mapping->id(), $deactivated->id() );
+		$this->assertNull( $maps->find_for_product( 100, 101 ) );
+		$this->assertNull( $this->service->saleable_quantity( 100, 101 ) );
+		$this->assertNotContains( $mapping->id(), array_map( static function ( $item ): int { return $item->id(); }, $maps->active() ) );
+		$this->assertSame( 1, (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . Schema::table( 'mapping_components' ) . ' WHERE mapping_id = %d', $mapping->id() ) ) );
+		$this->assertSame( $mapping->version() + 1, (int) $wpdb->get_var( $wpdb->prepare( 'SELECT version FROM ' . Schema::table( 'mappings' ) . ' WHERE id = %d', $mapping->id() ) ) );
+	}
 }
