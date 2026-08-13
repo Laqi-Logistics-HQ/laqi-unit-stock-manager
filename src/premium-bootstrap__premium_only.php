@@ -32,6 +32,8 @@ require_once __DIR__ . '/Premium__premium_only/Reports/StockReportBuilder.php';
 require_once __DIR__ . '/Premium__premium_only/Reports/StockReportScheduler.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/StockReportController.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/StockReportSection.php';
+require_once __DIR__ . '/Premium__premium_only/Planning/StockScenarioPlanner.php';
+require_once __DIR__ . '/Premium__premium_only/Admin/StockScenarioSection.php';
 
 /**
  * Give physically separate paid modules the completed shared composition root.
@@ -55,12 +57,14 @@ add_action(
 		$report_settings   = new Premium\Reports\StockReportSettings();
 		$report_builder    = new Premium\Reports\StockReportBuilder( $container->pool_repository(), $container->quantity_formatter(), $alert_policies, $forecast_policies, $forecast_service );
 		$report_scheduler  = new Premium\Reports\StockReportScheduler( $report_settings, $report_builder );
+		$scenario_planner  = new Premium\Planning\StockScenarioPlanner( $container->pool_repository(), $container->mapping_repository(), $forecast_policies, $forecast_service );
 		$loss_types->register( $container->movement_registry() );
 		$container->screen_section_catalog()->register( new Premium\Admin\MovementLedgerSection( $container->movement_repository(), $container->movement_presenter(), new Admin\PaginationRenderer() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\StockLossSection( $container->pool_repository(), $container->quantity_formatter(), $loss_types ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\LowStockAlertsSection( $alert_policies, $container->pool_repository(), $container->quantity_formatter(), $alert_deliveries ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ForecastSection( $container->pool_repository(), $forecast_policies, $forecast_service, $container->quantity_formatter(), new Admin\PaginationRenderer() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\StockReportSection( $report_settings ) );
+		$container->screen_section_catalog()->register( new Premium\Admin\StockScenarioSection( $container->pool_repository(), $scenario_planner, $container->quantity_formatter() ) );
 		( new Premium\Admin\MovementLedgerExportController( $container->movement_repository(), $container->movement_presenter() ) )->register();
 		( new Premium\Admin\StockLossController( $container->stock_adjustment_service(), $loss_types ) )->register();
 		( new Premium\Admin\LowStockAlertController( $alert_policies, $container->pool_repository(), $container->unit_registry() ) )->register();

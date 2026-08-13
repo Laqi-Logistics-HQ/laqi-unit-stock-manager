@@ -7,7 +7,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T18:31:06+00:00\n"
+"POT-Creation-Date: 2026-08-13T18:42:11+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -38,6 +38,7 @@ msgstr ""
 #: Admin/MovementLedgerExportController.php:86
 #: Admin/MovementLedgerSection.php:81
 #: Admin/StockLossSection.php:70
+#: Admin/StockScenarioSection.php:53
 #: Reports/StockReportBuilder.php:62
 msgid "Inventory pool"
 msgstr ""
@@ -45,12 +46,14 @@ msgstr ""
 #: Admin/ForecastSection.php:73
 #: Admin/LowStockAlertsSection.php:75
 #: Admin/StockLossSection.php:70
+#: Admin/StockScenarioSection.php:53
 msgid "Search inventory pools"
 msgstr ""
 
 #: Admin/ForecastSection.php:77
 #: Admin/LowStockAlertsSection.php:79
 #: Admin/StockLossSection.php:74
+#: Admin/StockScenarioSection.php:57
 msgid "Choose pool"
 msgstr ""
 
@@ -505,6 +508,74 @@ msgstr ""
 
 #: Admin/StockReportSection.php:110
 msgid "The stock report could not be saved or sent."
+msgstr ""
+
+#: Admin/StockScenarioSection.php:46
+msgid "Planner"
+msgstr ""
+
+#: Admin/StockScenarioSection.php:52
+msgid "Stock scenario planner"
+msgstr ""
+
+#: Admin/StockScenarioSection.php:52
+msgid "Model a promotion or sales mix without changing stock, mappings, or forecasts."
+msgstr ""
+
+#. translators: %s: pool name.
+#: Admin/StockScenarioSection.php:76
+#, php-format
+msgid "Scenario for %s"
+msgstr ""
+
+#. translators: %s: formatted stock.
+#: Admin/StockScenarioSection.php:76
+#, php-format
+msgid "Current on hand: %s"
+msgstr ""
+
+#: Admin/StockScenarioSection.php:80
+msgid "This pool has no active product mappings to model."
+msgstr ""
+
+#: Admin/StockScenarioSection.php:84
+msgid "Product or variation"
+msgstr ""
+
+#: Admin/StockScenarioSection.php:84
+msgid "Use per sale"
+msgstr ""
+
+#: Admin/StockScenarioSection.php:84
+msgid "Expected sales"
+msgstr ""
+
+#: Admin/StockScenarioSection.php:91
+msgid "Promotion uplift (%)"
+msgstr ""
+
+#: Admin/StockScenarioSection.php:91
+msgid "Calculate scenario"
+msgstr ""
+
+#: Admin/StockScenarioSection.php:95
+msgid "The current stock covers this scenario."
+msgstr ""
+
+#: Admin/StockScenarioSection.php:95
+msgid "This scenario exceeds current stock."
+msgstr ""
+
+#: Admin/StockScenarioSection.php:95
+msgid "Scenario demand"
+msgstr ""
+
+#: Admin/StockScenarioSection.php:95
+msgid "Projected balance"
+msgstr ""
+
+#: Admin/StockScenarioSection.php:99
+msgid "Projected days remaining"
 msgstr ""
 
 #. translators: 1: severity, 2: inventory pool name.
