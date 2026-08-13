@@ -93,6 +93,10 @@ Mapping edits update the active pool and exact consumption rule without repeatin
 the one-time native-stock migration decision. They use optimistic mapping versions,
 so a stale form cannot silently overwrite a newer administrator change.
 
+Custom units use soft retirement. The repository prevents retirement while a pool
+uses the key as its base/display unit or another active custom unit references it;
+retired records remain stored so a historical key is never redefined accidentally.
+
 The Stock tab searches pool names and internal SKUs together with linked product
 names, variation SKUs, and attributes. Results use repository-backed counts and
 25-row pages, so the admin screen does not silently stop at a fixed catalog size.

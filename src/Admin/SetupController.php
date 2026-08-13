@@ -92,6 +92,20 @@ final class SetupController {
 		add_action( 'admin_post_laqi_lusm_unlink_mapping', array( $this, 'unlink_mapping' ) );
 		add_action( 'admin_post_laqi_lusm_update_mapping', array( $this, 'update_mapping' ) );
 		add_action( 'admin_post_laqi_lusm_create_unit', array( $this, 'create_unit' ) );
+		add_action( 'admin_post_laqi_lusm_retire_unit', array( $this, 'retire_unit' ) );
+	}
+
+	/** Retire an unused merchant-defined unit. @return void */
+	public function retire_unit(): void {
+		$unit_id = isset( $_POST['unit_id'] ) ? absint( $_POST['unit_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$this->authorize( 'laqi_lusm_retire_unit_' . $unit_id );
+		try {
+			$this->custom_units->deactivate( $unit_id );
+			$this->redirect( 'unit_retired' );
+		} catch ( Throwable $error ) {
+			unset( $error );
+			$this->redirect( 'unit_in_use' );
+		}
 	}
 
 	/** Update an active mapping without repeating native-stock migration.

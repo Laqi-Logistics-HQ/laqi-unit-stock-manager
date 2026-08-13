@@ -206,10 +206,21 @@ final class SetupSection implements ScreenSectionInterface {
 		if ( array() === $units ) {
 			return;
 		}
-		echo '<h3>' . esc_html__( 'Custom units', 'laqi-unit-stock-manager' ) . '</h3><ul class="laqi-lusm-custom-units">';
+		echo '<h3>' . esc_html__( 'Custom units', 'laqi-unit-stock-manager' ) . '</h3>';
+		echo '<p class="description">' . esc_html__( 'Unused units can be retired. Units used by an inventory pool or another active custom unit are protected.', 'laqi-unit-stock-manager' ) . '</p>';
+		echo '<ul class="laqi-lusm-custom-units">';
 		foreach ( $units as $unit ) {
 			/* translators: 1: unit label, 2: unit key, 3: equivalent quantity, 4: reference unit. */
-			echo '<li>' . esc_html( sprintf( __( '%1$s (%2$s) = %3$s %4$s', 'laqi-unit-stock-manager' ), $unit['label'], $unit['unit_key'], $unit['reference_value'], $unit['reference_unit'] ) ) . '</li>';
+			echo '<li><span>' . esc_html( sprintf( __( '%1$s (%2$s) = %3$s %4$s', 'laqi-unit-stock-manager' ), $unit['label'], $unit['unit_key'], $unit['reference_value'], $unit['reference_unit'] ) ) . '</span>';
+			?>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+				<input type="hidden" name="action" value="laqi_lusm_retire_unit" />
+				<input type="hidden" name="unit_id" value="<?php echo esc_attr( $unit['id'] ); ?>" />
+				<?php wp_nonce_field( 'laqi_lusm_retire_unit_' . $unit['id'] ); ?>
+				<?php submit_button( __( 'Retire', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?>
+			</form>
+			<?php
+			echo '</li>';
 		}
 		echo '</ul>';
 	}

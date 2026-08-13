@@ -63,7 +63,7 @@ Yes. Map each variation to the same inventory pool and specify its exact consump
 
 = Can I use my own units? =
 
-Yes. The Setup tab can define an exact custom unit from an existing unit. Custom units are available to pool and mapping forms after creation.
+Yes. The Setup tab can define an exact custom unit from an existing unit. Custom units are available to pool and mapping forms after creation. Unused custom units can be retired, while units used by pools or other active custom definitions are protected.
 
 = What happens to existing WooCommerce stock? =
 
