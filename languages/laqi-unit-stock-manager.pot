@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T14:07:48+00:00\n"
+"POT-Creation-Date: 2026-08-13T14:13:54+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -58,7 +58,7 @@ msgid "Search"
 msgstr ""
 
 #: src/Admin/PoolStockSection.php:101
-#: src/Admin/SetupSection.php:101
+#: src/Admin/SetupSection.php:140
 msgid "Inventory pool"
 msgstr ""
 
@@ -131,71 +131,110 @@ msgstr ""
 msgid "Apply"
 msgstr ""
 
-#: src/Admin/SetupController.php:157
+#: src/Admin/SetupController.php:193
 msgid "You are not allowed to configure unit stock."
 msgstr ""
 
-#: src/Admin/SetupSection.php:53
+#: src/Admin/SetupSection.php:63
 msgid "Setup"
 msgstr ""
 
-#: src/Admin/SetupSection.php:61
+#: src/Admin/SetupSection.php:71
 msgid "Create inventory pool"
 msgstr ""
 
-#: src/Admin/SetupSection.php:62
+#: src/Admin/SetupSection.php:72
 msgid "Create the authoritative bulk quantity that products and variations will consume."
 msgstr ""
 
-#: src/Admin/SetupSection.php:66
+#: src/Admin/SetupSection.php:76
 msgid "Pool name"
 msgstr ""
 
-#: src/Admin/SetupSection.php:67
+#: src/Admin/SetupSection.php:77
 msgid "Internal SKU"
 msgstr ""
 
-#: src/Admin/SetupSection.php:68
+#: src/Admin/SetupSection.php:78
 msgid "Stock unit"
 msgstr ""
 
-#: src/Admin/SetupSection.php:69
+#: src/Admin/SetupSection.php:79
 msgid "Opening balance"
 msgstr ""
 
-#: src/Admin/SetupSection.php:70
+#: src/Admin/SetupSection.php:80
 msgid "Create pool"
 msgstr ""
 
-#: src/Admin/SetupSection.php:74
+#: src/Admin/SetupSection.php:84
 msgid "Link a product or variation"
 msgstr ""
 
-#: src/Admin/SetupSection.php:75
+#: src/Admin/SetupSection.php:85
 msgid "Choose exactly how much pooled stock one sold item consumes. Labels are never parsed automatically."
 msgstr ""
 
-#: src/Admin/SetupSection.php:87
-msgid "Create an inventory pool before linking products."
+#: src/Admin/SetupSection.php:89
+#: src/Admin/SetupSection.php:99
+msgid "Create custom unit"
+msgstr ""
+
+#: src/Admin/SetupSection.php:90
+msgid "Define a merchant unit as an exact quantity of any existing unit, such as one sack equaling 25 kg."
 msgstr ""
 
 #: src/Admin/SetupSection.php:94
-msgid "Product or variation"
+msgid "Unit key"
+msgstr ""
+
+#: src/Admin/SetupSection.php:95
+msgid "Label"
 msgstr ""
 
 #: src/Admin/SetupSection.php:96
+msgid "Symbol"
+msgstr ""
+
+#: src/Admin/SetupSection.php:97
+msgid "Equivalent quantity"
+msgstr ""
+
+#: src/Admin/SetupSection.php:98
+msgid "Of unit"
+msgstr ""
+
+#: src/Admin/SetupSection.php:113
+msgid "Custom units"
+msgstr ""
+
+#. translators: 1: unit label, 2: unit key, 3: equivalent quantity, 4: reference unit.
+#: src/Admin/SetupSection.php:116
+#, php-format
+msgid "%1$s (%2$s) = %3$s %4$s"
+msgstr ""
+
+#: src/Admin/SetupSection.php:126
+msgid "Create an inventory pool before linking products."
+msgstr ""
+
+#: src/Admin/SetupSection.php:133
+msgid "Product or variation"
+msgstr ""
+
+#: src/Admin/SetupSection.php:135
 msgid "Select a product"
 msgstr ""
 
-#: src/Admin/SetupSection.php:107
+#: src/Admin/SetupSection.php:146
 msgid "Consumption per sold item"
 msgstr ""
 
-#: src/Admin/SetupSection.php:108
+#: src/Admin/SetupSection.php:147
 msgid "Consumption unit"
 msgstr ""
 
-#: src/Admin/SetupSection.php:109
+#: src/Admin/SetupSection.php:148
 msgid "Save mapping"
 msgstr ""
 
@@ -229,11 +268,15 @@ msgstr ""
 msgid "Product stock mapping saved."
 msgstr ""
 
-#: src/Admin/UnitStockPage.php:123
+#: src/Admin/UnitStockPage.php:124
+msgid "Custom stock unit created."
+msgstr ""
+
+#: src/Admin/UnitStockPage.php:131
 msgid "The setup could not be saved. Check that the quantities and units are compatible."
 msgstr ""
 
-#: src/Admin/UnitStockPage.php:125
+#: src/Admin/UnitStockPage.php:133
 msgid "Inventory stock could not be updated. Check the quantity and try again."
 msgstr ""
 

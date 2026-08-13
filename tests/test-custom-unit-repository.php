@@ -47,5 +47,7 @@ class Test_Custom_Unit_Repository extends WP_UnitTestCase {
 
 		$this->assertSame( 25000000000000, $reloaded->get( 'sack' )->base_factor() );
 		$this->assertSame( 50000000000000, $reloaded->normalize( '2', 'sack' )->amount() );
+		$this->assertSame( 'Supplier sack', $repository->active()[0]['label'] );
+		$this->assertSame( 'kg', $repository->active()[0]['reference_unit'] );
 	}
 }

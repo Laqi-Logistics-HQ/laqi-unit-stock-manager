@@ -43,6 +43,11 @@ class Test_Stock_Status_Synchronizer extends WP_UnitTestCase {
 		$this->product->set_regular_price( '5' );
 		$this->product->set_status( 'publish' );
 		$this->product->save();
+		$stale_mapping_ids = $wpdb->get_col( $wpdb->prepare( 'SELECT id FROM ' . Schema::table( 'mappings' ) . ' WHERE product_id = %d', $this->product->get_id() ) );
+		foreach ( $stale_mapping_ids as $stale_mapping_id ) {
+			$wpdb->delete( Schema::table( 'mapping_components' ), array( 'mapping_id' => $stale_mapping_id ), array( '%d' ) );
+		}
+		$wpdb->delete( Schema::table( 'mappings' ), array( 'product_id' => $this->product->get_id() ), array( '%d' ) );
 
 		$pools         = new PoolRepository( $wpdb );
 		$mappings      = new MappingRepository( $wpdb );
