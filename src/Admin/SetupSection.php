@@ -10,6 +10,7 @@ namespace LaqiUnitStockManager\Admin;
 defined( 'ABSPATH' ) || exit;
 
 use LaqiUnitStockManager\Storage\PoolRepository;
+use LaqiUnitStockManager\Storage\CustomUnitRepository;
 use LaqiUnitStockManager\Unit\UnitRegistry;
 use WC_Product;
 
@@ -33,14 +34,23 @@ final class SetupSection implements ScreenSectionInterface {
 	private $units;
 
 	/**
+	 * Custom-unit persistence.
+	 *
+	 * @var CustomUnitRepository
+	 */
+	private $custom_units;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param PoolRepository $pools Pool repository.
-	 * @param UnitRegistry   $units Unit registry.
+	 * @param PoolRepository       $pools Pool repository.
+	 * @param UnitRegistry         $units Unit registry.
+	 * @param CustomUnitRepository $custom_units Custom-unit persistence.
 	 */
-	public function __construct( PoolRepository $pools, UnitRegistry $units ) {
-		$this->pools = $pools;
-		$this->units = $units;
+	public function __construct( PoolRepository $pools, UnitRegistry $units, CustomUnitRepository $custom_units ) {
+		$this->pools        = $pools;
+		$this->units        = $units;
+		$this->custom_units = $custom_units;
 	}
 
 	/** Get the section ID. @return string */
@@ -75,8 +85,37 @@ final class SetupSection implements ScreenSectionInterface {
 				<p><?php esc_html_e( 'Choose exactly how much pooled stock one sold item consumes. Labels are never parsed automatically.', 'laqi-unit-stock-manager' ); ?></p>
 				<?php $this->render_mapping_form(); ?>
 			</section>
+			<section class="card">
+				<h2><?php esc_html_e( 'Create custom unit', 'laqi-unit-stock-manager' ); ?></h2>
+				<p><?php esc_html_e( 'Define a merchant unit as an exact quantity of any existing unit, such as one sack equaling 25 kg.', 'laqi-unit-stock-manager' ); ?></p>
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+					<input type="hidden" name="action" value="laqi_lusm_create_unit" />
+					<?php wp_nonce_field( 'laqi_lusm_create_unit' ); ?>
+					<?php $this->text_field( 'unit_key', __( 'Unit key', 'laqi-unit-stock-manager' ), true ); ?>
+					<?php $this->text_field( 'unit_label', __( 'Label', 'laqi-unit-stock-manager' ), true ); ?>
+					<?php $this->text_field( 'unit_symbol', __( 'Symbol', 'laqi-unit-stock-manager' ), true ); ?>
+					<?php $this->text_field( 'reference_value', __( 'Equivalent quantity', 'laqi-unit-stock-manager' ), true, 'decimal' ); ?>
+					<?php $this->unit_field( 'reference_unit', __( 'Of unit', 'laqi-unit-stock-manager' ) ); ?>
+					<?php submit_button( __( 'Create custom unit', 'laqi-unit-stock-manager' ) ); ?>
+				</form>
+				<?php $this->render_custom_units(); ?>
+			</section>
 		</div>
 		<?php
+	}
+
+	/** Render existing custom definitions. @return void */
+	private function render_custom_units(): void {
+		$units = $this->custom_units->active();
+		if ( array() === $units ) {
+			return;
+		}
+		echo '<h3>' . esc_html__( 'Custom units', 'laqi-unit-stock-manager' ) . '</h3><ul class="laqi-lusm-custom-units">';
+		foreach ( $units as $unit ) {
+			/* translators: 1: unit label, 2: unit key, 3: equivalent quantity, 4: reference unit. */
+			echo '<li>' . esc_html( sprintf( __( '%1$s (%2$s) = %3$s %4$s', 'laqi-unit-stock-manager' ), $unit['label'], $unit['unit_key'], $unit['reference_value'], $unit['reference_unit'] ) ) . '</li>';
+		}
+		echo '</ul>';
 	}
 
 	/** Render the mapping form. @return void */

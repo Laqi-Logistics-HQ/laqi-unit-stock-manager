@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 use LaqiUnitStockManager\Inventory\StockMutationService;
 use LaqiUnitStockManager\Storage\MappingRepository;
 use LaqiUnitStockManager\Storage\PoolRepository;
+use LaqiUnitStockManager\Storage\CustomUnitRepository;
 use LaqiUnitStockManager\Unit\UnitRegistry;
 use Throwable;
 use WC_Product_Variation;
@@ -42,24 +43,59 @@ final class SetupController {
 	private $mutations;
 
 	/**
+	 * Custom-unit persistence.
+	 *
+	 * @var CustomUnitRepository
+	 */
+	private $custom_units;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param PoolRepository       $pools     Pool repository.
 	 * @param MappingRepository    $mappings  Mapping repository.
 	 * @param UnitRegistry         $units     Unit registry.
 	 * @param StockMutationService $mutations Mutation service.
+	 * @param CustomUnitRepository $custom_units Custom-unit persistence.
 	 */
-	public function __construct( PoolRepository $pools, MappingRepository $mappings, UnitRegistry $units, StockMutationService $mutations ) {
-		$this->pools     = $pools;
-		$this->mappings  = $mappings;
-		$this->units     = $units;
-		$this->mutations = $mutations;
+	public function __construct( PoolRepository $pools, MappingRepository $mappings, UnitRegistry $units, StockMutationService $mutations, CustomUnitRepository $custom_units ) {
+		$this->pools        = $pools;
+		$this->mappings     = $mappings;
+		$this->units        = $units;
+		$this->mutations    = $mutations;
+		$this->custom_units = $custom_units;
 	}
 
 	/** Register setup endpoints. @return void */
 	public function register(): void {
 		add_action( 'admin_post_laqi_lusm_create_pool', array( $this, 'create_pool' ) );
 		add_action( 'admin_post_laqi_lusm_save_mapping', array( $this, 'save_mapping' ) );
+		add_action( 'admin_post_laqi_lusm_create_unit', array( $this, 'create_unit' ) );
+	}
+
+	/**
+	 * Create a merchant-defined unit.
+	 *
+	 * @return void
+	 * @throws \InvalidArgumentException When unit input is invalid.
+	 */
+	public function create_unit(): void {
+		$this->authorize( 'laqi_lusm_create_unit' );
+		try {
+			$key       = isset( $_POST['unit_key'] ) ? sanitize_key( wp_unslash( $_POST['unit_key'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$label     = isset( $_POST['unit_label'] ) ? sanitize_text_field( wp_unslash( $_POST['unit_label'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$symbol    = isset( $_POST['unit_symbol'] ) ? sanitize_text_field( wp_unslash( $_POST['unit_symbol'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$value     = isset( $_POST['reference_value'] ) ? sanitize_text_field( wp_unslash( $_POST['reference_value'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$reference = isset( $_POST['reference_unit'] ) ? sanitize_key( wp_unslash( $_POST['reference_unit'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			if ( '' === $label || '' === $symbol ) {
+				throw new \InvalidArgumentException( 'A custom unit requires a label and symbol.' );
+			}
+			$this->custom_units->create( $this->units, $key, $label, $symbol, $value, $reference );
+			$this->redirect( 'unit_created' );
+		} catch ( Throwable $error ) {
+			unset( $error );
+			$this->redirect( 'setup_error' );
+		}
 	}
 
 	/** Create an inventory pool.

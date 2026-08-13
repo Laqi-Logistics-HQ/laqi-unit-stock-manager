@@ -119,6 +119,14 @@ final class UnitStockPage {
 					'dismissible' => true,
 				)
 			);
+		} elseif ( 'unit_created' === $result ) {
+			wp_admin_notice(
+				__( 'Custom stock unit created.', 'laqi-unit-stock-manager' ),
+				array(
+					'type'        => 'success',
+					'dismissible' => true,
+				)
+			);
 		} elseif ( 'setup_error' === $result ) {
 			wp_admin_notice( __( 'The setup could not be saved. Check that the quantities and units are compatible.', 'laqi-unit-stock-manager' ), array( 'type' => 'error' ) );
 		} elseif ( 'error' === $result ) {

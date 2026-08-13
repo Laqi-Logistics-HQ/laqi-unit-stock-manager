@@ -97,4 +97,18 @@ final class CustomUnitRepository {
 			);
 		}
 	}
+
+	/**
+	 * List active merchant-defined unit metadata.
+	 *
+	 * @return array<int, array<string, string>>
+	 */
+	public function active(): array {
+		$rows = $this->db->get_results(
+			'SELECT unit_key, label, symbol, family, reference_value, reference_unit FROM ' . Schema::table( 'units' ) . ' WHERE active = 1 ORDER BY label ASC, id ASC', // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			ARRAY_A
+		); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+
+		return is_array( $rows ) ? $rows : array();
+	}
 }
