@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T12:23:58+00:00\n"
+"POT-Creation-Date: 2026-08-13T12:34:19+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -58,6 +58,7 @@ msgid "Search"
 msgstr ""
 
 #: src/Admin/PoolStockSection.php:68
+#: src/Admin/SetupSection.php:101
 msgid "Inventory pool"
 msgstr ""
 
@@ -105,6 +106,74 @@ msgstr ""
 msgid "Apply"
 msgstr ""
 
+#: src/Admin/SetupController.php:157
+msgid "You are not allowed to configure unit stock."
+msgstr ""
+
+#: src/Admin/SetupSection.php:53
+msgid "Setup"
+msgstr ""
+
+#: src/Admin/SetupSection.php:61
+msgid "Create inventory pool"
+msgstr ""
+
+#: src/Admin/SetupSection.php:62
+msgid "Create the authoritative bulk quantity that products and variations will consume."
+msgstr ""
+
+#: src/Admin/SetupSection.php:66
+msgid "Pool name"
+msgstr ""
+
+#: src/Admin/SetupSection.php:67
+msgid "Internal SKU"
+msgstr ""
+
+#: src/Admin/SetupSection.php:68
+msgid "Stock unit"
+msgstr ""
+
+#: src/Admin/SetupSection.php:69
+msgid "Opening balance"
+msgstr ""
+
+#: src/Admin/SetupSection.php:70
+msgid "Create pool"
+msgstr ""
+
+#: src/Admin/SetupSection.php:74
+msgid "Link a product or variation"
+msgstr ""
+
+#: src/Admin/SetupSection.php:75
+msgid "Choose exactly how much pooled stock one sold item consumes. Labels are never parsed automatically."
+msgstr ""
+
+#: src/Admin/SetupSection.php:87
+msgid "Create an inventory pool before linking products."
+msgstr ""
+
+#: src/Admin/SetupSection.php:94
+msgid "Product or variation"
+msgstr ""
+
+#: src/Admin/SetupSection.php:96
+msgid "Select a product"
+msgstr ""
+
+#: src/Admin/SetupSection.php:107
+msgid "Consumption per sold item"
+msgstr ""
+
+#: src/Admin/SetupSection.php:108
+msgid "Consumption unit"
+msgstr ""
+
+#: src/Admin/SetupSection.php:109
+msgid "Save mapping"
+msgstr ""
+
 #: src/Admin/StockAdjustmentController.php:69
 msgid "You are not allowed to adjust unit stock."
 msgstr ""
@@ -127,11 +196,23 @@ msgstr ""
 msgid "Inventory stock updated."
 msgstr ""
 
-#: src/Admin/UnitStockPage.php:107
+#: src/Admin/UnitStockPage.php:108
+msgid "Inventory pool created."
+msgstr ""
+
+#: src/Admin/UnitStockPage.php:116
+msgid "Product stock mapping saved."
+msgstr ""
+
+#: src/Admin/UnitStockPage.php:123
+msgid "The setup could not be saved. Check that the quantities and units are compatible."
+msgstr ""
+
+#: src/Admin/UnitStockPage.php:125
 msgid "Inventory stock could not be updated. Check the quantity and try again."
 msgstr ""
 
-#: src/Plugin.php:149
+#: src/Plugin.php:151
 msgid "Laqi Unit Stock Manager for WooCommerce requires WooCommerce to be installed and active."
 msgstr ""
 

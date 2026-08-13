@@ -43,15 +43,17 @@ final class PoolRepository {
 	 * @param string   $base_unit        Canonical unit key.
 	 * @param string   $display_unit     Preferred display unit.
 	 * @param bool     $allow_backorders Whether negative stock is allowed.
+	 * @param string   $internal_sku     Optional merchant-facing pool SKU.
 	 * @return Pool
 	 * @throws RuntimeException When persistence fails.
 	 */
-	public function create( string $name, Quantity $opening_balance, string $base_unit, string $display_unit, bool $allow_backorders = false ): Pool {
+	public function create( string $name, Quantity $opening_balance, string $base_unit, string $display_unit, bool $allow_backorders = false, string $internal_sku = '' ): Pool {
 		$now      = current_time( 'mysql', true );
 		$inserted = $this->db->insert(
 			Schema::table( 'pools' ),
 			array(
 				'name'             => $name,
+				'internal_sku'     => $internal_sku,
 				'family'           => $opening_balance->family(),
 				'base_unit'        => $base_unit,
 				'display_unit'     => $display_unit,
@@ -60,7 +62,7 @@ final class PoolRepository {
 				'created_at'       => $now,
 				'updated_at'       => $now,
 			),
-			array( '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s' )
+			array( '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s' )
 		);
 
 		if ( false === $inserted ) {
@@ -68,6 +70,21 @@ final class PoolRepository {
 		}
 
 		return new Pool( (int) $this->db->insert_id, $name, $opening_balance, $display_unit, $allow_backorders );
+	}
+
+	/**
+	 * Create a pool with a zero balance for mutation-service initialization.
+	 *
+	 * @param string $name             Pool name.
+	 * @param string $family           Measurement family.
+	 * @param string $base_unit        Canonical unit key.
+	 * @param string $display_unit     Preferred display unit.
+	 * @param bool   $allow_backorders Whether negative stock is allowed.
+	 * @param string $internal_sku     Optional merchant-facing pool SKU.
+	 * @return Pool
+	 */
+	public function create_empty( string $name, string $family, string $base_unit, string $display_unit, bool $allow_backorders = false, string $internal_sku = '' ): Pool {
+		return $this->create( $name, new Quantity( $family, 0 ), $base_unit, $display_unit, $allow_backorders, $internal_sku );
 	}
 
 	/**

@@ -103,6 +103,24 @@ final class UnitStockPage {
 					'dismissible' => true,
 				)
 			);
+		} elseif ( 'pool_created' === $result ) {
+			wp_admin_notice(
+				__( 'Inventory pool created.', 'laqi-unit-stock-manager' ),
+				array(
+					'type'        => 'success',
+					'dismissible' => true,
+				)
+			);
+		} elseif ( 'mapping_saved' === $result ) {
+			wp_admin_notice(
+				__( 'Product stock mapping saved.', 'laqi-unit-stock-manager' ),
+				array(
+					'type'        => 'success',
+					'dismissible' => true,
+				)
+			);
+		} elseif ( 'setup_error' === $result ) {
+			wp_admin_notice( __( 'The setup could not be saved. Check that the quantities and units are compatible.', 'laqi-unit-stock-manager' ), array( 'type' => 'error' ) );
 		} elseif ( 'error' === $result ) {
 			wp_admin_notice( __( 'Inventory stock could not be updated. Check the quantity and try again.', 'laqi-unit-stock-manager' ), array( 'type' => 'error' ) );
 		}
