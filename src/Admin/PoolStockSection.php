@@ -13,6 +13,9 @@ use LaqiUnitStockManager\Presentation\PoolPresenter;
 use LaqiUnitStockManager\Storage\PoolRepository;
 use LaqiUnitStockManager\Storage\MappingRepository;
 use LaqiUnitStockManager\Availability\AvailabilityService;
+use LaqiUnitStockManager\Diagnostics\MappingDiagnostics;
+use LaqiUnitStockManager\Domain\Quantity;
+use LaqiUnitStockManager\Presentation\QuantityFormatter;
 
 /**
  * Renders searchable pool balances and inline adjustment controls.
@@ -43,6 +46,16 @@ final class PoolStockSection implements ScreenSectionInterface {
 	 * @var AvailabilityService */
 	private $availability;
 
+	/** Exact quantity formatting.
+	 *
+	 * @var QuantityFormatter */
+	private $formatter;
+
+	/** Configuration diagnostics.
+	 *
+	 * @var MappingDiagnostics */
+	private $diagnostics;
+
 	/**
 	 * Constructor.
 	 *
@@ -50,12 +63,16 @@ final class PoolStockSection implements ScreenSectionInterface {
 	 * @param PoolPresenter       $presenter    Shared pool presenter.
 	 * @param MappingRepository   $mappings     Mapping persistence.
 	 * @param AvailabilityService $availability Availability calculations.
+	 * @param QuantityFormatter   $formatter    Exact quantity formatting.
+	 * @param MappingDiagnostics  $diagnostics  Configuration diagnostics.
 	 */
-	public function __construct( PoolRepository $pools, PoolPresenter $presenter, MappingRepository $mappings, AvailabilityService $availability ) {
+	public function __construct( PoolRepository $pools, PoolPresenter $presenter, MappingRepository $mappings, AvailabilityService $availability, QuantityFormatter $formatter, MappingDiagnostics $diagnostics ) {
 		$this->pools        = $pools;
 		$this->presenter    = $presenter;
 		$this->mappings     = $mappings;
 		$this->availability = $availability;
+		$this->formatter    = $formatter;
+		$this->diagnostics  = $diagnostics;
 	}
 
 	/** Get the section ID. @return string */
@@ -109,6 +126,7 @@ final class PoolStockSection implements ScreenSectionInterface {
 	 * @return void */
 	private function render_links( int $pool_id ): void {
 		$mappings = $this->mappings->find_for_pool( $pool_id );
+		$pool     = $this->pools->find( $pool_id );
 		if ( array() === $mappings ) {
 			echo '<span class="notice-warning">' . esc_html__( 'No products linked', 'laqi-unit-stock-manager' ) . '</span>';
 			return;
@@ -119,10 +137,26 @@ final class PoolStockSection implements ScreenSectionInterface {
 			if ( ! $product ) {
 				continue;
 			}
-			$saleable = $this->availability->saleable_quantity( $mapping->product_id(), $mapping->variation_id() );
+			$saleable  = $this->availability->saleable_quantity( $mapping->product_id(), $mapping->variation_id() );
+			$component = current(
+				array_filter(
+					$mapping->components(),
+					static function ( $candidate ) use ( $pool_id ): bool {
+						return $candidate->pool_id() === $pool_id;
+					}
+				)
+			);
 			echo '<li><strong>' . esc_html( $product->get_formatted_name() ) . '</strong><br />';
+			if ( $component && $pool ) {
+				/* translators: %s: exact pool quantity consumed by one sold item. */
+				echo esc_html( sprintf( __( 'Uses %s per item.', 'laqi-unit-stock-manager' ), $this->formatter->format( new Quantity( $pool->quantity()->family(), $component->consumption() ), $pool->display_unit() ) ) ) . ' ';
+			}
 			/* translators: %s: number of saleable items or Unlimited. */
-			echo esc_html( sprintf( __( 'Saleable: %s', 'laqi-unit-stock-manager' ), null === $saleable ? __( 'Unlimited', 'laqi-unit-stock-manager' ) : number_format_i18n( $saleable ) ) ) . '</li>';
+			echo esc_html( sprintf( __( 'Saleable: %s', 'laqi-unit-stock-manager' ), null === $saleable ? __( 'Unlimited', 'laqi-unit-stock-manager' ) : number_format_i18n( $saleable ) ) );
+			foreach ( $this->diagnostics->inspect( $mapping ) as $warning ) {
+				echo '<span class="laqi-lusm-warning">' . esc_html( $warning ) . '</span>';
+			}
+			echo '</li>';
 		}
 		echo '</ul>';
 	}

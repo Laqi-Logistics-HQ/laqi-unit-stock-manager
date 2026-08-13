@@ -8,6 +8,7 @@
 namespace LaqiUnitStockManager;
 
 use LaqiUnitStockManager\Storage\Schema;
+use LaqiUnitStockManager\Diagnostics\MappingDiagnostics;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -67,8 +68,9 @@ final class Plugin {
 		( new WooCommerce\CartValidator( $container->availability_service() ) )->register();
 		( new WooCommerce\OrderItemSnapshotter( $container->mapping_repository(), $container->calculator_registry() ) )->register();
 		( new WooCommerce\OrderStockLifecycle( $container->stock_mutation_service() ) )->register();
+		( new WooCommerce\StockStatusSynchronizer( $container->mapping_repository(), $container->availability_service() ) )->register();
 		$sections = $container->screen_section_catalog();
-		$sections->register( new Admin\PoolStockSection( $container->pool_repository(), $container->pool_presenter(), $container->mapping_repository(), $container->availability_service() ) );
+		$sections->register( new Admin\PoolStockSection( $container->pool_repository(), $container->pool_presenter(), $container->mapping_repository(), $container->availability_service(), $container->quantity_formatter(), new MappingDiagnostics() ) );
 		$sections->register( new Admin\SetupSection( $container->pool_repository(), $container->unit_registry() ) );
 		( new Admin\UnitStockPage( $sections ) )->register();
 		( new Admin\StockAdjustmentController( $container->pool_repository(), $container->unit_registry(), $container->stock_mutation_service() ) )->register();
