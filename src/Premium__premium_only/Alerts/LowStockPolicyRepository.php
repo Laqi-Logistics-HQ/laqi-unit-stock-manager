@@ -52,10 +52,12 @@ final class LowStockPolicyRepository {
 	 * @param int               $reminder_hours Reminder interval, or zero.
 	 * @param int               $quiet_start Quiet start hour, or -1.
 	 * @param int               $quiet_end Quiet end hour, or -1.
+	 * @param string            $webhook_url HTTPS webhook URL.
+	 * @param string            $webhook_secret Signing secret.
 	 * @return void
 	 * @throws RuntimeException When the pool cannot be updated.
 	 */
-	public function save( int $pool_id, int $threshold_base, array $recipients, int $critical_base = 0, int $reminder_hours = 0, int $quiet_start = -1, int $quiet_end = -1 ): void {
+	public function save( int $pool_id, int $threshold_base, array $recipients, int $critical_base = 0, int $reminder_hours = 0, int $quiet_start = -1, int $quiet_end = -1, string $webhook_url = '', string $webhook_secret = '' ): void {
 		$json                = $this->db->get_var( $this->db->prepare( 'SELECT policy_json FROM ' . Schema::table( 'pools' ) . ' WHERE id = %d', $pool_id ) );
 		$policy              = json_decode( (string) $json, true );
 		$policy              = is_array( $policy ) ? $policy : array();
@@ -70,6 +72,8 @@ final class LowStockPolicyRepository {
 			'reminder_hours' => $reminder_hours,
 			'quiet_start'    => $quiet_start,
 			'quiet_end'      => $quiet_end,
+			'webhook_url'    => $webhook_url,
+			'webhook_secret' => '' !== $webhook_secret ? $webhook_secret : ( isset( $existing['webhook_secret'] ) ? (string) $existing['webhook_secret'] : '' ),
 		);
 		$updated             = $this->db->update( Schema::table( 'pools' ), array( 'policy_json' => wp_json_encode( $policy ) ), array( 'id' => $pool_id ), array( '%s' ), array( '%d' ) );
 		if ( false === $updated ) {

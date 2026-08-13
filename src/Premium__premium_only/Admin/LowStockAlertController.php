@@ -76,10 +76,15 @@ final class LowStockAlertController {
 			$reminder_hours = isset( $_POST['reminder_hours'] ) ? absint( $_POST['reminder_hours'] ) : 0;
 			$quiet_start    = isset( $_POST['quiet_start'] ) && '' !== $_POST['quiet_start'] ? min( 23, absint( $_POST['quiet_start'] ) ) : -1;
 			$quiet_end      = isset( $_POST['quiet_end'] ) && '' !== $_POST['quiet_end'] ? min( 23, absint( $_POST['quiet_end'] ) ) : -1;
+			$webhook_url    = isset( $_POST['webhook_url'] ) ? esc_url_raw( wp_unslash( $_POST['webhook_url'] ) ) : '';
+			$webhook_secret = isset( $_POST['webhook_secret'] ) ? sanitize_text_field( wp_unslash( $_POST['webhook_secret'] ) ) : '';
+			if ( '' !== $webhook_url && ( 'https' !== wp_parse_url( $webhook_url, PHP_URL_SCHEME ) || ! wp_http_validate_url( $webhook_url ) ) ) {
+				throw new \InvalidArgumentException( 'Webhook URLs must be safe HTTPS URLs.' );
+			}
 			if ( $quantity->amount() < 0 || $critical->amount() < 0 || $critical->amount() > $quantity->amount() || array() === $emails ) {
 				throw new \InvalidArgumentException( 'A non-negative threshold and recipient are required.' );
 			}
-			$this->policies->save( $pool_id, $quantity->amount(), $emails, $critical->amount(), $reminder_hours, $quiet_start, $quiet_end );
+			$this->policies->save( $pool_id, $quantity->amount(), $emails, $critical->amount(), $reminder_hours, $quiet_start, $quiet_end, $webhook_url, $webhook_secret );
 			do_action( 'laqi_lusm_stock_mutated', array( $pool_id ), array() );
 			$this->redirect( $pool_id, 'alert_saved' );
 		} catch ( Throwable $error ) {
