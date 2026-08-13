@@ -188,7 +188,7 @@ final class SupplierRepository {
 	 * @return array<string,mixed>|null
 	 */
 	public function pack( int $pack_id ): ?array {
-		$row = $this->db->get_row( $this->db->prepare( 'SELECT p.*, s.name AS supplier_name FROM ' . $this->table( 'supplier_packs' ) . ' p INNER JOIN ' . $this->table( 'suppliers' ) . ' s ON s.id = p.supplier_id AND s.active = 1 WHERE p.id = %d AND p.active = 1', $pack_id ), ARRAY_A );
+		$row = $this->db->get_row( $this->db->prepare( 'SELECT p.*, s.name AS supplier_name, s.lead_time_days FROM ' . $this->table( 'supplier_packs' ) . ' p INNER JOIN ' . $this->table( 'suppliers' ) . ' s ON s.id = p.supplier_id AND s.active = 1 WHERE p.id = %d AND p.active = 1', $pack_id ), ARRAY_A );
 		return is_array( $row ) ? $row : null;
 	}
 
@@ -200,8 +200,24 @@ final class SupplierRepository {
 
 	/** Active packs with names. @return array<int,array<string,mixed>> */
 	public function packs(): array {
-		$rows = $this->db->get_results( 'SELECT p.*, p.name AS pack_name, s.name AS supplier_name, i.name AS pool_name, i.display_unit, i.family FROM ' . $this->table( 'supplier_packs' ) . ' p INNER JOIN ' . $this->table( 'suppliers' ) . ' s ON s.id = p.supplier_id INNER JOIN ' . $this->db->prefix . 'laqi_lusm_pools i ON i.id = p.pool_id WHERE p.active = 1 AND s.active = 1 ORDER BY s.name ASC, p.name ASC', ARRAY_A );
+		$rows = $this->db->get_results( 'SELECT p.*, p.name AS pack_name, s.name AS supplier_name, s.lead_time_days, i.name AS pool_name, i.display_unit, i.family FROM ' . $this->table( 'supplier_packs' ) . ' p INNER JOIN ' . $this->table( 'suppliers' ) . ' s ON s.id = p.supplier_id INNER JOIN ' . $this->db->prefix . 'laqi_lusm_pools i ON i.id = p.pool_id WHERE p.active = 1 AND s.active = 1 ORDER BY s.name ASC, p.name ASC', ARRAY_A );
 		return is_array( $rows ) ? $rows : array();
+	}
+
+	/** Active packs for one pool.
+	 *
+	 * @param int $pool_id Pool ID.
+	 * @return array<int,array<string,mixed>>
+	 */
+	public function packs_for_pool( int $pool_id ): array {
+		return array_values(
+			array_filter(
+				$this->packs(),
+				static function ( array $pack ) use ( $pool_id ): bool {
+					return $pool_id === (int) $pack['pool_id'];
+				}
+			)
+		);
 	}
 
 	/** Record a receipt once per movement.

@@ -7,7 +7,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T19:04:52+00:00\n"
+"POT-Creation-Date: 2026-08-13T19:14:25+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -38,6 +38,7 @@ msgstr ""
 #: Admin/MovementLedgerExportController.php:86
 #: Admin/MovementLedgerSection.php:81
 #: Admin/ReceivingSection.php:57
+#: Admin/ReorderSection.php:66
 #: Admin/StockLossSection.php:70
 #: Admin/StockScenarioSection.php:53
 #: Reports/StockReportBuilder.php:62
@@ -53,6 +54,7 @@ msgstr ""
 
 #: Admin/ForecastSection.php:77
 #: Admin/LowStockAlertsSection.php:79
+#: Admin/ReorderSection.php:70
 #: Admin/StockLossSection.php:74
 #: Admin/StockScenarioSection.php:57
 msgid "Choose pool"
@@ -421,8 +423,10 @@ msgstr ""
 msgid "Receive stock now"
 msgstr ""
 
+#. translators: %s: unit.
 #: Admin/ReceivingSection.php:58
 #: Admin/ReceivingSection.php:63
+#: Admin/ReorderSection.php:80
 msgid "Supplier pack"
 msgstr ""
 
@@ -476,8 +480,10 @@ msgstr ""
 msgid "Pack"
 msgstr ""
 
+#. translators: %s: unit.
 #: Admin/ReceivingSection.php:76
 #: Admin/ReceivingSection.php:81
+#: Admin/ReorderSection.php:80
 msgid "Pool"
 msgstr ""
 
@@ -532,6 +538,86 @@ msgstr ""
 
 #: Admin/ReceivingSection.php:97
 msgid "The receiving operation could not be completed."
+msgstr ""
+
+#: Admin/ReorderController.php:58
+msgid "You are not allowed to manage reorder suggestions."
+msgstr ""
+
+#: Admin/ReorderSection.php:60
+msgid "Reorder"
+msgstr ""
+
+#: Admin/ReorderSection.php:66
+msgid "Reorder policy"
+msgstr ""
+
+#: Admin/ReorderSection.php:66
+msgid "Suggestions cover forecast demand during supplier lead time plus your safety stock, then subtract on-hand and incoming stock."
+msgstr ""
+
+#: Admin/ReorderSection.php:75
+msgid "Preferred supplier pack"
+msgstr ""
+
+#. translators: %s: unit.
+#: Admin/ReorderSection.php:79
+#, php-format
+msgid "Safety stock (%s)"
+msgstr ""
+
+#. translators: %s: unit.
+#: Admin/ReorderSection.php:79
+msgid "Save reorder policy"
+msgstr ""
+
+#. translators: %s: unit.
+#: Admin/ReorderSection.php:80
+msgid "Reorder suggestions"
+msgstr ""
+
+#. translators: %s: unit.
+#: Admin/ReorderSection.php:80
+#: Reports/StockReportBuilder.php:64
+msgid "On hand"
+msgstr ""
+
+#. translators: %s: unit.
+#: Admin/ReorderSection.php:80
+msgid "Incoming"
+msgstr ""
+
+#. translators: %s: unit.
+#: Admin/ReorderSection.php:80
+msgid "Lead-time demand"
+msgstr ""
+
+#. translators: %s: unit.
+#: Admin/ReorderSection.php:80
+msgid "Safety stock"
+msgstr ""
+
+#. translators: %s: unit.
+#: Admin/ReorderSection.php:80
+msgid "Suggestion"
+msgstr ""
+
+#: Admin/ReorderSection.php:90
+msgid "Insufficient demand history for a reorder suggestion."
+msgstr ""
+
+#. translators: 1: pack count, 2: pack name.
+#: Admin/ReorderSection.php:94
+#, php-format
+msgid "%1$d × %2$s"
+msgstr ""
+
+#: Admin/ReorderSection.php:101
+msgid "Reorder policy saved."
+msgstr ""
+
+#: Admin/ReorderSection.php:108
+msgid "The reorder policy could not be saved."
 msgstr ""
 
 #: Admin/StockLossController.php:54
@@ -788,10 +874,6 @@ msgstr ""
 
 #: Reports/StockReportBuilder.php:63
 msgid "Internal SKU"
-msgstr ""
-
-#: Reports/StockReportBuilder.php:64
-msgid "On hand"
 msgstr ""
 
 #: Reports/StockReportBuilder.php:65
