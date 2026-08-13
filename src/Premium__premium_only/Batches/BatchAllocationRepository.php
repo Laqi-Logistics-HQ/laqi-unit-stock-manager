@@ -114,6 +114,13 @@ final class BatchAllocationRepository {
 		return is_array( $rows ) ? $rows : array();
 	}
 
+	/** Orders with quantity from a batch that has not been restored. @return array<int,array<string,mixed>> */
+	public function affected_orders( int $batch_id ): array {
+		$sql  = 'SELECT order_id,SUM(CASE WHEN direction=-1 THEN quantity_base ELSE -quantity_base END) quantity_base,MIN(created_at) first_allocated_at,MAX(created_at) last_allocated_at FROM ' . $this->table() . ' WHERE batch_id=%d AND order_id>0 GROUP BY order_id HAVING quantity_base>0 ORDER BY last_allocated_at DESC,order_id DESC';
+		$rows = $this->db->get_results( $this->db->prepare( $sql, $batch_id ), ARRAY_A );
+		return is_array( $rows ) ? $rows : array();
+	}
+
 	/** Apply a guarded batch balance delta. */
 	private function change_batch( int $batch_id, int $delta ): void {
 		if ( $delta < 0 ) {

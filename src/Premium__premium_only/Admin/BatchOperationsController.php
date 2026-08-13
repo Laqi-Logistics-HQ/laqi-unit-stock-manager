@@ -27,7 +27,10 @@ final class BatchOperationsController {
 		add_action( 'admin_post_laqi_lusm_batch_quarantine', array( $this, 'quarantine' ) );
 		add_action( 'admin_post_laqi_lusm_batch_release', array( $this, 'release' ) );
 		add_action( 'admin_post_laqi_lusm_batch_write_off', array( $this, 'write_off' ) );
-		add_action( 'admin_post_laqi_lusm_batch_stocktake', array( $this, 'stocktake' ) );}
+		add_action( 'admin_post_laqi_lusm_batch_stocktake', array( $this, 'stocktake' ) );
+		add_action( 'admin_post_laqi_lusm_batch_recall', array( $this, 'recall' ) );}
+	/** Confirm recall. */ public function recall(): void {
+		$this->finish( 'recall' );}
 	/** Quarantine. */ public function quarantine(): void {
 		$this->finish( 'quarantine' );}
 	/** Release. */ public function release(): void {
@@ -56,6 +59,7 @@ final class BatchOperationsController {
 			}$results = array(
 				'quarantine' => 'batch_quarantined',
 				'release'    => 'batch_released',
+				'recall'     => 'batch_recalled',
 				'write_off'  => 'batch_written_off',
 				'stocktake'  => 'batch_stocktake_saved',
 			);

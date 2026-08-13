@@ -26,6 +26,8 @@ final class BatchOperationsService {
 		$this->batches->set_status( $batch_id, 'active', 'quarantined', $actor_id, $reason ); }
 	/** Release quarantined quantity. */ public function release( int $batch_id, int $actor_id = 0, string $reason = '' ): void {
 		$this->batches->set_status( $batch_id, 'quarantined', 'active', $actor_id, $reason ); }
+	/** Confirm a merchant-reviewed recall without contacting customers. */ public function recall( int $batch_id, int $actor_id, string $reason ): void {
+		$this->batches->recall( $batch_id, $actor_id, $reason ); }
 	/** Permanently remove the remaining selected batch quantity. */ public function write_off( int $batch_id, int $actor_id ): void {
 		$batch    = $this->required( $batch_id );
 		$quantity = (int) $batch['quantity_available_base'];
