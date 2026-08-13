@@ -33,4 +33,6 @@ foreach ( array( 'alert_deliveries', 'movements', 'mapping_components', 'mapping
 }
 delete_option( 'laqi_lusm_schema_version' );
 delete_option( 'laqi_lusm_alert_schema_version' );
+delete_option( 'laqi_lusm_stock_report_settings' );
+delete_option( 'laqi_lusm_stock_report_history' );
 delete_site_option( 'laqi_lusm_schema_version' );

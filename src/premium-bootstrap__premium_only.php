@@ -27,6 +27,11 @@ require_once __DIR__ . '/Premium__premium_only/Forecasting/ForecastPolicyReposit
 require_once __DIR__ . '/Premium__premium_only/Forecasting/StockForecastService.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/ForecastController.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/ForecastSection.php';
+require_once __DIR__ . '/Premium__premium_only/Reports/StockReportSettings.php';
+require_once __DIR__ . '/Premium__premium_only/Reports/StockReportBuilder.php';
+require_once __DIR__ . '/Premium__premium_only/Reports/StockReportScheduler.php';
+require_once __DIR__ . '/Premium__premium_only/Admin/StockReportController.php';
+require_once __DIR__ . '/Premium__premium_only/Admin/StockReportSection.php';
 
 /**
  * Give physically separate paid modules the completed shared composition root.
@@ -47,18 +52,25 @@ add_action(
 		$alert_channels->register( new Premium\Alerts\WebhookAlertChannel() );
 		$forecast_policies = new Premium\Forecasting\ForecastPolicyRepository( $wpdb );
 		$forecast_service  = new Premium\Forecasting\StockForecastService( $container->movement_repository() );
+		$report_settings   = new Premium\Reports\StockReportSettings();
+		$report_builder    = new Premium\Reports\StockReportBuilder( $container->pool_repository(), $container->quantity_formatter(), $alert_policies, $forecast_policies, $forecast_service );
+		$report_scheduler  = new Premium\Reports\StockReportScheduler( $report_settings, $report_builder );
 		$loss_types->register( $container->movement_registry() );
 		$container->screen_section_catalog()->register( new Premium\Admin\MovementLedgerSection( $container->movement_repository(), $container->movement_presenter(), new Admin\PaginationRenderer() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\StockLossSection( $container->pool_repository(), $container->quantity_formatter(), $loss_types ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\LowStockAlertsSection( $alert_policies, $container->pool_repository(), $container->quantity_formatter(), $alert_deliveries ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ForecastSection( $container->pool_repository(), $forecast_policies, $forecast_service, $container->quantity_formatter(), new Admin\PaginationRenderer() ) );
+		$container->screen_section_catalog()->register( new Premium\Admin\StockReportSection( $report_settings ) );
 		( new Premium\Admin\MovementLedgerExportController( $container->movement_repository(), $container->movement_presenter() ) )->register();
 		( new Premium\Admin\StockLossController( $container->stock_adjustment_service(), $loss_types ) )->register();
 		( new Premium\Admin\LowStockAlertController( $alert_policies, $container->pool_repository(), $container->unit_registry() ) )->register();
 		( new Premium\Admin\ForecastController( $forecast_policies, $container->pool_repository() ) )->register();
+		( new Premium\Admin\StockReportController( $report_settings, $report_scheduler ) )->register();
+		$report_scheduler->register();
 		$alert_evaluator = new Premium\Alerts\LowStockAlertEvaluator( $alert_policies, $container->pool_repository(), $container->quantity_formatter(), $alert_channels, $alert_deliveries );
 		$alert_evaluator->register();
 		register_deactivation_hook( LAQI_LUSM_FILE, array( $alert_evaluator, 'unschedule' ) );
+		register_deactivation_hook( LAQI_LUSM_FILE, array( $report_scheduler, 'unschedule' ) );
 		do_action( 'laqi_lusm_premium_ready', $container );
 	}
 );
