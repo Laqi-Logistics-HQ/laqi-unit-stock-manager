@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T16:55:58+00:00\n"
+"POT-Creation-Date: 2026-08-13T17:01:56+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -61,8 +61,8 @@ msgstr ""
 
 #: src/Admin/ActivitySection.php:79
 #: src/Admin/PoolStockSection.php:119
-#: src/Admin/SetupSection.php:170
-#: src/Admin/SetupSection.php:239
+#: src/Admin/SetupSection.php:187
+#: src/Admin/SetupSection.php:271
 msgid "Inventory pool"
 msgstr ""
 
@@ -124,8 +124,8 @@ msgid "Stock"
 msgstr ""
 
 #: src/Admin/PoolStockSection.php:113
-#: src/Admin/SetupSection.php:171
-#: src/Admin/SetupSection.php:240
+#: src/Admin/SetupSection.php:188
+#: src/Admin/SetupSection.php:272
 msgid "Search inventory pools"
 msgstr ""
 
@@ -216,172 +216,182 @@ msgstr ""
 msgid "You are not allowed to configure unit stock."
 msgstr ""
 
-#: src/Admin/SetupSection.php:83
+#: src/Admin/SetupSection.php:95
 msgid "Setup"
 msgstr ""
 
-#: src/Admin/SetupSection.php:91
+#: src/Admin/SetupSection.php:103
 msgid "Create inventory pool"
 msgstr ""
 
-#: src/Admin/SetupSection.php:92
+#: src/Admin/SetupSection.php:104
 msgid "Create the authoritative bulk quantity that products and variations will consume."
 msgstr ""
 
-#: src/Admin/SetupSection.php:96
+#: src/Admin/SetupSection.php:108
 msgid "Pool name"
 msgstr ""
 
-#: src/Admin/SetupSection.php:97
+#: src/Admin/SetupSection.php:109
 msgid "Internal SKU"
 msgstr ""
 
-#: src/Admin/SetupSection.php:98
+#: src/Admin/SetupSection.php:110
 msgid "Stock unit"
 msgstr ""
 
-#: src/Admin/SetupSection.php:99
+#: src/Admin/SetupSection.php:111
 #: src/Container.php:129
 msgid "Opening balance"
 msgstr ""
 
-#: src/Admin/SetupSection.php:100
+#: src/Admin/SetupSection.php:112
 msgid "Create pool"
 msgstr ""
 
-#: src/Admin/SetupSection.php:104
+#: src/Admin/SetupSection.php:116
 msgid "Link a product or variation"
 msgstr ""
 
-#: src/Admin/SetupSection.php:105
+#: src/Admin/SetupSection.php:117
 msgid "Choose exactly how much pooled stock one sold item consumes. Labels are never parsed automatically."
 msgstr ""
 
-#: src/Admin/SetupSection.php:109
+#: src/Admin/SetupSection.php:121
 msgid "Current product links"
 msgstr ""
 
-#: src/Admin/SetupSection.php:110
+#: src/Admin/SetupSection.php:122
 msgid "Edit active consumption rules or unlink an item. Changes affect future purchases only and do not alter past order snapshots."
 msgstr ""
 
-#: src/Admin/SetupSection.php:114
-#: src/Admin/SetupSection.php:124
+#: src/Admin/SetupSection.php:126
+#: src/Admin/SetupSection.php:136
 msgid "Create custom unit"
 msgstr ""
 
-#: src/Admin/SetupSection.php:115
+#: src/Admin/SetupSection.php:127
 msgid "Define a merchant unit as an exact quantity of any existing unit, such as one sack equaling 25 kg."
 msgstr ""
 
-#: src/Admin/SetupSection.php:119
+#: src/Admin/SetupSection.php:131
 msgid "Unit key"
 msgstr ""
 
-#: src/Admin/SetupSection.php:120
+#: src/Admin/SetupSection.php:132
 msgid "Label"
 msgstr ""
 
-#: src/Admin/SetupSection.php:121
+#: src/Admin/SetupSection.php:133
 msgid "Symbol"
 msgstr ""
 
-#: src/Admin/SetupSection.php:122
+#: src/Admin/SetupSection.php:134
 msgid "Equivalent quantity"
 msgstr ""
 
-#: src/Admin/SetupSection.php:123
+#: src/Admin/SetupSection.php:135
 msgid "Of unit"
 msgstr ""
 
-#: src/Admin/SetupSection.php:136
+#: src/Admin/SetupSection.php:153
 msgid "No products or variations are linked yet."
 msgstr ""
 
-#: src/Admin/SetupSection.php:142
-#: src/Admin/SetupSection.php:237
+#: src/Admin/SetupSection.php:159
+#: src/Admin/SetupSection.php:269
 msgid "Product or variation"
 msgstr ""
 
-#: src/Admin/SetupSection.php:143
+#: src/Admin/SetupSection.php:160
 msgid "Consumption rule"
 msgstr ""
 
-#: src/Admin/SetupSection.php:144
+#: src/Admin/SetupSection.php:161
 msgid "Actions"
 msgstr ""
 
 #. translators: %d: unavailable WooCommerce product or variation ID.
-#: src/Admin/SetupSection.php:161
+#: src/Admin/SetupSection.php:178
 #, php-format
 msgid "Unavailable product #%d"
 msgstr ""
 
-#: src/Admin/SetupSection.php:176
-#: src/Admin/SetupSection.php:241
+#: src/Admin/SetupSection.php:193
+#: src/Admin/SetupSection.php:273
 msgid "Consumption per sold item"
 msgstr ""
 
-#: src/Admin/SetupSection.php:178
-#: src/Admin/SetupSection.php:242
+#: src/Admin/SetupSection.php:195
+#: src/Admin/SetupSection.php:274
 msgid "Consumption unit"
 msgstr ""
 
-#: src/Admin/SetupSection.php:184
+#: src/Admin/SetupSection.php:201
 msgid "Save changes"
 msgstr ""
 
-#: src/Admin/SetupSection.php:192
+#: src/Admin/SetupSection.php:209
 msgid "Unlink"
 msgstr ""
 
-#: src/Admin/SetupSection.php:208
+#. translators: 1: first visible mapping number, 2: last visible mapping number, 3: total active mappings.
+#: src/Admin/SetupSection.php:218
+#, php-format
+msgid "Showing %1$d-%2$d of %3$d product links."
+msgstr ""
+
+#: src/Admin/SetupSection.php:221
+msgid "Product link pages"
+msgstr ""
+
+#: src/Admin/SetupSection.php:240
 msgid "Custom units"
 msgstr ""
 
-#: src/Admin/SetupSection.php:209
+#: src/Admin/SetupSection.php:241
 msgid "Unused units can be retired. Units used by an inventory pool or another active custom unit are protected."
 msgstr ""
 
 #. translators: 1: unit label, 2: unit key, 3: equivalent quantity, 4: reference unit.
-#: src/Admin/SetupSection.php:213
+#: src/Admin/SetupSection.php:245
 #, php-format
 msgid "%1$s (%2$s) = %3$s %4$s"
 msgstr ""
 
-#: src/Admin/SetupSection.php:219
+#: src/Admin/SetupSection.php:251
 msgid "Retire"
 msgstr ""
 
-#: src/Admin/SetupSection.php:230
+#: src/Admin/SetupSection.php:262
 msgid "Create an inventory pool before linking products."
 msgstr ""
 
-#: src/Admin/SetupSection.php:238
+#: src/Admin/SetupSection.php:270
 msgid "Search for a product or variation"
 msgstr ""
 
-#: src/Admin/SetupSection.php:243
+#: src/Admin/SetupSection.php:275
 msgid "Existing WooCommerce stock"
 msgstr ""
 
-#: src/Admin/SetupSection.php:245
+#: src/Admin/SetupSection.php:277
 msgid "Disable native quantity management"
 msgstr ""
 
-#: src/Admin/SetupSection.php:246
+#: src/Admin/SetupSection.php:278
 msgid "Add native item count to this pool, then disable it"
 msgstr ""
 
-#: src/Admin/SetupSection.php:247
+#: src/Admin/SetupSection.php:279
 msgid "Keep native quantity management unchanged"
 msgstr ""
 
-#: src/Admin/SetupSection.php:249
+#: src/Admin/SetupSection.php:281
 msgid "Transferring multiplies the current native item count by the consumption per item and adds that exact quantity to the pool once."
 msgstr ""
 
-#: src/Admin/SetupSection.php:250
+#: src/Admin/SetupSection.php:282
 msgid "Save mapping"
 msgstr ""
 

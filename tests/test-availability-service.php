@@ -124,6 +124,20 @@ class Test_Availability_Service extends WP_UnitTestCase {
 		$this->assertSame( 1, (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . Schema::table( 'mapping_components' ) . ' WHERE mapping_id = (SELECT id FROM ' . Schema::table( 'mappings' ) . ' WHERE product_id = %d AND variation_id = %d)', 100, 101 ) ) );
 	}
 
+	/** Active mapping reads expose complete counts and stable offsets. */
+	public function test_active_mappings_can_be_paginated(): void {
+		global $wpdb;
+
+		$maps   = new MappingRepository( $wpdb );
+		$first  = $maps->active( 1, 0 );
+		$second = $maps->active( 1, 1 );
+
+		$this->assertGreaterThanOrEqual( 2, $maps->count_active() );
+		$this->assertCount( 1, $first );
+		$this->assertCount( 1, $second );
+		$this->assertNotSame( $first[0]->id(), $second[0]->id() );
+	}
+
 	/** Stale setup forms cannot overwrite a newer mapping version. */
 	public function test_mapping_update_rejects_a_stale_version(): void {
 		global $wpdb;

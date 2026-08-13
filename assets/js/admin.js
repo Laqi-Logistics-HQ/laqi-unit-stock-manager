@@ -22,5 +22,14 @@
 				},
 			} );
 		} );
+
+		$( '.wc-product-search, .laqi-lusm-pool-search' ).each( function () {
+			const field = $( this );
+			const label = $( `label[for="${ field.attr( 'id' ) }"]` ).text();
+			field
+				.next( '.select2' )
+				.find( '.select2-selection__rendered' )
+				.attr( 'aria-label', label || field.data( 'placeholder' ) );
+		} );
 	} );
 }( jQuery, window.laqi_lusm_pool_search ) );
