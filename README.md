@@ -83,11 +83,11 @@ unless its generated runtime exists.
 
 Styles live in `assets/css` and are enqueued by `src/Assets.php` only on the
 Unit Stock admin screen, with a unique handle and the plugin version for cache
-busting. The Setup tab enqueues WooCommerce's own enhanced product selector on
-that screen for scalable AJAX catalog search. Active links are reviewed and
+busting. The Setup tab uses WooCommerce's enhanced selector for scalable AJAX
+product, variation, and inventory-pool search. Active links are reviewed and
 soft-unlinked in the same tab; historical mapping components remain available
 for immutable order restoration. The plugin has no frontend UI and registers no
-plugin-owned scripts or storefront assets.
+one screen-scoped plugin script; it registers no storefront assets.
 
 Mapping edits update the active pool and exact consumption rule without repeating
 the one-time native-stock migration decision. They use optimistic mapping versions,

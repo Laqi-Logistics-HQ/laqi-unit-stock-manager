@@ -64,6 +64,39 @@ test( 'admin screen renders without serious accessibility or runtime failures', 
 	expect( blocking ).toEqual( [] );
 } );
 
+test( 'setup pool picker performs an authorized paginated search', async ( {
+	page,
+} ) => {
+	await page.goto( `${ plugin.adminPath }&section=setup`, {
+		waitUntil: 'networkidle',
+	} );
+	let picker = page.locator( '.laqi-lusm-pool-search' ).first();
+	if ( ( await picker.count() ) === 0 ) {
+		await page.locator( '#laqi-lusm-pool_name' ).fill( 'Browser test pool' );
+		await page.locator( '#laqi-lusm-opening_balance' ).fill( '1' );
+		await Promise.all( [
+			page.waitForURL( /section=setup/ ),
+			page.getByRole( 'button', { name: 'Create pool' } ).click(),
+		] );
+		picker = page.locator( '.laqi-lusm-pool-search' ).first();
+	}
+	await expect( picker ).toBeAttached();
+	await picker
+		.locator( 'xpath=following-sibling::span[contains(@class,"select2")]' )
+		.click();
+	const responsePromise = page.waitForResponse( ( response ) =>
+		response.url().includes( 'action=laqi_lusm_search_pools' )
+	);
+	await page.locator( '.select2-search__field' ).last().fill( 'a' );
+	const response = await responsePromise;
+	const payload = await response.json();
+
+	expect( response.status() ).toBe( 200 );
+	expect( payload.success ).toBe( true );
+	expect( Array.isArray( payload.data.results ) ).toBe( true );
+	expect( typeof payload.data.pagination.more ).toBe( 'boolean' );
+} );
+
 test( 'deactivation leaves no plugin assets loaded', async ( { page } ) => {
 	await page.goto( '/wp-admin/plugins.php' );
 	// Match on data-plugin, not data-slug. WordPress fills data-slug with

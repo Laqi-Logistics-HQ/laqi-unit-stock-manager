@@ -37,7 +37,7 @@ class Test_Assets extends WP_UnitTestCase {
 		( new Assets() )->enqueue_admin( 'woocommerce_page_laqi-unit-stock-manager' );
 
 		$this->assertTrue( wp_style_is( 'laqi-unit-stock-manager-admin', 'enqueued' ) );
-		$this->assertFalse( wp_script_is( 'laqi-unit-stock-manager-admin', 'registered' ) );
+		$this->assertTrue( wp_script_is( 'laqi-unit-stock-manager-admin', 'enqueued' ) );
 		$this->assertTrue( wp_script_is( 'wc-enhanced-select', 'enqueued' ) );
 	}
 

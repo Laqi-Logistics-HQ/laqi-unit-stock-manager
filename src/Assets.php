@@ -47,6 +47,21 @@ final class Assets {
 		);
 
 		wp_enqueue_script( 'wc-enhanced-select' );
+		wp_enqueue_script(
+			'laqi-unit-stock-manager-admin',
+			LAQI_LUSM_URL . 'assets/js/admin.js',
+			array( 'jquery', 'wc-enhanced-select' ),
+			LAQI_LUSM_VERSION,
+			true
+		);
+		wp_localize_script(
+			'laqi-unit-stock-manager-admin',
+			'laqi_lusm_pool_search',
+			array(
+				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+				'nonce'   => wp_create_nonce( 'laqi_lusm_search_pools' ),
+			)
+		);
 		wp_enqueue_style( 'woocommerce_admin_styles' );
 	}
 }
