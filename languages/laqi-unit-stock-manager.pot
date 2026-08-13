@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T17:01:56+00:00\n"
+"POT-Creation-Date: 2026-08-13T17:08:25+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -60,7 +60,7 @@ msgid "Date"
 msgstr ""
 
 #: src/Admin/ActivitySection.php:79
-#: src/Admin/PoolStockSection.php:119
+#: src/Admin/PoolStockSection.php:129
 #: src/Admin/SetupSection.php:187
 #: src/Admin/SetupSection.php:271
 msgid "Inventory pool"
@@ -83,7 +83,7 @@ msgid "Source"
 msgstr ""
 
 #: src/Admin/ActivitySection.php:84
-#: src/Admin/PoolStockSection.php:222
+#: src/Admin/PoolStockSection.php:261
 #: src/Privacy.php:128
 msgid "Reason"
 msgstr ""
@@ -114,101 +114,121 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
+#: src/Admin/PoolDetailsController.php:48
 #: src/Admin/PoolSearchController.php:40
 #: src/Admin/UnitStockPage.php:55
 msgid "You are not allowed to manage unit stock."
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:97
+#: src/Admin/PoolStockSection.php:107
 msgid "Stock"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:113
+#: src/Admin/PoolStockSection.php:123
 #: src/Admin/SetupSection.php:188
 #: src/Admin/SetupSection.php:272
 msgid "Search inventory pools"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:114
+#: src/Admin/PoolStockSection.php:124
 msgid "Search pools, products, SKUs, or attributes"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:115
+#: src/Admin/PoolStockSection.php:125
 msgid "Search"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:120
+#: src/Admin/PoolStockSection.php:130
 msgid "On hand"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:121
+#: src/Admin/PoolStockSection.php:131
 msgid "Linked products"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:122
+#: src/Admin/PoolStockSection.php:132
 msgid "Adjustment"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:126
+#: src/Admin/PoolStockSection.php:136
 msgid "No inventory pools found."
 msgstr ""
 
 #. translators: 1: first visible pool number, 2: last visible pool number, 3: total matching pools.
-#: src/Admin/PoolStockSection.php:141
+#: src/Admin/PoolStockSection.php:151
 #, php-format
 msgid "Showing %1$d-%2$d of %3$d inventory pools."
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:144
+#: src/Admin/PoolStockSection.php:154
 msgid "Inventory pool pages"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:167
+#: src/Admin/PoolStockSection.php:181
+#: src/Admin/SetupSection.php:108
+msgid "Pool name"
+msgstr ""
+
+#: src/Admin/PoolStockSection.php:183
+#: src/Admin/PoolStockSection.php:184
+#: src/Admin/SetupSection.php:109
+msgid "Internal SKU"
+msgstr ""
+
+#: src/Admin/PoolStockSection.php:185
+msgid "Display unit"
+msgstr ""
+
+#: src/Admin/PoolStockSection.php:193
+msgid "Save details"
+msgstr ""
+
+#: src/Admin/PoolStockSection.php:206
 msgid "No products linked"
 msgstr ""
 
 #. translators: %s: exact pool quantity consumed by one sold item.
-#: src/Admin/PoolStockSection.php:188
+#: src/Admin/PoolStockSection.php:227
 #, php-format
 msgid "Uses %s per item."
 msgstr ""
 
 #. translators: %s: number of saleable items or Unlimited.
-#: src/Admin/PoolStockSection.php:191
+#: src/Admin/PoolStockSection.php:230
 #, php-format
 msgid "Saleable: %s"
 msgstr ""
 
 #. translators: %s: number of saleable items or Unlimited.
-#: src/Admin/PoolStockSection.php:191
+#: src/Admin/PoolStockSection.php:230
 msgid "Unlimited"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:213
+#: src/Admin/PoolStockSection.php:252
 msgid "Adjustment type"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:215
+#: src/Admin/PoolStockSection.php:254
 msgid "Set to"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:216
+#: src/Admin/PoolStockSection.php:255
 msgid "Add"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:217
+#: src/Admin/PoolStockSection.php:256
 msgid "Subtract"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:219
+#: src/Admin/PoolStockSection.php:258
 msgid "Quantity"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:223
+#: src/Admin/PoolStockSection.php:262
 msgid "Reason (optional)"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:224
+#: src/Admin/PoolStockSection.php:263
 msgid "Apply"
 msgstr ""
 
@@ -226,14 +246,6 @@ msgstr ""
 
 #: src/Admin/SetupSection.php:104
 msgid "Create the authoritative bulk quantity that products and variations will consume."
-msgstr ""
-
-#: src/Admin/SetupSection.php:108
-msgid "Pool name"
-msgstr ""
-
-#: src/Admin/SetupSection.php:109
-msgid "Internal SKU"
 msgstr ""
 
 #: src/Admin/SetupSection.php:110
@@ -418,34 +430,42 @@ msgid "Inventory pool created."
 msgstr ""
 
 #: src/Admin/UnitStockPage.php:116
+msgid "Inventory pool details updated."
+msgstr ""
+
+#: src/Admin/UnitStockPage.php:123
+msgid "Inventory pool details could not be updated."
+msgstr ""
+
+#: src/Admin/UnitStockPage.php:126
 msgid "Product stock mapping saved."
 msgstr ""
 
-#: src/Admin/UnitStockPage.php:124
+#: src/Admin/UnitStockPage.php:134
 msgid "Product stock mapping unlinked."
 msgstr ""
 
-#: src/Admin/UnitStockPage.php:132
+#: src/Admin/UnitStockPage.php:142
 msgid "Product stock mapping updated."
 msgstr ""
 
-#: src/Admin/UnitStockPage.php:140
+#: src/Admin/UnitStockPage.php:150
 msgid "Custom stock unit created."
 msgstr ""
 
-#: src/Admin/UnitStockPage.php:148
+#: src/Admin/UnitStockPage.php:158
 msgid "Custom stock unit retired."
 msgstr ""
 
-#: src/Admin/UnitStockPage.php:155
+#: src/Admin/UnitStockPage.php:165
 msgid "The custom stock unit is still in use and could not be retired."
 msgstr ""
 
-#: src/Admin/UnitStockPage.php:157
+#: src/Admin/UnitStockPage.php:167
 msgid "The setup could not be saved. Check that the quantities and units are compatible."
 msgstr ""
 
-#: src/Admin/UnitStockPage.php:159
+#: src/Admin/UnitStockPage.php:169
 msgid "Inventory stock could not be updated. Check the quantity and try again."
 msgstr ""
 
@@ -493,7 +513,7 @@ msgstr ""
 msgid "This linked item is not currently purchasable."
 msgstr ""
 
-#: src/Plugin.php:159
+#: src/Plugin.php:160
 msgid "Laqi Unit Stock Manager for WooCommerce requires WooCommerce to be installed and active."
 msgstr ""
 

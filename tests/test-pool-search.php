@@ -147,4 +147,18 @@ class Test_Pool_Search extends WP_UnitTestCase {
 		$this->assertSame( $this->extra_pool_ids[0], $first[0]->id() );
 		$this->assertSame( $this->extra_pool_ids[1], $second[0]->id() );
 	}
+
+	/** Pool detail edits preserve the exact balance and reject stale versions. */
+	public function test_pool_details_can_be_updated_safely(): void {
+		$pool    = $this->pools->find( $this->pool_id );
+		$balance = $pool->quantity()->amount();
+		$updated = $this->pools->update_details( $pool->id(), 'Renamed ingredient', 'NEW-SKU', 'kg', $pool->version() );
+
+		$this->assertSame( 'Renamed ingredient', $updated->name() );
+		$this->assertSame( 'NEW-SKU', $updated->internal_sku() );
+		$this->assertSame( 'kg', $updated->display_unit() );
+		$this->assertSame( $balance, $updated->quantity()->amount() );
+		$this->expectException( RuntimeException::class );
+		$this->pools->update_details( $pool->id(), 'Stale edit', '', 'g', $pool->version() );
+	}
 }

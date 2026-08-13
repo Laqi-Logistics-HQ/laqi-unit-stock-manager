@@ -111,6 +111,16 @@ final class UnitStockPage {
 					'dismissible' => true,
 				)
 			);
+		} elseif ( 'pool_updated' === $result ) {
+			wp_admin_notice(
+				__( 'Inventory pool details updated.', 'laqi-unit-stock-manager' ),
+				array(
+					'type'        => 'success',
+					'dismissible' => true,
+				)
+			);
+		} elseif ( 'pool_update_error' === $result ) {
+			wp_admin_notice( __( 'Inventory pool details could not be updated.', 'laqi-unit-stock-manager' ), array( 'type' => 'error' ) );
 		} elseif ( 'mapping_saved' === $result ) {
 			wp_admin_notice(
 				__( 'Product stock mapping saved.', 'laqi-unit-stock-manager' ),

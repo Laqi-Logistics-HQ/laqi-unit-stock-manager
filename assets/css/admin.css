@@ -57,6 +57,16 @@
 	align-items: center;
 }
 
+.laqi-lusm-pool-details {
+	display: grid;
+	gap: 0.35rem;
+}
+
+.laqi-lusm-pool-details .submit {
+	margin: 0;
+	padding: 0;
+}
+
 .laqi-lusm-setup-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(min(26rem, 100%), 1fr));
