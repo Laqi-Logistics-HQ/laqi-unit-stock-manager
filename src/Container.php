@@ -10,6 +10,7 @@ namespace LaqiUnitStockManager;
 defined( 'ABSPATH' ) || exit;
 
 use LaqiUnitStockManager\Inventory\StockMutationService;
+use LaqiUnitStockManager\Inventory\StockAdjustmentService;
 use LaqiUnitStockManager\Inventory\MovementRegistry;
 use LaqiUnitStockManager\Inventory\MovementType;
 use LaqiUnitStockManager\Storage\CustomUnitRepository;
@@ -86,6 +87,11 @@ final class Container {
 		global $wpdb;
 
 		return new StockMutationService( $wpdb );
+	}
+
+	/** Shared exact manual adjustment rules. @return StockAdjustmentService */
+	public function stock_adjustment_service(): StockAdjustmentService {
+		return new StockAdjustmentService( $this->pool_repository(), $this->unit_registry(), $this->stock_mutation_service() );
 	}
 
 	/**
