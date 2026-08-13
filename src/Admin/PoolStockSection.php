@@ -22,6 +22,9 @@ use LaqiUnitStockManager\Presentation\QuantityFormatter;
  */
 final class PoolStockSection implements ScreenSectionInterface {
 
+	/** Pools displayed per page. */
+	const PER_PAGE = 25;
+
 	/**
 	 * Pool persistence.
 	 *
@@ -87,11 +90,17 @@ final class PoolStockSection implements ScreenSectionInterface {
 
 	/** Render the stock table. @return void */
 	public function render(): void {
-		$search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$rows   = array_map( array( $this->presenter, 'present' ), $this->pools->search( $search ) );
+		$search      = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$total       = $this->pools->count_search( $search );
+		$total_pages = max( 1, intdiv( $total + self::PER_PAGE - 1, self::PER_PAGE ) );
+		$page        = isset( $_GET['stock_page'] ) ? absint( $_GET['stock_page'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$page        = max( 1, min( $total_pages, $page ) );
+		$offset      = ( $page - 1 ) * self::PER_PAGE;
+		$rows        = array_map( array( $this->presenter, 'present' ), $this->pools->search( $search, self::PER_PAGE, $offset ) );
 		?>
 		<form method="get" class="laqi-lusm-search">
 			<input type="hidden" name="page" value="laqi-unit-stock-manager" />
+			<input type="hidden" name="section" value="stock" />
 			<label class="screen-reader-text" for="laqi-lusm-search"><?php esc_html_e( 'Search inventory pools', 'laqi-unit-stock-manager' ); ?></label>
 			<input id="laqi-lusm-search" type="search" name="s" value="<?php echo esc_attr( $search ); ?>" placeholder="<?php esc_attr_e( 'Search pools, products, SKUs, or attributes', 'laqi-unit-stock-manager' ); ?>" />
 			<?php submit_button( __( 'Search', 'laqi-unit-stock-manager' ), 'secondary', '', false ); ?>
@@ -117,6 +126,60 @@ final class PoolStockSection implements ScreenSectionInterface {
 			<?php endforeach; ?>
 			</tbody>
 		</table>
+		<?php $this->render_pagination( $search, $page, $total_pages, $offset, count( $rows ), $total ); ?>
+		<?php
+	}
+
+	/**
+	 * Render stock result counts and accessible pagination.
+	 *
+	 * @param string $search      Active search.
+	 * @param int    $page        Current page.
+	 * @param int    $total_pages Total pages.
+	 * @param int    $offset      Current row offset.
+	 * @param int    $row_count   Rows on this page.
+	 * @param int    $total       Total matching rows.
+	 * @return void
+	 */
+	private function render_pagination( string $search, int $page, int $total_pages, int $offset, int $row_count, int $total ): void {
+		if ( $total < 1 ) {
+			return;
+		}
+		?>
+		<div class="laqi-lusm-pagination">
+			<p>
+			<?php
+			/* translators: 1: first visible pool number, 2: last visible pool number, 3: total matching pools. */
+			echo esc_html( sprintf( __( 'Showing %1$d-%2$d of %3$d inventory pools.', 'laqi-unit-stock-manager' ), $offset + 1, $offset + $row_count, $total ) );
+			?>
+			</p>
+			<?php if ( $total_pages > 1 ) : ?>
+				<nav aria-label="<?php esc_attr_e( 'Inventory pool pages', 'laqi-unit-stock-manager' ); ?>">
+				<?php
+				$url   = add_query_arg(
+					array(
+						'page'       => UnitStockPage::SLUG,
+						'section'    => 'stock',
+						's'          => $search,
+						'stock_page' => 999999999,
+					),
+					admin_url( 'admin.php' )
+				);
+				$links = paginate_links(
+					array(
+						'base'      => str_replace( '999999999', '%#%', $url ),
+						'current'   => $page,
+						'total'     => $total_pages,
+						'type'      => 'list',
+						'prev_text' => __( 'Previous', 'laqi-unit-stock-manager' ),
+						'next_text' => __( 'Next', 'laqi-unit-stock-manager' ),
+					)
+				);
+				echo wp_kses_post( $links );
+				?>
+				</nav>
+			<?php endif; ?>
+		</div>
 		<?php
 	}
 

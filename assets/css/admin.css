@@ -17,6 +17,20 @@
 	vertical-align: middle;
 }
 
+.laqi-lusm-pagination {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: center;
+	justify-content: space-between;
+	margin-top: 1rem;
+}
+
+.laqi-lusm-pagination p,
+.laqi-lusm-pagination .page-numbers {
+	margin: 0;
+}
+
 .laqi-lusm-linked-products {
 	margin: 0;
 }
