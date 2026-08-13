@@ -17,6 +17,14 @@
 	vertical-align: middle;
 }
 
+.laqi-lusm-linked-products {
+	margin: 0;
+}
+
+.laqi-lusm-linked-products li:last-child {
+	margin-bottom: 0;
+}
+
 .laqi-lusm-adjustment {
 	display: flex;
 	flex-wrap: wrap;
@@ -49,6 +57,7 @@
 }
 
 @media screen and (max-width: 782px) {
+
 	.laqi-lusm-stock-table thead {
 		display: none;
 	}

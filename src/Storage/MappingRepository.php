@@ -179,4 +179,30 @@ final class MappingRepository {
 			$components
 		);
 	}
+
+	/**
+	 * Find active mappings consuming one inventory pool.
+	 *
+	 * @param int $pool_id Pool ID.
+	 * @return ProductMapping[]
+	 */
+	public function find_for_pool( int $pool_id ): array {
+		$ids      = $this->db->get_col(
+			$this->db->prepare(
+				'SELECT DISTINCT m.id FROM ' . Schema::table( 'mappings' ) . ' m INNER JOIN ' . Schema::table( 'mapping_components' ) . ' c ON c.mapping_id = m.id WHERE c.pool_id = %d AND m.active = 1 ORDER BY m.id ASC',
+				$pool_id
+			)
+		);
+		$mappings = array();
+		foreach ( $ids as $mapping_id ) {
+			$row = $this->db->get_row( $this->db->prepare( 'SELECT product_id, variation_id FROM ' . Schema::table( 'mappings' ) . ' WHERE id = %d', $mapping_id ), ARRAY_A );
+			if ( is_array( $row ) ) {
+				$mapping = $this->find_for_product( (int) $row['product_id'], (int) $row['variation_id'] );
+				if ( null !== $mapping ) {
+					$mappings[] = $mapping;
+				}
+			}
+		}
+		return $mappings;
+	}
 }

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T12:34:19+00:00\n"
+"POT-Creation-Date: 2026-08-13T12:44:57+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -41,68 +41,87 @@ msgstr ""
 msgid "https://laqi-logistics.com"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:52
+#: src/Admin/PoolStockSection.php:68
 msgid "Stock"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:62
+#: src/Admin/PoolStockSection.php:78
 msgid "Search inventory pools"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:63
+#: src/Admin/PoolStockSection.php:79
 msgid "Search pools or SKU"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:64
+#: src/Admin/PoolStockSection.php:80
 msgid "Search"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:68
+#: src/Admin/PoolStockSection.php:84
 #: src/Admin/SetupSection.php:101
 msgid "Inventory pool"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:69
+#: src/Admin/PoolStockSection.php:85
 msgid "On hand"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:70
+#: src/Admin/PoolStockSection.php:86
+msgid "Linked products"
+msgstr ""
+
+#: src/Admin/PoolStockSection.php:87
 msgid "Adjustment"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:74
+#: src/Admin/PoolStockSection.php:91
 msgid "No inventory pools found."
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:101
+#: src/Admin/PoolStockSection.php:113
+msgid "No products linked"
+msgstr ""
+
+#. translators: %s: number of saleable items or Unlimited.
+#: src/Admin/PoolStockSection.php:125
+#, php-format
+msgid "Saleable: %s"
+msgstr ""
+
+#. translators: %s: number of saleable items or Unlimited.
+#: src/Admin/PoolStockSection.php:125
+msgid "Unlimited"
+msgstr ""
+
+#: src/Admin/PoolStockSection.php:143
 msgid "Adjustment type"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:103
+#: src/Admin/PoolStockSection.php:145
 msgid "Set to"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:104
+#: src/Admin/PoolStockSection.php:146
 msgid "Add"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:105
+#: src/Admin/PoolStockSection.php:147
 msgid "Subtract"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:107
+#: src/Admin/PoolStockSection.php:149
 msgid "Quantity"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:110
+#: src/Admin/PoolStockSection.php:152
 msgid "Reason"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:111
+#: src/Admin/PoolStockSection.php:153
 msgid "Reason (optional)"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:112
+#: src/Admin/PoolStockSection.php:154
 msgid "Apply"
 msgstr ""
 

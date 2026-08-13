@@ -11,6 +11,8 @@ defined( 'ABSPATH' ) || exit;
 
 use LaqiUnitStockManager\Presentation\PoolPresenter;
 use LaqiUnitStockManager\Storage\PoolRepository;
+use LaqiUnitStockManager\Storage\MappingRepository;
+use LaqiUnitStockManager\Availability\AvailabilityService;
 
 /**
  * Renders searchable pool balances and inline adjustment controls.
@@ -31,15 +33,29 @@ final class PoolStockSection implements ScreenSectionInterface {
 	 */
 	private $presenter;
 
+	/** Mapping persistence.
+	 *
+	 * @var MappingRepository */
+	private $mappings;
+
+	/** Availability calculations.
+	 *
+	 * @var AvailabilityService */
+	private $availability;
+
 	/**
 	 * Constructor.
 	 *
-	 * @param PoolRepository $pools     Pool repository.
-	 * @param PoolPresenter  $presenter Shared pool presenter.
+	 * @param PoolRepository      $pools     Pool repository.
+	 * @param PoolPresenter       $presenter    Shared pool presenter.
+	 * @param MappingRepository   $mappings     Mapping persistence.
+	 * @param AvailabilityService $availability Availability calculations.
 	 */
-	public function __construct( PoolRepository $pools, PoolPresenter $presenter ) {
-		$this->pools     = $pools;
-		$this->presenter = $presenter;
+	public function __construct( PoolRepository $pools, PoolPresenter $presenter, MappingRepository $mappings, AvailabilityService $availability ) {
+		$this->pools        = $pools;
+		$this->presenter    = $presenter;
+		$this->mappings     = $mappings;
+		$this->availability = $availability;
 	}
 
 	/** Get the section ID. @return string */
@@ -67,22 +83,48 @@ final class PoolStockSection implements ScreenSectionInterface {
 			<thead><tr>
 				<th scope="col"><?php esc_html_e( 'Inventory pool', 'laqi-unit-stock-manager' ); ?></th>
 				<th scope="col"><?php esc_html_e( 'On hand', 'laqi-unit-stock-manager' ); ?></th>
+				<th scope="col"><?php esc_html_e( 'Linked products', 'laqi-unit-stock-manager' ); ?></th>
 				<th scope="col"><?php esc_html_e( 'Adjustment', 'laqi-unit-stock-manager' ); ?></th>
 			</tr></thead>
 			<tbody>
 			<?php if ( array() === $rows ) : ?>
-				<tr><td colspan="3"><?php esc_html_e( 'No inventory pools found.', 'laqi-unit-stock-manager' ); ?></td></tr>
+				<tr><td colspan="4"><?php esc_html_e( 'No inventory pools found.', 'laqi-unit-stock-manager' ); ?></td></tr>
 			<?php endif; ?>
 			<?php foreach ( $rows as $row ) : ?>
 				<tr>
 					<th scope="row"><?php echo esc_html( $row['name'] ); ?></th>
 					<td><strong><?php echo esc_html( $row['quantity_display'] ); ?></strong></td>
+					<td><?php $this->render_links( (int) $row['id'] ); ?></td>
 					<td><?php $this->render_adjustment_form( $row ); ?></td>
 				</tr>
 			<?php endforeach; ?>
 			</tbody>
 		</table>
 		<?php
+	}
+
+	/** Render linked products and variation availability.
+	 *
+	 * @param int $pool_id Pool ID.
+	 * @return void */
+	private function render_links( int $pool_id ): void {
+		$mappings = $this->mappings->find_for_pool( $pool_id );
+		if ( array() === $mappings ) {
+			echo '<span class="notice-warning">' . esc_html__( 'No products linked', 'laqi-unit-stock-manager' ) . '</span>';
+			return;
+		}
+		echo '<ul class="laqi-lusm-linked-products">';
+		foreach ( $mappings as $mapping ) {
+			$product = wc_get_product( $mapping->variation_id() > 0 ? $mapping->variation_id() : $mapping->product_id() );
+			if ( ! $product ) {
+				continue;
+			}
+			$saleable = $this->availability->saleable_quantity( $mapping->product_id(), $mapping->variation_id() );
+			echo '<li><strong>' . esc_html( $product->get_formatted_name() ) . '</strong><br />';
+			/* translators: %s: number of saleable items or Unlimited. */
+			echo esc_html( sprintf( __( 'Saleable: %s', 'laqi-unit-stock-manager' ), null === $saleable ? __( 'Unlimited', 'laqi-unit-stock-manager' ) : number_format_i18n( $saleable ) ) ) . '</li>';
+		}
+		echo '</ul>';
 	}
 
 	/**
