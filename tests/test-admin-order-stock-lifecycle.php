@@ -30,6 +30,9 @@ class Test_Admin_Order_Stock_Lifecycle extends WP_UnitTestCase {
 	/** @var OrderStockLifecycle */
 	private $lifecycle;
 
+	/** @var OrderItemSnapshotter */
+	private $snapshotter;
+
 	/** Install plugin tables. */
 	public static function set_up_before_class(): void {
 		parent::set_up_before_class();
@@ -84,9 +87,11 @@ class Test_Admin_Order_Stock_Lifecycle extends WP_UnitTestCase {
 		$this->order->add_item( $item );
 		$this->order->save();
 
-		$snapshotter = new OrderItemSnapshotter( $mappings, new CalculatorRegistry() );
+		$snapshotter       = new OrderItemSnapshotter( $mappings, new CalculatorRegistry() );
+		$this->snapshotter = $snapshotter;
 		$item->delete_meta_data( OrderItemSnapshotter::META_KEY );
 		$item->delete_meta_data( ReducedOrderItemEditor::SEQUENCE_META );
+		$item->delete_meta_data( ReducedOrderItemEditor::ADDED_CYCLE_META );
 		$item->delete_meta_data( OrderStockLifecycle::RESTOCKED_QUANTITY_META );
 		$snapshotter->snapshot_admin_item( $item );
 		$item->save();
@@ -129,7 +134,7 @@ class Test_Admin_Order_Stock_Lifecycle extends WP_UnitTestCase {
 		global $wpdb;
 
 		$this->lifecycle->reduce( $this->order );
-		$editor = new ReducedOrderItemEditor( new StockMutationService( $wpdb ) );
+		$editor = new ReducedOrderItemEditor( new StockMutationService( $wpdb ), $this->snapshotter );
 		$item   = current( $this->order->get_items() );
 
 		$item->set_quantity( 3 );
@@ -147,6 +152,63 @@ class Test_Admin_Order_Stock_Lifecycle extends WP_UnitTestCase {
 		$item->save();
 		$this->assertSame( 250, $this->balance() );
 		$this->assertSame( 3, (int) $item->get_meta( ReducedOrderItemEditor::SEQUENCE_META, true ) );
+	}
+
+	/** A line added after reduction immediately consumes its mapped demand. */
+	public function test_line_added_to_reduced_order_consumes_stock(): void {
+		global $wpdb;
+
+		$this->lifecycle->reduce( $this->order );
+		$item = new WC_Order_Item_Product();
+		$item->set_product( $this->product );
+		$item->set_quantity( 1 );
+		$this->order->add_item( $item );
+		$this->order->save();
+
+		$editor = new ReducedOrderItemEditor( new StockMutationService( $wpdb ), $this->snapshotter );
+		$editor->add_saved_item( $item->get_id(), $item, $this->order->get_id() );
+		$this->assertSame( 250, $this->balance() );
+
+		$editor->add_saved_item( $item->get_id(), $item, $this->order->get_id() );
+		$this->assertSame( 250, $this->balance() );
+		$this->assertSame( 250, $item->get_meta( OrderItemSnapshotter::META_KEY, true )['pool_demand'][ $this->pool_id ] );
+	}
+
+	/** A line that cannot reserve stock is removed instead of becoming untracked. */
+	public function test_insufficient_added_line_is_rolled_back(): void {
+		$this->lifecycle->reduce( $this->order );
+		$item = new WC_Order_Item_Product();
+		$item->set_product( $this->product );
+		$item->set_quantity( 3 );
+		$this->order->add_item( $item );
+		$this->order->save();
+		global $wpdb;
+		$editor = new ReducedOrderItemEditor( new StockMutationService( $wpdb ), $this->snapshotter );
+
+		try {
+			$editor->add_saved_item( $item->get_id(), $item, $this->order->get_id() );
+			$this->fail( 'Expected the added line to exceed pooled stock.' );
+		} catch ( \LaqiUnitStockManager\Inventory\InsufficientStockException $error ) {
+			$this->assertSame( 500, $this->balance() );
+			$this->assertSame( 0, (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}woocommerce_order_items WHERE order_item_id = %d", $item->get_id() ) ) );
+		}
+	}
+
+	/** Deleting a partially restocked line restores only its outstanding demand. */
+	public function test_deleted_line_restores_only_outstanding_stock(): void {
+		global $wpdb;
+
+		$this->lifecycle->reduce( $this->order );
+		$item_id = array_key_first( $this->order->get_items() );
+		$this->lifecycle->restock_refund( true, $this->order, array( $item_id => array( 'qty' => 1 ) ) );
+		$this->assertSame( 750, $this->balance() );
+
+		$editor = new ReducedOrderItemEditor( new StockMutationService( $wpdb ), $this->snapshotter );
+		$editor->remove_saved_item( $item_id );
+		$this->assertSame( 1000, $this->balance() );
+
+		$editor->remove_saved_item( $item_id );
+		$this->assertSame( 1000, $this->balance() );
 	}
 
 	/** Read current pool balance. */
