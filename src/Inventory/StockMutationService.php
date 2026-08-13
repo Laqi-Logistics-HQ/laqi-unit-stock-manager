@@ -116,6 +116,7 @@ final class StockMutationService {
 
 			$result = $this->insert_movement( $moves, $pool_id, $delta, $target, $type, $idempotency_key, $context );
 			$this->query_or_fail( 'COMMIT' );
+			do_action( 'laqi_lusm_stock_mutated', array( $pool_id ), array( $result ) );
 			return $result;
 		} catch ( \Throwable $error ) {
 			$this->db->query( 'ROLLBACK' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
@@ -203,6 +204,19 @@ final class StockMutationService {
 			}
 
 			$this->query_or_fail( 'COMMIT' );
+			do_action(
+				'laqi_lusm_stock_mutated',
+				array_values(
+					array_unique(
+						array_map(
+							static function ( array $movement ): int {
+								return (int) $movement['pool_id']; },
+							$movements
+						)
+					)
+				),
+				$results
+			);
 			return $results;
 		} catch ( \Throwable $error ) {
 			$this->db->query( 'ROLLBACK' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery

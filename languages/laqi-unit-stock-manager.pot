@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T12:44:57+00:00\n"
+"POT-Creation-Date: 2026-08-13T14:07:48+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -41,87 +41,93 @@ msgstr ""
 msgid "https://laqi-logistics.com"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:68
+#: src/Admin/PoolStockSection.php:85
 msgid "Stock"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:78
+#: src/Admin/PoolStockSection.php:95
 msgid "Search inventory pools"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:79
+#: src/Admin/PoolStockSection.php:96
 msgid "Search pools or SKU"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:80
+#: src/Admin/PoolStockSection.php:97
 msgid "Search"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:84
+#: src/Admin/PoolStockSection.php:101
 #: src/Admin/SetupSection.php:101
 msgid "Inventory pool"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:85
+#: src/Admin/PoolStockSection.php:102
 msgid "On hand"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:86
+#: src/Admin/PoolStockSection.php:103
 msgid "Linked products"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:87
+#: src/Admin/PoolStockSection.php:104
 msgid "Adjustment"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:91
+#: src/Admin/PoolStockSection.php:108
 msgid "No inventory pools found."
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:113
+#: src/Admin/PoolStockSection.php:131
 msgid "No products linked"
 msgstr ""
 
+#. translators: %s: exact pool quantity consumed by one sold item.
+#: src/Admin/PoolStockSection.php:152
+#, php-format
+msgid "Uses %s per item."
+msgstr ""
+
 #. translators: %s: number of saleable items or Unlimited.
-#: src/Admin/PoolStockSection.php:125
+#: src/Admin/PoolStockSection.php:155
 #, php-format
 msgid "Saleable: %s"
 msgstr ""
 
 #. translators: %s: number of saleable items or Unlimited.
-#: src/Admin/PoolStockSection.php:125
+#: src/Admin/PoolStockSection.php:155
 msgid "Unlimited"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:143
+#: src/Admin/PoolStockSection.php:177
 msgid "Adjustment type"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:145
+#: src/Admin/PoolStockSection.php:179
 msgid "Set to"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:146
+#: src/Admin/PoolStockSection.php:180
 msgid "Add"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:147
+#: src/Admin/PoolStockSection.php:181
 msgid "Subtract"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:149
+#: src/Admin/PoolStockSection.php:183
 msgid "Quantity"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:152
+#: src/Admin/PoolStockSection.php:186
 msgid "Reason"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:153
+#: src/Admin/PoolStockSection.php:187
 msgid "Reason (optional)"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:154
+#: src/Admin/PoolStockSection.php:188
 msgid "Apply"
 msgstr ""
 
@@ -231,7 +237,19 @@ msgstr ""
 msgid "Inventory stock could not be updated. Check the quantity and try again."
 msgstr ""
 
-#: src/Plugin.php:151
+#: src/Diagnostics/MappingDiagnostics.php:28
+msgid "Linked product no longer exists."
+msgstr ""
+
+#: src/Diagnostics/MappingDiagnostics.php:33
+msgid "WooCommerce stock quantity is also enabled. Disable native quantity management for this linked item to avoid conflicting stock sources."
+msgstr ""
+
+#: src/Diagnostics/MappingDiagnostics.php:36
+msgid "This linked item is not currently purchasable."
+msgstr ""
+
+#: src/Plugin.php:153
 msgid "Laqi Unit Stock Manager for WooCommerce requires WooCommerce to be installed and active."
 msgstr ""
 

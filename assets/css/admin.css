@@ -25,6 +25,12 @@
 	margin-bottom: 0;
 }
 
+.laqi-lusm-warning {
+	display: block;
+	margin-top: 0.25rem;
+	color: #8a2424;
+}
+
 .laqi-lusm-adjustment {
 	display: flex;
 	flex-wrap: wrap;

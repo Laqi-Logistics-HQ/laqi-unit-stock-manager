@@ -127,7 +127,12 @@ final class Container {
 	 * @return PoolPresenter
 	 */
 	public function pool_presenter(): PoolPresenter {
-		return new PoolPresenter( new QuantityFormatter( $this->unit_registry() ) );
+		return new PoolPresenter( $this->quantity_formatter() );
+	}
+
+	/** Exact quantity display formatter. @return QuantityFormatter */
+	public function quantity_formatter(): QuantityFormatter {
+		return new QuantityFormatter( $this->unit_registry() );
 	}
 
 	/**
