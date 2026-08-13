@@ -35,4 +35,11 @@ class Test_Plugin extends WP_UnitTestCase {
 		$this->assertTrue( $plugin->is_woocommerce_active() );
 		$this->assertNotFalse( has_action( 'before_woocommerce_init' ) );
 	}
+
+	/**
+	 * Paid modules receive the shared container through the removable bootstrap.
+	 */
+	public function test_optional_paid_bootstrap_registers_composition_hook(): void {
+		$this->assertNotFalse( has_action( 'laqi_lusm_booted' ) );
+	}
 }

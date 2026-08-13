@@ -135,6 +135,14 @@ fi
 if [ "$CHANNEL" != "freemius" ]; then
   rm -rf "$DEST/vendor" "$DEST/freemius"
 fi
+
+# Free is generated from the same source tree as both paid channels. Freemius
+# uses this suffix for its own free-package split; apply the identical physical
+# boundary to the WordPress.org archive built directly by this repository.
+if [ "$CHANNEL" = "wordpressorg" ]; then
+  find "$DEST" -type f -name '*__premium_only.*' -delete
+  find "$DEST" -depth -type d -name '*__premium_only' -exec rm -rf {} +
+fi
 # Strip the licensing-SDK bootstrap from every channel but `freemius`.
 #
 # Removing vendor/ is not enough. The bootstrap and the paid-file manifest live

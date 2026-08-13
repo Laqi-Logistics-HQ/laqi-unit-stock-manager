@@ -173,25 +173,28 @@ jobs:
           tools: composer
           coverage: none
       - run: composer install --no-dev --optimize-autoloader --no-interaction
-      - name: Build and verify both sales channels
+      - name: Build and verify all edition channels
         shell: bash
         run: |
           bash bin/build.sh --channel woocommerce --version 0.0.0-test
           bash bin/build.sh --channel freemius --version 0.0.0-test
+          bash bin/build.sh --channel wordpressorg --version 0.0.0-test
 
           woo_archive="dist/laqi-unit-stock-manager-0.0.0-test-woocommerce.zip"
           freemius_archive="dist/laqi-unit-stock-manager-0.0.0-test-freemius.zip"
+          free_archive="dist/laqi-unit-stock-manager-0.0.0-test-wordpressorg.zip"
           woo_contents="$(unzip -Z1 "$woo_archive")"
           freemius_contents="$(unzip -Z1 "$freemius_archive")"
+          free_contents="$(unzip -Z1 "$free_archive")"
 
           for forbidden in .wp-env.json playwright.config.js docs/ tests/ test-results/ .github/ package.json package-lock.json; do
-            if grep -q "^laqi-unit-stock-manager/${forbidden}" <<< "$woo_contents$freemius_contents"; then
+            if grep -q "^laqi-unit-stock-manager/${forbidden}" <<< "$woo_contents$freemius_contents$free_contents"; then
               echo "::error::Release archive contains development-only path: $forbidden"
               exit 1
             fi
           done
 
-          if grep -Eq '(^|/)\.[^/]+(/|$)|\.zip$' <<< "$woo_contents$freemius_contents"; then
+          if grep -Eq '(^|/)\.[^/]+(/|$)|\.zip$' <<< "$woo_contents$freemius_contents$free_contents"; then
             echo "::error::Release archive contains a hidden path or nested ZIP."
             exit 1
           fi
@@ -201,13 +204,25 @@ jobs:
             exit 1
           fi
 
+          premium_bootstrap='laqi-unit-stock-manager/src/premium-bootstrap__premium_only.php'
+          for paid_contents in "$woo_contents" "$freemius_contents"; do
+            if ! grep -qx "$premium_bootstrap" <<< "$paid_contents"; then
+              echo "::error::Paid archive is missing its optional composition bootstrap."
+              exit 1
+            fi
+          done
+          if grep -q '__premium_only' <<< "$free_contents"; then
+            echo "::error::WordPress.org archive contains paid-only files."
+            exit 1
+          fi
+
           if grep -q '"freemius/wordpress-sdk"' composer.json &&
              ! grep -qx 'laqi-unit-stock-manager/vendor/freemius/wordpress-sdk/start.php' <<< "$freemius_contents"; then
             echo "::error::Freemius archive is missing its configured SDK bootstrap."
             exit 1
           fi
 
-          for archive_contents in "$woo_contents" "$freemius_contents"; do
+          for archive_contents in "$woo_contents" "$freemius_contents" "$free_contents"; do
             for required in \
               laqi-unit-stock-manager/readme.txt \
               laqi-unit-stock-manager/changelog.txt \

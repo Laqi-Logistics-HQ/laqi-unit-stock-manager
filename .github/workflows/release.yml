@@ -72,14 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # Add `wordpressorg` here when this plugin gains a free edition.
-        # bin/build.sh already accepts that channel and strips the licensing-SDK
-        # bootstrap for it, and the "Publish the free build to R2" step below is
-        # already written against it — but that step is gated on
-        # `matrix.channel == 'wordpressorg'`, so until the channel is listed here
-        # it silently never runs. A step that cannot fire looks identical to one
-        # that works.
-        channel: [woocommerce, freemius]
+        channel: [woocommerce, freemius, wordpressorg]
     steps:
       - uses: actions/checkout@v5
 
@@ -144,6 +137,17 @@ jobs:
               exit 1
             fi
           done
+
+          premium_bootstrap='laqi-unit-stock-manager/src/premium-bootstrap__premium_only.php'
+          if [ "${{ matrix.channel }}" = "wordpressorg" ]; then
+            if grep -q '__premium_only' <<< "$contents"; then
+              echo "::error::WordPress.org archive contains paid-only files."
+              exit 1
+            fi
+          elif ! grep -qx "$premium_bootstrap" <<< "$contents"; then
+            echo "::error::Paid archive is missing its optional composition bootstrap."
+            exit 1
+          fi
 
           if [ -f package-lock.json ]; then
             for required_asset in \
