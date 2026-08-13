@@ -10,6 +10,7 @@ use LaqiUnitStockManager\Inventory\StockMutationService;
 use LaqiUnitStockManager\Storage\Schema;
 use LaqiUnitStockManager\Storage\MovementRepository;
 use LaqiUnitStockManager\Container;
+use LaqiUnitStockManager\Premium\Alerts\LowStockPolicyRepository;
 
 /**
  * Tests the single authoritative stock mutation path.
@@ -222,5 +223,31 @@ class Test_Stock_Mutation_Service extends WP_UnitTestCase {
 		$this->assertSame( 'loss', $row['source_type'] );
 		$this->assertSame( 'Broken container', $row['reason'] );
 		$this->assertSame( 7, (int) $row['actor_id'] );
+	}
+
+	/** Low-stock email fires once per crossing and rearms after recovery. */
+	public function test_low_stock_alert_fires_once_per_threshold_crossing(): void {
+		global $wpdb;
+		$sent = 0;
+		add_filter(
+			'pre_wp_mail',
+			static function () use ( &$sent ): bool {
+				++$sent;
+				return true;
+			}
+		);
+		$policies = new LowStockPolicyRepository( $wpdb );
+		$wpdb->update( Schema::table( 'pools' ), array( 'policy_json' => wp_json_encode( array( 'allocation' => 'future-strategy' ) ) ), array( 'id' => $this->pool_id ) );
+		$policies->save( $this->pool_id, 9000000000000, array( 'stock@example.com' ) );
+		$envelope = json_decode( (string) $wpdb->get_var( $wpdb->prepare( 'SELECT policy_json FROM ' . Schema::table( 'pools' ) . ' WHERE id = %d', $this->pool_id ) ), true );
+		$this->assertSame( 'future-strategy', $envelope['allocation'] );
+		$service = new StockMutationService( $wpdb );
+		$service->apply( $this->pool_id, -2000000000000, 'manual_subtract', 'alert-low:' . $this->pool_id );
+		$service->apply( $this->pool_id, -1000000000000, 'manual_subtract', 'alert-still-low:' . $this->pool_id );
+		$this->assertSame( 1, $sent );
+		$this->assertTrue( (bool) $policies->find( $this->pool_id )['is_low'] );
+		$service->apply( $this->pool_id, 4000000000000, 'manual_add', 'alert-recover:' . $this->pool_id );
+		$service->apply( $this->pool_id, -3000000000000, 'manual_subtract', 'alert-low-again:' . $this->pool_id );
+		$this->assertSame( 2, $sent );
 	}
 }

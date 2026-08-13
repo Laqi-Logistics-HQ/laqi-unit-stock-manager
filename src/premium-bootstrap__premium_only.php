@@ -14,6 +14,10 @@ require_once __DIR__ . '/Premium__premium_only/Admin/MovementLedgerExportControl
 require_once __DIR__ . '/Premium__premium_only/Inventory/StockLossTypeCatalog.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/StockLossController.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/StockLossSection.php';
+require_once __DIR__ . '/Premium__premium_only/Alerts/LowStockPolicyRepository.php';
+require_once __DIR__ . '/Premium__premium_only/Alerts/LowStockAlertEvaluator.php';
+require_once __DIR__ . '/Premium__premium_only/Admin/LowStockAlertController.php';
+require_once __DIR__ . '/Premium__premium_only/Admin/LowStockAlertsSection.php';
 
 /**
  * Give physically separate paid modules the completed shared composition root.
@@ -25,11 +29,16 @@ add_action(
 	'laqi_lusm_booted',
 	static function ( Container $container ): void {
 		$loss_types = new Premium\Inventory\StockLossTypeCatalog();
+		global $wpdb;
+		$alert_policies = new Premium\Alerts\LowStockPolicyRepository( $wpdb );
 		$loss_types->register( $container->movement_registry() );
 		$container->screen_section_catalog()->register( new Premium\Admin\MovementLedgerSection( $container->movement_repository(), $container->movement_presenter(), new Admin\PaginationRenderer() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\StockLossSection( $container->pool_repository(), $container->quantity_formatter(), $loss_types ) );
+		$container->screen_section_catalog()->register( new Premium\Admin\LowStockAlertsSection( $alert_policies, $container->pool_repository(), $container->quantity_formatter() ) );
 		( new Premium\Admin\MovementLedgerExportController( $container->movement_repository(), $container->movement_presenter() ) )->register();
 		( new Premium\Admin\StockLossController( $container->stock_adjustment_service(), $loss_types ) )->register();
+		( new Premium\Admin\LowStockAlertController( $alert_policies, $container->pool_repository(), $container->unit_registry() ) )->register();
+		( new Premium\Alerts\LowStockAlertEvaluator( $alert_policies, $container->pool_repository(), $container->quantity_formatter() ) )->register();
 		do_action( 'laqi_lusm_premium_ready', $container );
 	}
 );
