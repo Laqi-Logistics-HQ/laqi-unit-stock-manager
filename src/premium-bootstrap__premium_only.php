@@ -36,6 +36,9 @@ require_once __DIR__ . '/Premium__premium_only/Planning/StockScenarioPlanner.php
 require_once __DIR__ . '/Premium__premium_only/Admin/StockScenarioSection.php';
 require_once __DIR__ . '/Premium__premium_only/Receiving/SupplierRepository.php';
 require_once __DIR__ . '/Premium__premium_only/Batches/BatchRepository.php';
+require_once __DIR__ . '/Premium__premium_only/Batches/BatchAllocationRepository.php';
+require_once __DIR__ . '/Premium__premium_only/Batches/BatchMovementAllocator.php';
+require_once __DIR__ . '/Premium__premium_only/Batches/ExpiredBatchAvailability.php';
 require_once __DIR__ . '/Premium__premium_only/Receiving/ReceivingService.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/ReceivingController.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/ReceivingSection.php';
@@ -93,6 +96,10 @@ add_action(
 		$material_costs->install();
 		$batches = new Premium\Batches\BatchRepository( $wpdb );
 		$batches->install();
+		$batch_allocations = new Premium\Batches\BatchAllocationRepository( $wpdb );
+		$batch_allocations->install();
+		( new Premium\Batches\BatchMovementAllocator( $batch_allocations ) )->register();
+		( new Premium\Batches\ExpiredBatchAvailability( $batches ) )->register();
 		$material_economics = new Premium\Costing\MaterialEconomicsService( $material_costs );
 		$reservations       = new Premium\Reservations\ReservationRepository( $wpdb );
 		$reservations->install();

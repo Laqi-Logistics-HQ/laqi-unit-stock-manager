@@ -134,8 +134,13 @@ final class BatchRepository {
 
 	/** Active FEFO candidates for one pool; undated quantities are last. @return array<int,array<string,mixed>> */
 	public function allocatable( int $pool_id ): array {
-		$rows = $this->db->get_results( $this->db->prepare( 'SELECT * FROM ' . $this->table() . ' WHERE pool_id = %d AND status = %s AND quantity_available_base > 0 ORDER BY CASE WHEN expiry_date IS NULL THEN 1 ELSE 0 END, expiry_date ASC, received_at ASC, id ASC', $pool_id, 'active' ), ARRAY_A );
+		$rows = $this->db->get_results( $this->db->prepare( 'SELECT * FROM ' . $this->table() . ' WHERE pool_id = %d AND status = %s AND quantity_available_base > 0 AND (expiry_date IS NULL OR expiry_date >= %s) ORDER BY CASE WHEN expiry_date IS NULL THEN 1 ELSE 0 END, expiry_date ASC, received_at ASC, id ASC', $pool_id, 'active', current_time( 'Y-m-d' ) ), ARRAY_A );
 		return is_array( $rows ) ? $rows : array();
+	}
+
+	/** Expired active quantity that remains physically on hand. */
+	public function expired_quantity( int $pool_id ): int {
+		return (int) $this->db->get_var( $this->db->prepare( 'SELECT COALESCE(SUM(quantity_available_base),0) FROM ' . $this->table() . ' WHERE pool_id=%d AND status=%s AND expiry_date IS NOT NULL AND expiry_date<%s', $pool_id, 'active', current_time( 'Y-m-d' ) ) );
 	}
 
 	/** Batch for an idempotent receipt movement. @return array<string,mixed>|null */
