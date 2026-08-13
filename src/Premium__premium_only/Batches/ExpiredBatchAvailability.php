@@ -19,6 +19,6 @@ final class ExpiredBatchAvailability {
 		$this->batches = $batches; }
 	/** Register after other available-to-sell policies. */ public function register(): void {
 		add_filter( 'laqi_lusm_pool_available_quantity', array( $this, 'available_quantity' ), 40, 2 ); }
-	/** Subtract expired active lots. */ public function available_quantity( int $available, int $pool_id ): int {
-		return max( 0, $available - $this->batches->expired_quantity( $pool_id ) ); }
+	/** Subtract quarantined and expired lots. */ public function available_quantity( int $available, int $pool_id ): int {
+		return max( 0, $available - $this->batches->unavailable_quantity( $pool_id ) ); }
 }

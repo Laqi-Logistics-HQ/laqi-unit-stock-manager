@@ -144,6 +144,12 @@ the exact consumed lots before a later stock cycle can allocate them again.
 Expired active lots remain physically on hand but are excluded from storefront,
 reservation, hold, and order-allocation capacity; non-order corrections may
 still reduce them so later quarantine and write-off workflows are not blocked.
+The Receiving tab also provides exact batch stocktakes, permanent write-offs,
+and reversible quarantine/release controls. Quarantined quantities remain in
+physical on-hand stock but are excluded from every availability path. Each
+status transition records its quantity snapshot, actor, optional reason, and
+timestamp in an append-only batch-event journal; quantity-changing operations
+continue to use the authoritative stock movement and allocation journals.
 
 Every Action Scheduler hook added by the plugin must also be added to the list in
 `Plugin::on_deactivate()`. Deactivation must cancel all plugin-owned scheduled

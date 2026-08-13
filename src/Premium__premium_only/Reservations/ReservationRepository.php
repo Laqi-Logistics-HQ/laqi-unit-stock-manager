@@ -67,7 +67,7 @@ final class ReservationRepository {
 					} throw new RuntimeException( 'The order reservation already has different demand.' ); }
 				$held    = (int) $this->db->get_var( $this->db->prepare( 'SELECT COALESCE(SUM(quantity_base),0) FROM ' . $this->db->prefix . 'laqi_lusm_stock_holds WHERE pool_id = %d AND status = %s', $pool_id, 'active' ) );
 				$safety  = $this->safety_stock( (string) $pool['policy_json'] );
-				$expired = (int) $this->db->get_var( $this->db->prepare( 'SELECT COALESCE(SUM(quantity_available_base),0) FROM ' . $this->db->prefix . 'laqi_lusm_batches WHERE pool_id=%d AND status=%s AND expiry_date IS NOT NULL AND expiry_date<%s', $pool_id, 'active', current_time( 'Y-m-d' ) ) );
+				$expired = (int) $this->db->get_var( $this->db->prepare( 'SELECT COALESCE(SUM(quantity_available_base),0) FROM ' . $this->db->prefix . 'laqi_lusm_batches WHERE pool_id=%d AND (status=%s OR (status=%s AND expiry_date IS NOT NULL AND expiry_date<%s))', $pool_id, 'quarantined', 'active', current_time( 'Y-m-d' ) ) );
 				if ( (int) $pool['quantity_base'] - $this->reserved_quantity( (int) $pool_id ) - $held - $safety - $expired < (int) $quantity ) {
 					throw new RuntimeException( 'The pooled stock cannot satisfy this reservation.' ); }
 				$now      = current_time( 'mysql', true );
