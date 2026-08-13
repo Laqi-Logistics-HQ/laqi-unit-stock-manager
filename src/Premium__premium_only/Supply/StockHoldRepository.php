@@ -50,7 +50,8 @@ final class StockHoldRepository {
 			$pool     = $this->db->get_row( $this->db->prepare( 'SELECT quantity_base, policy_json FROM ' . $this->db->prefix . 'laqi_lusm_pools WHERE id = %d FOR UPDATE', $pool_id ), ARRAY_A );
 			$reserved = (int) $this->db->get_var( $this->db->prepare( 'SELECT COALESCE(SUM(quantity_base),0) FROM ' . $this->db->prefix . 'laqi_lusm_reservations WHERE pool_id=%d AND status=%s AND expires_at>%s', $pool_id, 'active', current_time( 'mysql', true ) ) );
 			$safety   = is_array( $pool ) ? $this->safety_stock( (string) $pool['policy_json'] ) : 0;
-			if ( ! is_array( $pool ) || (int) $pool['quantity_base'] - $reserved - $this->held_quantity( $pool_id ) - $safety < $quantity ) {
+			$expired  = (int) $this->db->get_var( $this->db->prepare( 'SELECT COALESCE(SUM(quantity_available_base),0) FROM ' . $this->db->prefix . 'laqi_lusm_batches WHERE pool_id=%d AND status=%s AND expiry_date IS NOT NULL AND expiry_date<%s', $pool_id, 'active', current_time( 'Y-m-d' ) ) );
+			if ( ! is_array( $pool ) || (int) $pool['quantity_base'] - $reserved - $this->held_quantity( $pool_id ) - $safety - $expired < $quantity ) {
 				throw new \InvalidArgumentException( 'Insufficient available stock for this hold.' ); }
 			$inserted = $this->db->insert(
 				$this->table(),

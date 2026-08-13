@@ -136,6 +136,14 @@ including the supplier lot, optional expiry, receipt cost snapshot, received and
 remaining normalized quantities. The batch repository exposes dated stock in
 earliest-expiry-first order with undated receipts last; allocation and recall
 modules build on that contract without changing the original pool ledger.
+The shared mutation engine exposes `laqi_lusm_stock_movement_applying` from
+inside its existing database transaction. Paid FEFO allocation journals each
+batch or legacy-unbatched portion there, so a failed extension rolls back the
+pool, batch balances, and movement together. Positive order movements restore
+the exact consumed lots before a later stock cycle can allocate them again.
+Expired active lots remain physically on hand but are excluded from storefront,
+reservation, hold, and order-allocation capacity; non-order corrections may
+still reduce them so later quarantine and write-off workflows are not blocked.
 
 Every Action Scheduler hook added by the plugin must also be added to the list in
 `Plugin::on_deactivate()`. Deactivation must cancel all plugin-owned scheduled
