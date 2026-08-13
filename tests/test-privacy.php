@@ -40,6 +40,7 @@ class Test_Privacy extends WP_UnitTestCase {
 		global $wpdb;
 
 		$user_id = self::factory()->user->create( array( 'user_email' => 'stock-manager@example.com' ) );
+		$wpdb->update( Schema::table( 'movements' ), array( 'actor_id' => 0 ), array( 'actor_id' => $user_id ), array( '%d' ), array( '%d' ) );
 		$now     = current_time( 'mysql', true );
 		$wpdb->insert(
 			Schema::table( 'pools' ),

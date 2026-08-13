@@ -32,9 +32,8 @@ laqi-unit-stock-manager.php   # bootstrap: headers, constants, autoload, lifecyc
 uninstall.php         # data cleanup on delete (plugin NOT loaded here)
 src/Plugin.php        # main class (PSR-4 namespace LaqiUnitStockManager); WC guard, HPOS, i18n
 src/Privacy.php       # exporter, eraser, and privacy-policy integration points
-src/Assets.php        # registers + enqueues CSS/JS, wires JS translations
-assets/css/           # admin.css, frontend.css (enqueued, version-busted)
-assets/js/            # admin.js, frontend.js (use wp.i18n.__ for translatable strings)
+src/Assets.php        # scopes Unit Stock admin styles
+assets/css/           # admin.css (Unit Stock screen only, version-busted)
 languages/            # .pot / .po / .mo / .json — see languages/README.md
 bin/build.sh          # build distributable zip per channel (woocommerce|freemius|wordpressorg)
 bin/install-wp-tests.sh # provision pinned WordPress test suites for CI
@@ -80,16 +79,17 @@ The WooCommerce build excludes the complete Composer runtime and uses the
 fallback PSR-4 loader. If a lockfile marks a real asset build, packaging fails
 unless its generated runtime exists.
 
-## Assets (CSS / JS)
+## Assets
 
-Source files live in `assets/css` and `assets/js` and are enqueued by
-`src/Assets.php` with unique handles and the plugin version for cache busting.
+Styles live in `assets/css` and are enqueued by `src/Assets.php` only on the
+Unit Stock admin screen, with a unique handle and the plugin version for cache
+busting. The current plugin needs no JavaScript and has no frontend UI, so it
+registers no scripts or storefront assets.
 All plugin-owned globals use `laqi_lusm_`; registered handles, slugs,
 HTML IDs, CSS classes, and CSS custom properties use the equivalent hyphenated
 form combining `laqi` with the plugin initials. Do not shorten UI selectors just
-because an element appears only on the plugin's own admin screen. Add a file, then enqueue
-it there. Guard admin enqueues to this plugin's own screens (there's a
-`$hook_suffix` check stub).
+because an element appears only on the plugin's own admin screen. Add a file,
+then enqueue it through an equally narrow screen or feature guard.
 
 For a real build pipeline (Gutenberg blocks, React, JSX, SCSS), use
 `@wordpress/scripts` (`package.json`): source in `assets/src`, output to
@@ -97,10 +97,9 @@ For a real build pipeline (Gutenberg blocks, React, JSX, SCSS), use
 
 ## Privacy and background work
 
-`src/Privacy.php` registers the WordPress exporter, eraser, and privacy-policy
-integration points. Its initial callbacks report no data. Replace them before
-release whenever the plugin stores personal data, and document any retention or
-third-party sharing accurately.
+`src/Privacy.php` registers the WordPress exporter, eraser, and suggested
+privacy-policy content. Attributed movements export with the acting user and an
+erasure request anonymizes that association while retaining the stock ledger.
 
 Every Action Scheduler hook added by the plugin must also be added to the list in
 `Plugin::on_deactivate()`. Deactivation must cancel all plugin-owned scheduled
