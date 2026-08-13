@@ -132,7 +132,6 @@ final class SetupSection implements ScreenSectionInterface {
 	/** Render active product mappings. @return void */
 	private function render_mappings(): void {
 		$mappings = $this->mappings->active();
-		$pools    = $this->pools->search( '', 500 );
 		if ( array() === $mappings ) {
 			echo '<p>' . esc_html__( 'No products or variations are linked yet.', 'laqi-unit-stock-manager' ) . '</p>';
 			return;
@@ -169,10 +168,10 @@ final class SetupSection implements ScreenSectionInterface {
 							<input type="hidden" name="mapping_version" value="<?php echo esc_attr( $mapping->version() ); ?>" />
 							<?php wp_nonce_field( 'laqi_lusm_update_mapping_' . $mapping->id() ); ?>
 							<label class="screen-reader-text" for="laqi-lusm-edit-pool-<?php echo esc_attr( $mapping->id() ); ?>"><?php esc_html_e( 'Inventory pool', 'laqi-unit-stock-manager' ); ?></label>
-							<select id="laqi-lusm-edit-pool-<?php echo esc_attr( $mapping->id() ); ?>" name="pool_id" required>
-							<?php foreach ( $pools as $candidate_pool ) : ?>
-								<option value="<?php echo esc_attr( $candidate_pool->id() ); ?>" <?php selected( $component && $component->pool_id() === $candidate_pool->id() ); ?>><?php echo esc_html( $candidate_pool->name() . ' (' . $candidate_pool->display_unit() . ')' ); ?></option>
-							<?php endforeach; ?>
+							<select id="laqi-lusm-edit-pool-<?php echo esc_attr( $mapping->id() ); ?>" class="laqi-lusm-pool-search" name="pool_id" data-placeholder="<?php esc_attr_e( 'Search inventory pools', 'laqi-unit-stock-manager' ); ?>" required>
+							<?php if ( $pool ) : ?>
+								<option value="<?php echo esc_attr( $pool->id() ); ?>" selected><?php echo esc_html( $pool->name() . ' (' . $pool->display_unit() . ')' ); ?></option>
+							<?php endif; ?>
 							</select>
 							<label class="screen-reader-text" for="laqi-lusm-edit-consumption-<?php echo esc_attr( $mapping->id() ); ?>"><?php esc_html_e( 'Consumption per sold item', 'laqi-unit-stock-manager' ); ?></label>
 							<input id="laqi-lusm-edit-consumption-<?php echo esc_attr( $mapping->id() ); ?>" name="consumption" type="text" inputmode="decimal" value="<?php echo esc_attr( $editable['value'] ); ?>" required size="8" />
@@ -227,8 +226,7 @@ final class SetupSection implements ScreenSectionInterface {
 
 	/** Render the mapping form. @return void */
 	private function render_mapping_form(): void {
-		$pools = $this->pools->search( '', 500 );
-		if ( array() === $pools ) {
+		if ( 0 === $this->pools->count_search() ) {
 			echo '<p class="notice notice-info inline">' . esc_html__( 'Create an inventory pool before linking products.', 'laqi-unit-stock-manager' ) . '</p>';
 			return;
 		}
@@ -239,11 +237,7 @@ final class SetupSection implements ScreenSectionInterface {
 			<label for="laqi-lusm-product"><?php esc_html_e( 'Product or variation', 'laqi-unit-stock-manager' ); ?></label>
 			<select id="laqi-lusm-product" class="wc-product-search" name="purchasable_id" data-placeholder="<?php esc_attr_e( 'Search for a product or variation', 'laqi-unit-stock-manager' ); ?>" data-action="woocommerce_json_search_products_and_variations" data-allow_clear="true" required></select>
 			<label for="laqi-lusm-pool"><?php esc_html_e( 'Inventory pool', 'laqi-unit-stock-manager' ); ?></label>
-			<select id="laqi-lusm-pool" name="pool_id" required>
-				<?php foreach ( $pools as $pool ) : ?>
-					<option value="<?php echo esc_attr( $pool->id() ); ?>"><?php echo esc_html( $pool->name() . ' (' . $pool->display_unit() . ')' ); ?></option>
-				<?php endforeach; ?>
-			</select>
+		<select id="laqi-lusm-pool" class="laqi-lusm-pool-search" name="pool_id" data-placeholder="<?php esc_attr_e( 'Search inventory pools', 'laqi-unit-stock-manager' ); ?>" required></select>
 			<?php $this->text_field( 'consumption', __( 'Consumption per sold item', 'laqi-unit-stock-manager' ), true, 'decimal' ); ?>
 			<?php $this->unit_field( 'consumption_unit', __( 'Consumption unit', 'laqi-unit-stock-manager' ) ); ?>
 			<label for="laqi-lusm-existing-stock"><?php esc_html_e( 'Existing WooCommerce stock', 'laqi-unit-stock-manager' ); ?></label>

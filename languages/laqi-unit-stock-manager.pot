@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T16:50:59+00:00\n"
+"POT-Creation-Date: 2026-08-13T16:55:58+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -61,8 +61,8 @@ msgstr ""
 
 #: src/Admin/ActivitySection.php:79
 #: src/Admin/PoolStockSection.php:119
-#: src/Admin/SetupSection.php:171
-#: src/Admin/SetupSection.php:241
+#: src/Admin/SetupSection.php:170
+#: src/Admin/SetupSection.php:239
 msgid "Inventory pool"
 msgstr ""
 
@@ -114,11 +114,18 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
+#: src/Admin/PoolSearchController.php:40
+#: src/Admin/UnitStockPage.php:55
+msgid "You are not allowed to manage unit stock."
+msgstr ""
+
 #: src/Admin/PoolStockSection.php:97
 msgid "Stock"
 msgstr ""
 
 #: src/Admin/PoolStockSection.php:113
+#: src/Admin/SetupSection.php:171
+#: src/Admin/SetupSection.php:240
 msgid "Search inventory pools"
 msgstr ""
 
@@ -287,94 +294,94 @@ msgstr ""
 msgid "Of unit"
 msgstr ""
 
-#: src/Admin/SetupSection.php:137
+#: src/Admin/SetupSection.php:136
 msgid "No products or variations are linked yet."
 msgstr ""
 
-#: src/Admin/SetupSection.php:143
-#: src/Admin/SetupSection.php:239
+#: src/Admin/SetupSection.php:142
+#: src/Admin/SetupSection.php:237
 msgid "Product or variation"
 msgstr ""
 
-#: src/Admin/SetupSection.php:144
+#: src/Admin/SetupSection.php:143
 msgid "Consumption rule"
 msgstr ""
 
-#: src/Admin/SetupSection.php:145
+#: src/Admin/SetupSection.php:144
 msgid "Actions"
 msgstr ""
 
 #. translators: %d: unavailable WooCommerce product or variation ID.
-#: src/Admin/SetupSection.php:162
+#: src/Admin/SetupSection.php:161
 #, php-format
 msgid "Unavailable product #%d"
 msgstr ""
 
-#: src/Admin/SetupSection.php:177
-#: src/Admin/SetupSection.php:247
+#: src/Admin/SetupSection.php:176
+#: src/Admin/SetupSection.php:241
 msgid "Consumption per sold item"
 msgstr ""
 
-#: src/Admin/SetupSection.php:179
-#: src/Admin/SetupSection.php:248
+#: src/Admin/SetupSection.php:178
+#: src/Admin/SetupSection.php:242
 msgid "Consumption unit"
 msgstr ""
 
-#: src/Admin/SetupSection.php:185
+#: src/Admin/SetupSection.php:184
 msgid "Save changes"
 msgstr ""
 
-#: src/Admin/SetupSection.php:193
+#: src/Admin/SetupSection.php:192
 msgid "Unlink"
 msgstr ""
 
-#: src/Admin/SetupSection.php:209
+#: src/Admin/SetupSection.php:208
 msgid "Custom units"
 msgstr ""
 
-#: src/Admin/SetupSection.php:210
+#: src/Admin/SetupSection.php:209
 msgid "Unused units can be retired. Units used by an inventory pool or another active custom unit are protected."
 msgstr ""
 
 #. translators: 1: unit label, 2: unit key, 3: equivalent quantity, 4: reference unit.
-#: src/Admin/SetupSection.php:214
+#: src/Admin/SetupSection.php:213
 #, php-format
 msgid "%1$s (%2$s) = %3$s %4$s"
 msgstr ""
 
-#: src/Admin/SetupSection.php:220
+#: src/Admin/SetupSection.php:219
 msgid "Retire"
 msgstr ""
 
-#: src/Admin/SetupSection.php:232
+#: src/Admin/SetupSection.php:230
 msgid "Create an inventory pool before linking products."
 msgstr ""
 
-#: src/Admin/SetupSection.php:240
+#: src/Admin/SetupSection.php:238
 msgid "Search for a product or variation"
 msgstr ""
 
-#: src/Admin/SetupSection.php:249
+#: src/Admin/SetupSection.php:243
 msgid "Existing WooCommerce stock"
 msgstr ""
 
-#: src/Admin/SetupSection.php:251
+#: src/Admin/SetupSection.php:245
 msgid "Disable native quantity management"
 msgstr ""
 
-#: src/Admin/SetupSection.php:252
+#: src/Admin/SetupSection.php:246
 msgid "Add native item count to this pool, then disable it"
 msgstr ""
 
-#: src/Admin/SetupSection.php:253
+#: src/Admin/SetupSection.php:247
 msgid "Keep native quantity management unchanged"
 msgstr ""
 
-#: src/Admin/SetupSection.php:255
+#: src/Admin/SetupSection.php:249
 msgid "Transferring multiplies the current native item count by the consumption per item and adds that exact quantity to the pool once."
 msgstr ""
 
-#: src/Admin/SetupSection.php:256
+#: src/Admin/SetupSection.php:250
 msgid "Save mapping"
 msgstr ""
 
@@ -386,10 +393,6 @@ msgstr ""
 #: src/Admin/UnitStockPage.php:45
 #: src/Admin/UnitStockPage.php:65
 msgid "Unit Stock"
-msgstr ""
-
-#: src/Admin/UnitStockPage.php:55
-msgid "You are not allowed to manage unit stock."
 msgstr ""
 
 #: src/Admin/UnitStockPage.php:68
@@ -480,7 +483,7 @@ msgstr ""
 msgid "This linked item is not currently purchasable."
 msgstr ""
 
-#: src/Plugin.php:158
+#: src/Plugin.php:159
 msgid "Laqi Unit Stock Manager for WooCommerce requires WooCommerce to be installed and active."
 msgstr ""
 
