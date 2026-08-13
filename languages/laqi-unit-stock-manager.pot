@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T16:14:17+00:00\n"
+"POT-Creation-Date: 2026-08-13T16:21:24+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -61,7 +61,8 @@ msgstr ""
 
 #: src/Admin/ActivitySection.php:62
 #: src/Admin/PoolStockSection.php:101
-#: src/Admin/SetupSection.php:133
+#: src/Admin/SetupSection.php:143
+#: src/Admin/SetupSection.php:205
 msgid "Inventory pool"
 msgstr ""
 
@@ -176,131 +177,163 @@ msgstr ""
 msgid "Apply"
 msgstr ""
 
-#: src/Admin/SetupController.php:196
+#: src/Admin/SetupController.php:211
 msgid "You are not allowed to configure unit stock."
 msgstr ""
 
-#: src/Admin/SetupSection.php:62
+#: src/Admin/SetupSection.php:83
 msgid "Setup"
 msgstr ""
 
-#: src/Admin/SetupSection.php:70
+#: src/Admin/SetupSection.php:91
 msgid "Create inventory pool"
 msgstr ""
 
-#: src/Admin/SetupSection.php:71
+#: src/Admin/SetupSection.php:92
 msgid "Create the authoritative bulk quantity that products and variations will consume."
 msgstr ""
 
-#: src/Admin/SetupSection.php:75
+#: src/Admin/SetupSection.php:96
 msgid "Pool name"
 msgstr ""
 
-#: src/Admin/SetupSection.php:76
+#: src/Admin/SetupSection.php:97
 msgid "Internal SKU"
 msgstr ""
 
-#: src/Admin/SetupSection.php:77
+#: src/Admin/SetupSection.php:98
 msgid "Stock unit"
 msgstr ""
 
-#: src/Admin/SetupSection.php:78
+#: src/Admin/SetupSection.php:99
 #: src/Container.php:129
 msgid "Opening balance"
 msgstr ""
 
-#: src/Admin/SetupSection.php:79
+#: src/Admin/SetupSection.php:100
 msgid "Create pool"
 msgstr ""
 
-#: src/Admin/SetupSection.php:83
+#: src/Admin/SetupSection.php:104
 msgid "Link a product or variation"
 msgstr ""
 
-#: src/Admin/SetupSection.php:84
+#: src/Admin/SetupSection.php:105
 msgid "Choose exactly how much pooled stock one sold item consumes. Labels are never parsed automatically."
 msgstr ""
 
-#: src/Admin/SetupSection.php:88
-#: src/Admin/SetupSection.php:98
+#: src/Admin/SetupSection.php:109
+msgid "Current product links"
+msgstr ""
+
+#: src/Admin/SetupSection.php:110
+msgid "Review active consumption rules or unlink an item. Unlinking does not alter past orders or their stock-restoration snapshots."
+msgstr ""
+
+#: src/Admin/SetupSection.php:114
+#: src/Admin/SetupSection.php:124
 msgid "Create custom unit"
 msgstr ""
 
-#: src/Admin/SetupSection.php:89
+#: src/Admin/SetupSection.php:115
 msgid "Define a merchant unit as an exact quantity of any existing unit, such as one sack equaling 25 kg."
 msgstr ""
 
-#: src/Admin/SetupSection.php:93
+#: src/Admin/SetupSection.php:119
 msgid "Unit key"
 msgstr ""
 
-#: src/Admin/SetupSection.php:94
+#: src/Admin/SetupSection.php:120
 msgid "Label"
 msgstr ""
 
-#: src/Admin/SetupSection.php:95
+#: src/Admin/SetupSection.php:121
 msgid "Symbol"
 msgstr ""
 
-#: src/Admin/SetupSection.php:96
+#: src/Admin/SetupSection.php:122
 msgid "Equivalent quantity"
 msgstr ""
 
-#: src/Admin/SetupSection.php:97
+#: src/Admin/SetupSection.php:123
 msgid "Of unit"
 msgstr ""
 
-#: src/Admin/SetupSection.php:112
+#: src/Admin/SetupSection.php:136
+msgid "No products or variations are linked yet."
+msgstr ""
+
+#: src/Admin/SetupSection.php:142
+#: src/Admin/SetupSection.php:203
+msgid "Product or variation"
+msgstr ""
+
+#: src/Admin/SetupSection.php:144
+#: src/Admin/SetupSection.php:211
+msgid "Consumption per sold item"
+msgstr ""
+
+#: src/Admin/SetupSection.php:145
+msgid "Action"
+msgstr ""
+
+#. translators: %d: unavailable WooCommerce product or variation ID.
+#: src/Admin/SetupSection.php:158
+#, php-format
+msgid "Unavailable product #%d"
+msgstr ""
+
+#: src/Admin/SetupSection.php:161
+msgid "Unavailable pool"
+msgstr ""
+
+#: src/Admin/SetupSection.php:168
+msgid "Unlink"
+msgstr ""
+
+#: src/Admin/SetupSection.php:184
 msgid "Custom units"
 msgstr ""
 
 #. translators: 1: unit label, 2: unit key, 3: equivalent quantity, 4: reference unit.
-#: src/Admin/SetupSection.php:115
+#: src/Admin/SetupSection.php:187
 #, php-format
 msgid "%1$s (%2$s) = %3$s %4$s"
 msgstr ""
 
-#: src/Admin/SetupSection.php:124
+#: src/Admin/SetupSection.php:196
 msgid "Create an inventory pool before linking products."
 msgstr ""
 
-#: src/Admin/SetupSection.php:131
-msgid "Product or variation"
-msgstr ""
-
-#: src/Admin/SetupSection.php:132
+#: src/Admin/SetupSection.php:204
 msgid "Search for a product or variation"
 msgstr ""
 
-#: src/Admin/SetupSection.php:139
-msgid "Consumption per sold item"
-msgstr ""
-
-#: src/Admin/SetupSection.php:140
+#: src/Admin/SetupSection.php:212
 msgid "Consumption unit"
 msgstr ""
 
-#: src/Admin/SetupSection.php:141
+#: src/Admin/SetupSection.php:213
 msgid "Existing WooCommerce stock"
 msgstr ""
 
-#: src/Admin/SetupSection.php:143
+#: src/Admin/SetupSection.php:215
 msgid "Disable native quantity management"
 msgstr ""
 
-#: src/Admin/SetupSection.php:144
+#: src/Admin/SetupSection.php:216
 msgid "Add native item count to this pool, then disable it"
 msgstr ""
 
-#: src/Admin/SetupSection.php:145
+#: src/Admin/SetupSection.php:217
 msgid "Keep native quantity management unchanged"
 msgstr ""
 
-#: src/Admin/SetupSection.php:147
+#: src/Admin/SetupSection.php:219
 msgid "Transferring multiplies the current native item count by the consumption per item and adds that exact quantity to the pool once."
 msgstr ""
 
-#: src/Admin/SetupSection.php:148
+#: src/Admin/SetupSection.php:220
 msgid "Save mapping"
 msgstr ""
 
@@ -335,14 +368,18 @@ msgid "Product stock mapping saved."
 msgstr ""
 
 #: src/Admin/UnitStockPage.php:124
+msgid "Product stock mapping unlinked."
+msgstr ""
+
+#: src/Admin/UnitStockPage.php:132
 msgid "Custom stock unit created."
 msgstr ""
 
-#: src/Admin/UnitStockPage.php:131
+#: src/Admin/UnitStockPage.php:139
 msgid "The setup could not be saved. Check that the quantities and units are compatible."
 msgstr ""
 
-#: src/Admin/UnitStockPage.php:133
+#: src/Admin/UnitStockPage.php:141
 msgid "Inventory stock could not be updated. Check the quantity and try again."
 msgstr ""
 

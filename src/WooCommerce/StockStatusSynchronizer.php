@@ -79,7 +79,16 @@ final class StockStatusSynchronizer {
 			return;
 		}
 		$saleable = $this->availability->saleable_quantity( $product_id, $variation_id );
-		$product->set_stock_status( null === $saleable || $saleable > 0 ? 'instock' : 'outofstock' );
+		if ( null === $saleable && $product->managing_stock() ) {
+			$native_quantity = $product->get_stock_quantity();
+			$in_stock        = $product->backorders_allowed() || ( null !== $native_quantity && $native_quantity > 0 );
+		} else {
+			$in_stock = null === $saleable || $saleable > 0;
+		}
+		$product->set_stock_status( $in_stock ? 'instock' : 'outofstock' );
 		$product->save();
+		if ( $variation_id > 0 ) {
+			WC_Product_Variable::sync_stock_status( $product_id );
+		}
 	}
 }

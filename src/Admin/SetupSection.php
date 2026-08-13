@@ -11,6 +11,9 @@ defined( 'ABSPATH' ) || exit;
 
 use LaqiUnitStockManager\Storage\PoolRepository;
 use LaqiUnitStockManager\Storage\CustomUnitRepository;
+use LaqiUnitStockManager\Storage\MappingRepository;
+use LaqiUnitStockManager\Domain\Quantity;
+use LaqiUnitStockManager\Presentation\QuantityFormatter;
 use LaqiUnitStockManager\Unit\UnitRegistry;
 
 /**
@@ -40,16 +43,34 @@ final class SetupSection implements ScreenSectionInterface {
 	private $custom_units;
 
 	/**
+	 * Product mapping persistence.
+	 *
+	 * @var MappingRepository
+	 */
+	private $mappings;
+
+	/**
+	 * Exact quantity formatting.
+	 *
+	 * @var QuantityFormatter
+	 */
+	private $formatter;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param PoolRepository       $pools Pool repository.
 	 * @param UnitRegistry         $units Unit registry.
 	 * @param CustomUnitRepository $custom_units Custom-unit persistence.
+	 * @param MappingRepository    $mappings Product mapping persistence.
+	 * @param QuantityFormatter    $formatter Exact quantity formatting.
 	 */
-	public function __construct( PoolRepository $pools, UnitRegistry $units, CustomUnitRepository $custom_units ) {
+	public function __construct( PoolRepository $pools, UnitRegistry $units, CustomUnitRepository $custom_units, MappingRepository $mappings, QuantityFormatter $formatter ) {
 		$this->pools        = $pools;
 		$this->units        = $units;
 		$this->custom_units = $custom_units;
+		$this->mappings     = $mappings;
+		$this->formatter    = $formatter;
 	}
 
 	/** Get the section ID. @return string */
@@ -84,6 +105,11 @@ final class SetupSection implements ScreenSectionInterface {
 				<p><?php esc_html_e( 'Choose exactly how much pooled stock one sold item consumes. Labels are never parsed automatically.', 'laqi-unit-stock-manager' ); ?></p>
 				<?php $this->render_mapping_form(); ?>
 			</section>
+			<section class="card laqi-lusm-setup-wide">
+				<h2><?php esc_html_e( 'Current product links', 'laqi-unit-stock-manager' ); ?></h2>
+				<p><?php esc_html_e( 'Review active consumption rules or unlink an item. Unlinking does not alter past orders or their stock-restoration snapshots.', 'laqi-unit-stock-manager' ); ?></p>
+				<?php $this->render_mappings(); ?>
+			</section>
 			<section class="card">
 				<h2><?php esc_html_e( 'Create custom unit', 'laqi-unit-stock-manager' ); ?></h2>
 				<p><?php esc_html_e( 'Define a merchant unit as an exact quantity of any existing unit, such as one sack equaling 25 kg.', 'laqi-unit-stock-manager' ); ?></p>
@@ -100,6 +126,52 @@ final class SetupSection implements ScreenSectionInterface {
 				<?php $this->render_custom_units(); ?>
 			</section>
 		</div>
+		<?php
+	}
+
+	/** Render active product mappings. @return void */
+	private function render_mappings(): void {
+		$mappings = $this->mappings->active();
+		if ( array() === $mappings ) {
+			echo '<p>' . esc_html__( 'No products or variations are linked yet.', 'laqi-unit-stock-manager' ) . '</p>';
+			return;
+		}
+		?>
+		<table class="widefat striped laqi-lusm-mapping-table">
+			<thead><tr>
+				<th scope="col"><?php esc_html_e( 'Product or variation', 'laqi-unit-stock-manager' ); ?></th>
+				<th scope="col"><?php esc_html_e( 'Inventory pool', 'laqi-unit-stock-manager' ); ?></th>
+				<th scope="col"><?php esc_html_e( 'Consumption per sold item', 'laqi-unit-stock-manager' ); ?></th>
+				<th scope="col"><?php esc_html_e( 'Action', 'laqi-unit-stock-manager' ); ?></th>
+			</tr></thead>
+			<tbody>
+			<?php foreach ( $mappings as $mapping ) : ?>
+				<?php
+				$product   = wc_get_product( $mapping->variation_id() > 0 ? $mapping->variation_id() : $mapping->product_id() );
+				$component = current( $mapping->components() );
+				$pool      = $component ? $this->pools->find( $component->pool_id() ) : null;
+				?>
+				<tr>
+					<th scope="row">
+					<?php
+					/* translators: %d: unavailable WooCommerce product or variation ID. */
+					echo esc_html( $product ? $product->get_formatted_name() : sprintf( __( 'Unavailable product #%d', 'laqi-unit-stock-manager' ), $mapping->variation_id() > 0 ? $mapping->variation_id() : $mapping->product_id() ) );
+					?>
+					</th>
+					<td><?php echo esc_html( $pool ? $pool->name() : __( 'Unavailable pool', 'laqi-unit-stock-manager' ) ); ?></td>
+					<td><?php echo esc_html( $pool && $component ? $this->formatter->format( new Quantity( $pool->quantity()->family(), $component->consumption() ), $pool->display_unit() ) : '' ); ?></td>
+					<td>
+						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+							<input type="hidden" name="action" value="laqi_lusm_unlink_mapping" />
+							<input type="hidden" name="mapping_id" value="<?php echo esc_attr( $mapping->id() ); ?>" />
+							<?php wp_nonce_field( 'laqi_lusm_unlink_mapping_' . $mapping->id() ); ?>
+							<?php submit_button( __( 'Unlink', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?>
+						</form>
+					</td>
+				</tr>
+			<?php endforeach; ?>
+			</tbody>
+		</table>
 		<?php
 	}
 

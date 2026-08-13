@@ -54,6 +54,10 @@
 	max-width: none;
 }
 
+.laqi-lusm-setup-grid .laqi-lusm-setup-wide {
+	grid-column: 1 / -1;
+}
+
 .laqi-lusm-setup-grid form {
 	display: grid;
 	grid-template-columns: minmax(10rem, 1fr) minmax(12rem, 2fr);
@@ -72,15 +76,33 @@
 	margin: -0.4rem 0 0;
 }
 
+.laqi-lusm-mapping-table th,
+.laqi-lusm-mapping-table td {
+	vertical-align: middle;
+}
+
+.laqi-lusm-setup-grid .laqi-lusm-mapping-table form {
+	display: block;
+}
+
+.laqi-lusm-mapping-table .submit {
+	margin: 0;
+	padding: 0;
+}
+
 @media screen and (max-width: 782px) {
 
-	.laqi-lusm-stock-table thead {
+	.laqi-lusm-stock-table thead,
+	.laqi-lusm-mapping-table thead {
 		display: none;
 	}
 
 	.laqi-lusm-stock-table tr,
 	.laqi-lusm-stock-table th,
-	.laqi-lusm-stock-table td {
+	.laqi-lusm-stock-table td,
+	.laqi-lusm-mapping-table tr,
+	.laqi-lusm-mapping-table th,
+	.laqi-lusm-mapping-table td {
 		display: block;
 		width: auto;
 	}

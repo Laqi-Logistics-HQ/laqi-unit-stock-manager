@@ -87,4 +87,38 @@ class Test_Stock_Status_Synchronizer extends WP_UnitTestCase {
 
 		$this->assertSame( 'instock', wc_get_product( $this->product->get_id() )->get_stock_status() );
 	}
+
+	/** An unlinked item is released from the pooled out-of-stock status. */
+	public function test_unlinked_product_returns_to_in_stock(): void {
+		global $wpdb;
+
+		$this->product->set_stock_status( 'outofstock' );
+		$this->product->save();
+		$mappings = new MappingRepository( $wpdb );
+		$mapping  = $mappings->find_for_product( $this->product->get_id() );
+		$this->assertNotNull( $mapping );
+		$mappings->deactivate( $mapping->id() );
+
+		$this->synchronizer->sync_mapping( $this->product->get_id() );
+
+		$this->assertSame( 'instock', wc_get_product( $this->product->get_id() )->get_stock_status() );
+	}
+
+	/** An unlinked item with native quantity management returns to native status. */
+	public function test_unlinked_product_restores_native_quantity_status(): void {
+		global $wpdb;
+
+		$this->product->set_manage_stock( true );
+		$this->product->set_stock_quantity( 0 );
+		$this->product->set_stock_status( 'instock' );
+		$this->product->save();
+		$mappings = new MappingRepository( $wpdb );
+		$mapping  = $mappings->find_for_product( $this->product->get_id() );
+		$this->assertNotNull( $mapping );
+		$mappings->deactivate( $mapping->id() );
+
+		$this->synchronizer->sync_mapping( $this->product->get_id() );
+
+		$this->assertSame( 'outofstock', wc_get_product( $this->product->get_id() )->get_stock_status() );
+	}
 }

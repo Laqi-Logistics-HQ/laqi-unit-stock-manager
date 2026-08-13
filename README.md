@@ -84,8 +84,10 @@ unless its generated runtime exists.
 Styles live in `assets/css` and are enqueued by `src/Assets.php` only on the
 Unit Stock admin screen, with a unique handle and the plugin version for cache
 busting. The Setup tab enqueues WooCommerce's own enhanced product selector on
-that screen for scalable AJAX catalog search. The plugin has no frontend UI and
-registers no plugin-owned scripts or storefront assets.
+that screen for scalable AJAX catalog search. Active links are reviewed and
+soft-unlinked in the same tab; historical mapping components remain available
+for immutable order restoration. The plugin has no frontend UI and registers no
+plugin-owned scripts or storefront assets.
 All plugin-owned globals use `laqi_lusm_`; registered handles, slugs,
 HTML IDs, CSS classes, and CSS custom properties use the equivalent hyphenated
 form combining `laqi` with the plugin initials. Do not shorten UI selectors just
