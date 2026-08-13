@@ -48,9 +48,13 @@ final class MovementPresenter {
 	public function present( array $row ): array {
 		return array(
 			'id'              => (int) $row['id'],
+			'pool_id'         => (int) $row['pool_id'],
 			'pool_name'       => (string) $row['pool_name'],
+			'type'            => (string) $row['type'],
 			'type_label'      => $this->types->label( (string) $row['type'] ),
+			'delta_base'      => (int) $row['delta_base'],
 			'delta_display'   => $this->format_quantity( $row, (int) $row['delta_base'] ),
+			'balance_base'    => (int) $row['balance_base'],
 			'balance_display' => $this->format_quantity( $row, (int) $row['balance_base'] ),
 			'source_type'     => (string) $row['source_type'],
 			'source_id'       => (int) $row['source_id'],

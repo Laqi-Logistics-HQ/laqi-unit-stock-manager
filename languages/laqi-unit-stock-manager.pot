@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T14:27:13+00:00\n"
+"POT-Creation-Date: 2026-08-13T14:34:00+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -198,7 +198,7 @@ msgid "Stock unit"
 msgstr ""
 
 #: src/Admin/SetupSection.php:79
-#: src/Container.php:123
+#: src/Container.php:129
 msgid "Opening balance"
 msgstr ""
 
@@ -297,7 +297,7 @@ msgstr ""
 msgid "Save mapping"
 msgstr ""
 
-#: src/Admin/StockAdjustmentController.php:69
+#: src/Admin/StockAdjustmentController.php:49
 msgid "You are not allowed to adjust unit stock."
 msgstr ""
 
@@ -339,31 +339,31 @@ msgstr ""
 msgid "Inventory stock could not be updated. Check the quantity and try again."
 msgstr ""
 
-#: src/Container.php:124
+#: src/Container.php:130
 msgid "Order reduction"
 msgstr ""
 
-#: src/Container.php:125
+#: src/Container.php:131
 msgid "Order restoration"
 msgstr ""
 
-#: src/Container.php:126
+#: src/Container.php:132
 msgid "Refund restoration"
 msgstr ""
 
-#: src/Container.php:127
+#: src/Container.php:133
 msgid "Manual stock count"
 msgstr ""
 
-#: src/Container.php:128
+#: src/Container.php:134
 msgid "Manual addition"
 msgstr ""
 
-#: src/Container.php:129
+#: src/Container.php:135
 msgid "Manual subtraction"
 msgstr ""
 
-#: src/Container.php:130
+#: src/Container.php:136
 msgid "Existing stock migration"
 msgstr ""
 
@@ -379,7 +379,7 @@ msgstr ""
 msgid "This linked item is not currently purchasable."
 msgstr ""
 
-#: src/Plugin.php:154
+#: src/Plugin.php:155
 msgid "Laqi Unit Stock Manager for WooCommerce requires WooCommerce to be installed and active."
 msgstr ""
 

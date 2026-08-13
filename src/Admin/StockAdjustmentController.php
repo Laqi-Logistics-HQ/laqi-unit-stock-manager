@@ -9,9 +9,7 @@ namespace LaqiUnitStockManager\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
-use LaqiUnitStockManager\Inventory\StockMutationService;
-use LaqiUnitStockManager\Storage\PoolRepository;
-use LaqiUnitStockManager\Unit\UnitRegistry;
+use LaqiUnitStockManager\Inventory\StockAdjustmentService;
 use Throwable;
 
 /**
@@ -20,37 +18,19 @@ use Throwable;
 final class StockAdjustmentController {
 
 	/**
-	 * Pool persistence.
+	 * Shared adjustment service.
 	 *
-	 * @var PoolRepository
+	 * @var StockAdjustmentService
 	 */
-	private $pools;
-
-	/**
-	 * Unit definitions.
-	 *
-	 * @var UnitRegistry
-	 */
-	private $units;
-
-	/**
-	 * Authoritative mutation path.
-	 *
-	 * @var StockMutationService
-	 */
-	private $mutations;
+	private $adjustments;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param PoolRepository       $pools     Pool repository.
-	 * @param UnitRegistry         $units     Unit registry.
-	 * @param StockMutationService $mutations Mutation service.
+	 * @param StockAdjustmentService $adjustments Shared adjustment service.
 	 */
-	public function __construct( PoolRepository $pools, UnitRegistry $units, StockMutationService $mutations ) {
-		$this->pools     = $pools;
-		$this->units     = $units;
-		$this->mutations = $mutations;
+	public function __construct( StockAdjustmentService $adjustments ) {
+		$this->adjustments = $adjustments;
 	}
 
 	/** Register the adjustment endpoint. @return void */
@@ -73,35 +53,11 @@ final class StockAdjustmentController {
 		check_admin_referer( 'laqi_lusm_adjust_stock_' . $pool_id );
 
 		try {
-			$pool = $this->pools->find( $pool_id );
-			if ( null === $pool ) {
-				throw new \InvalidArgumentException( 'Unknown inventory pool.' );
-			}
-
-			$mode     = isset( $_POST['mode'] ) ? sanitize_key( wp_unslash( $_POST['mode'] ) ) : '';
-			$unit     = isset( $_POST['unit'] ) ? sanitize_key( wp_unslash( $_POST['unit'] ) ) : '';
-			$raw      = isset( $_POST['quantity'] ) ? sanitize_text_field( wp_unslash( $_POST['quantity'] ) ) : '';
-			$reason   = isset( $_POST['reason'] ) ? sanitize_text_field( wp_unslash( $_POST['reason'] ) ) : '';
-			$quantity = $this->units->normalize( $raw, $unit );
-
-			if ( $quantity->family() !== $pool->quantity()->family() || $unit !== $pool->display_unit() ) {
-				throw new \InvalidArgumentException( 'The adjustment unit does not match the inventory pool.' );
-			}
-
-			$key     = 'admin:' . get_current_user_id() . ':' . wp_generate_uuid4();
-			$context = array(
-				'source_type' => 'manual',
-				'actor_id'    => get_current_user_id(),
-				'reason'      => $reason,
-			);
-			if ( 'set' === $mode ) {
-				$this->mutations->set_balance( $pool_id, $quantity->amount(), 'manual_set', $key, $context );
-			} elseif ( 'add' === $mode || 'subtract' === $mode ) {
-				$direction = 'add' === $mode ? 1 : -1;
-				$this->mutations->apply( $pool_id, $direction * $quantity->amount(), 'manual_' . $mode, $key, $context );
-			} else {
-				throw new \InvalidArgumentException( 'Unknown stock adjustment type.' );
-			}
+			$mode   = isset( $_POST['mode'] ) ? sanitize_key( wp_unslash( $_POST['mode'] ) ) : '';
+			$unit   = isset( $_POST['unit'] ) ? sanitize_key( wp_unslash( $_POST['unit'] ) ) : '';
+			$raw    = isset( $_POST['quantity'] ) ? sanitize_text_field( wp_unslash( $_POST['quantity'] ) ) : '';
+			$reason = isset( $_POST['reason'] ) ? sanitize_text_field( wp_unslash( $_POST['reason'] ) ) : '';
+			$this->adjustments->adjust( $pool_id, $mode, $raw, $unit, $reason, get_current_user_id(), 'admin:' . get_current_user_id() . ':' . wp_generate_uuid4() );
 
 			$this->redirect( 'updated' );
 		} catch ( Throwable $error ) {
