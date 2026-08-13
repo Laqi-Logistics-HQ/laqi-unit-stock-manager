@@ -7,10 +7,104 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T17:40:09+00:00\n"
+"POT-Creation-Date: 2026-08-13T17:50:13+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
+
+#: Admin/LowStockAlertController.php:60
+msgid "You are not allowed to manage stock alerts."
+msgstr ""
+
+#: Admin/LowStockAlertsSection.php:56
+msgid "Alerts"
+msgstr ""
+
+#: Admin/LowStockAlertsSection.php:67
+msgid "Configure low-stock alert"
+msgstr ""
+
+#: Admin/LowStockAlertsSection.php:67
+msgid "An email is sent once when the total pool balance reaches or falls below its threshold. The alert rearms after stock recovers above it."
+msgstr ""
+
+#. translators: %s: unit symbol.
+#: Admin/LowStockAlertsSection.php:67
+#: Admin/LowStockAlertsSection.php:77
+#: Admin/MovementLedgerExportController.php:86
+#: Admin/MovementLedgerSection.php:81
+#: Admin/StockLossSection.php:70
+msgid "Inventory pool"
+msgstr ""
+
+#: Admin/LowStockAlertsSection.php:67
+#: Admin/StockLossSection.php:70
+msgid "Search inventory pools"
+msgstr ""
+
+#: Admin/LowStockAlertsSection.php:71
+#: Admin/StockLossSection.php:74
+msgid "Choose pool"
+msgstr ""
+
+#. translators: %s: unit symbol.
+#: Admin/LowStockAlertsSection.php:76
+#, php-format
+msgid "Low-stock threshold (%s)"
+msgstr ""
+
+#. translators: %s: unit symbol.
+#: Admin/LowStockAlertsSection.php:76
+msgid "Email recipients"
+msgstr ""
+
+#. translators: %s: unit symbol.
+#: Admin/LowStockAlertsSection.php:76
+msgid "Save alert"
+msgstr ""
+
+#. translators: %s: unit symbol.
+#: Admin/LowStockAlertsSection.php:77
+msgid "Configured pool alerts"
+msgstr ""
+
+#. translators: %s: unit symbol.
+#: Admin/LowStockAlertsSection.php:77
+#: Admin/MovementLedgerExportController.php:89
+#: Admin/MovementLedgerSection.php:81
+msgid "Balance"
+msgstr ""
+
+#. translators: %s: unit symbol.
+#: Admin/LowStockAlertsSection.php:77
+msgid "Threshold"
+msgstr ""
+
+#. translators: %s: unit symbol.
+#: Admin/LowStockAlertsSection.php:77
+msgid "Status"
+msgstr ""
+
+#. translators: %s: unit symbol.
+#: Admin/LowStockAlertsSection.php:77
+msgid "Recipients"
+msgstr ""
+
+#: Admin/LowStockAlertsSection.php:95
+msgid "Low"
+msgstr ""
+
+#: Admin/LowStockAlertsSection.php:95
+msgid "Healthy"
+msgstr ""
+
+#: Admin/LowStockAlertsSection.php:105
+msgid "Low-stock alert saved."
+msgstr ""
+
+#: Admin/LowStockAlertsSection.php:112
+msgid "The low-stock alert could not be saved. Check the threshold and recipients."
+msgstr ""
 
 #: Admin/MovementLedgerExportController.php:51
 msgid "You are not allowed to export the stock ledger."
@@ -28,12 +122,6 @@ msgstr ""
 msgid "Date (UTC)"
 msgstr ""
 
-#: Admin/MovementLedgerExportController.php:86
-#: Admin/MovementLedgerSection.php:81
-#: Admin/StockLossSection.php:70
-msgid "Inventory pool"
-msgstr ""
-
 #: Admin/MovementLedgerExportController.php:87
 #: Admin/MovementLedgerSection.php:81
 msgid "Movement"
@@ -42,11 +130,6 @@ msgstr ""
 #: Admin/MovementLedgerExportController.php:88
 #: Admin/MovementLedgerSection.php:81
 msgid "Change"
-msgstr ""
-
-#: Admin/MovementLedgerExportController.php:89
-#: Admin/MovementLedgerSection.php:81
-msgid "Balance"
 msgstr ""
 
 #: Admin/MovementLedgerExportController.php:90
@@ -134,14 +217,6 @@ msgstr ""
 msgid "Choose a pool, then record why a measurable quantity can no longer be sold."
 msgstr ""
 
-#: Admin/StockLossSection.php:70
-msgid "Search inventory pools"
-msgstr ""
-
-#: Admin/StockLossSection.php:74
-msgid "Choose pool"
-msgstr ""
-
 #: Admin/StockLossSection.php:76
 msgid "Current balance:"
 msgstr ""
@@ -172,6 +247,18 @@ msgstr ""
 
 #: Admin/StockLossSection.php:99
 msgid "The stock loss could not be recorded. Check the quantity and try again."
+msgstr ""
+
+#. translators: %s: inventory pool name.
+#: Alerts/LowStockAlertEvaluator.php:68
+#, php-format
+msgid "Low stock: %s"
+msgstr ""
+
+#. translators: 1: pool name, 2: current balance.
+#: Alerts/LowStockAlertEvaluator.php:69
+#, php-format
+msgid "%1$s has reached a low-stock balance of %2$s."
 msgstr ""
 
 #: Inventory/StockLossTypeCatalog.php:20
