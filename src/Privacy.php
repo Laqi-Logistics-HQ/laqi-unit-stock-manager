@@ -9,11 +9,12 @@ namespace LaqiUnitStockManager;
 
 defined( 'ABSPATH' ) || exit;
 
+use LaqiUnitStockManager\Storage\MovementRepository;
+
 /**
  * Registers the privacy integration points every WooCommerce extension needs.
  *
- * The boilerplate callbacks intentionally report no data. Replace their bodies
- * when the plugin stores personal data, and add accurate suggested policy text.
+ * Exports and anonymizes the user association stored on stock movements.
  */
 final class Privacy {
 
@@ -21,6 +22,22 @@ final class Privacy {
 	 * Identifier WordPress uses for this plugin's privacy data.
 	 */
 	const GROUP = 'laqi-unit-stock-manager';
+
+	/**
+	 * Stock movement persistence.
+	 *
+	 * @var MovementRepository
+	 */
+	private $movements;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param MovementRepository $movements Movement repository.
+	 */
+	public function __construct( MovementRepository $movements ) {
+		$this->movements = $movements;
+	}
 
 	/**
 	 * Register privacy hooks.
@@ -66,49 +83,88 @@ final class Privacy {
 	/**
 	 * Export personal data belonging to an email address.
 	 *
-	 * Replace this no-data result when the plugin stores personal data.
-	 *
 	 * @param string $email_address The person's email address.
 	 * @param int    $page          Export page.
 	 * @return array{data: array, done: bool}
 	 */
 	public function export( string $email_address, int $page = 1 ): array {
-		unset( $email_address, $page );
+		$user = get_user_by( 'email', $email_address );
+		if ( ! $user ) {
+			return array(
+				'data' => array(),
+				'done' => true,
+			);
+		}
+
+		$rows = $this->movements->for_actor( $user->ID, $page );
+		$data = array();
+		foreach ( $rows as $row ) {
+			$data[] = array(
+				'group_id'    => self::GROUP,
+				'group_label' => __( 'Unit stock movements', 'laqi-unit-stock-manager' ),
+				'item_id'     => 'movement-' . $row['id'],
+				'data'        => array(
+					array(
+						'name'  => __( 'Date', 'laqi-unit-stock-manager' ),
+						'value' => $row['created_at'],
+					),
+					array(
+						'name'  => __( 'Movement type', 'laqi-unit-stock-manager' ),
+						'value' => $row['type'],
+					),
+					array(
+						'name'  => __( 'Inventory pool ID', 'laqi-unit-stock-manager' ),
+						'value' => $row['pool_id'],
+					),
+					array(
+						'name'  => __( 'Stock change', 'laqi-unit-stock-manager' ),
+						'value' => $row['delta_base'],
+					),
+					array(
+						'name'  => __( 'Resulting balance', 'laqi-unit-stock-manager' ),
+						'value' => $row['balance_base'],
+					),
+					array(
+						'name'  => __( 'Reason', 'laqi-unit-stock-manager' ),
+						'value' => $row['reason'],
+					),
+				),
+			);
+		}
 
 		return array(
-			'data' => array(),
-			'done' => true,
+			'data' => $data,
+			'done' => count( $rows ) < 100,
 		);
 	}
 
 	/**
 	 * Erase personal data belonging to an email address.
 	 *
-	 * Replace this no-data result when the plugin stores personal data. When data
-	 * must be retained, return `items_retained` with an explanatory message.
-	 *
 	 * @param string $email_address The person's email address.
 	 * @param int    $page          Erasure page.
 	 * @return array{items_removed: bool, items_retained: bool, messages: array, done: bool}
 	 */
 	public function erase( string $email_address, int $page = 1 ): array {
-		unset( $email_address, $page );
-
+		unset( $page );
+		$user    = get_user_by( 'email', $email_address );
+		$removed = $user ? $this->movements->anonymize_actor( $user->ID ) : 0;
 		return array(
-			'items_removed'  => false,
+			'items_removed'  => $removed > 0,
 			'items_retained' => false,
-			'messages'       => array(),
+			'messages'       => $removed > 0 ? array( __( 'The user association was removed from stock movement records. The inventory ledger was retained for stock correctness.', 'laqi-unit-stock-manager' ) ) : array(),
 			'done'           => true,
 		);
 	}
 
 	/**
-	 * Add accurate suggested privacy-policy text before release.
+	 * Add suggested privacy-policy text.
 	 *
 	 * @return void
 	 */
 	public function add_privacy_policy_content(): void {
-		// TODO: call wp_add_privacy_policy_content() with an accurate inventory
-		// of stored data, retention, browser storage, and third-party sharing.
+		$content  = '<p>' . __( 'Laqi Unit Stock Manager stores inventory pools, product-to-pool mappings, exact stock movements, and operational order references. When a logged-in user performs a manual adjustment, the movement records that WordPress user ID for accountability.', 'laqi-unit-stock-manager' ) . '</p>';
+		$content .= '<p>' . __( 'The plugin does not copy customer names, email addresses, payment details, or shipping addresses into its own tables. It does not send inventory or personal data to Laqi Logistics or another external service. Movement records are retained until the plugin is deleted. A WordPress personal-data erasure request removes the user association while retaining the stock ledger required for inventory correctness.', 'laqi-unit-stock-manager' ) . '</p>';
+		wp_add_privacy_policy_content( __( 'Laqi Unit Stock Manager for WooCommerce', 'laqi-unit-stock-manager' ), wp_kses_post( $content ) );
 	}
 }
