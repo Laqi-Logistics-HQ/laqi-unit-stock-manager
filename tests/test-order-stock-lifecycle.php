@@ -6,6 +6,8 @@
  */
 
 use LaqiUnitStockManager\Inventory\StockMutationService;
+use LaqiUnitStockManager\Consumption\CalculatorRegistry;
+use LaqiUnitStockManager\Storage\MappingRepository;
 use LaqiUnitStockManager\Storage\Schema;
 use LaqiUnitStockManager\WooCommerce\OrderItemSnapshotter;
 use LaqiUnitStockManager\WooCommerce\OrderStockLifecycle;
@@ -75,7 +77,10 @@ class Test_Order_Stock_Lifecycle extends WP_UnitTestCase {
 		$this->order->add_item( $item );
 		$this->order->save();
 
-		$this->lifecycle = new OrderStockLifecycle( new StockMutationService( $wpdb ) );
+		$this->lifecycle = new OrderStockLifecycle(
+			new StockMutationService( $wpdb ),
+			new OrderItemSnapshotter( new MappingRepository( $wpdb ), new CalculatorRegistry() )
+		);
 	}
 
 	/**

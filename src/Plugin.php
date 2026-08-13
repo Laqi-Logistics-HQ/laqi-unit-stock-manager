@@ -66,8 +66,10 @@ final class Plugin {
 		$container = new Container();
 		$container->unit_registry();
 		( new WooCommerce\CartValidator( $container->availability_service() ) )->register();
-		( new WooCommerce\OrderItemSnapshotter( $container->mapping_repository(), $container->calculator_registry() ) )->register();
-		( new WooCommerce\OrderStockLifecycle( $container->stock_mutation_service() ) )->register();
+		$snapshotter = new WooCommerce\OrderItemSnapshotter( $container->mapping_repository(), $container->calculator_registry() );
+		$snapshotter->register();
+		( new WooCommerce\OrderStockLifecycle( $container->stock_mutation_service(), $snapshotter ) )->register();
+		( new WooCommerce\ReducedOrderItemEditor( $container->stock_mutation_service() ) )->register();
 		( new WooCommerce\StockStatusSynchronizer( $container->mapping_repository(), $container->availability_service() ) )->register();
 		$sections = $container->screen_section_catalog();
 		$sections->register( new Admin\PoolStockSection( $container->pool_repository(), $container->pool_presenter(), $container->mapping_repository(), $container->availability_service(), $container->quantity_formatter(), new MappingDiagnostics() ) );
