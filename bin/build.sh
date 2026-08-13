@@ -15,6 +15,8 @@
 set -euo pipefail
 
 SLUG="laqi-unit-stock-manager"
+FREE_PLUGIN_NAME="Laqi Unit Stock Manager for WooCommerce"
+PRO_PLUGIN_NAME="Laqi Unit Stock Manager Pro for WooCommerce"
 CHANNEL=""
 VERSION=""
 
@@ -123,6 +125,24 @@ fi
 FORBIDDEN_ARTIFACT="$(find "$DEST" -type f \( -name '*.zip' -o -name '.*' \) -print -quit)"
 if [ -n "$FORBIDDEN_ARTIFACT" ] || [ -d "$DEST/test-results" ]; then
   echo "refusing to package development artifact: ${FORBIDDEN_ARTIFACT:-$DEST/test-results}" >&2
+  rm -rf "$STAGE"
+  exit 1
+fi
+
+# Both editions can be installed during an upgrade. Give paid archives a clear
+# Plugins-screen name without changing their shared runtime identifiers or data.
+if [ "$CHANNEL" = "wordpressorg" ]; then
+  EXPECTED_PLUGIN_NAME="$FREE_PLUGIN_NAME"
+else
+  EXPECTED_PLUGIN_NAME="$PRO_PLUGIN_NAME"
+  sed -i.bak \
+    "s|^ \* Plugin Name:       $FREE_PLUGIN_NAME$| * Plugin Name:       $PRO_PLUGIN_NAME|" \
+    "$DEST/$SLUG.php"
+  rm -f "$DEST/$SLUG.php.bak"
+fi
+
+if ! grep -qFx " * Plugin Name:       $EXPECTED_PLUGIN_NAME" "$DEST/$SLUG.php"; then
+  echo "failed to set the $CHANNEL plugin name to: $EXPECTED_PLUGIN_NAME" >&2
   rm -rf "$STAGE"
   exit 1
 fi

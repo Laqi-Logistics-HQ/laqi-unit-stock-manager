@@ -21,6 +21,27 @@
 
 defined( 'ABSPATH' ) || exit;
 
+if ( defined( 'LAQI_LUSM_VERSION' ) ) {
+	if ( ! function_exists( 'laqi_lusm_render_duplicate_edition_notice' ) ) {
+		/**
+		 * Tell administrators that only the first-loaded edition is running.
+		 *
+		 * @return void
+		 */
+		function laqi_lusm_render_duplicate_edition_notice(): void {
+			if ( ! current_user_can( 'activate_plugins' ) ) {
+				return;
+			}
+			printf(
+				'<div class="notice notice-warning"><p>%s</p></div>',
+				esc_html__( 'Two editions of Laqi Unit Stock Manager are active. Only one is running. Deactivate the edition you are not using, then reload this page. Both editions share the same inventory pools and settings, so removing the one you no longer need keeps them.', 'laqi-unit-stock-manager' )
+			);
+		}
+	}
+	add_action( 'admin_notices', 'laqi_lusm_render_duplicate_edition_notice' );
+	return;
+}
+
 define( 'LAQI_LUSM_VERSION', '0.1.0' );
 define( 'LAQI_LUSM_FILE', __FILE__ );
 define( 'LAQI_LUSM_PATH', plugin_dir_path( __FILE__ ) );
