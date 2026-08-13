@@ -43,6 +43,13 @@ final class ProductMapping {
 	private $calculator_type;
 
 	/**
+	 * Persisted mapping version.
+	 *
+	 * @var int
+	 */
+	private $version;
+
+	/**
 	 * Consumption components.
 	 *
 	 * @var MappingComponent[]
@@ -57,13 +64,15 @@ final class ProductMapping {
 	 * @param int                $variation_id    Variation ID or zero.
 	 * @param string             $calculator_type Registered calculator type.
 	 * @param MappingComponent[] $components      Consumption components.
+	 * @param int                $version         Persisted mapping version.
 	 */
-	public function __construct( int $id, int $product_id, int $variation_id, string $calculator_type, array $components ) {
+	public function __construct( int $id, int $product_id, int $variation_id, string $calculator_type, array $components, int $version = 1 ) {
 		$this->id              = $id;
 		$this->product_id      = $product_id;
 		$this->variation_id    = $variation_id;
 		$this->calculator_type = $calculator_type;
 		$this->components      = $components;
+		$this->version         = $version;
 	}
 
 	/**
@@ -100,6 +109,15 @@ final class ProductMapping {
 	 */
 	public function calculator_type(): string {
 		return $this->calculator_type;
+	}
+
+	/**
+	 * Persisted mapping version.
+	 *
+	 * @return int
+	 */
+	public function version(): int {
+		return $this->version;
 	}
 
 	/**
