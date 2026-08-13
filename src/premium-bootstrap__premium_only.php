@@ -42,6 +42,14 @@ require_once __DIR__ . '/Premium__premium_only/Replenishment/ReorderPolicyReposi
 require_once __DIR__ . '/Premium__premium_only/Replenishment/ReorderSuggestionService.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/ReorderController.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/ReorderSection.php';
+require_once __DIR__ . '/Premium__premium_only/Exchange/CsvRowMapperInterface.php';
+require_once __DIR__ . '/Premium__premium_only/Exchange/CsvRowMapperRegistry.php';
+require_once __DIR__ . '/Premium__premium_only/Exchange/OperationsCsvService.php';
+require_once __DIR__ . '/Premium__premium_only/Exchange/SupplierCsvRowMapper.php';
+require_once __DIR__ . '/Premium__premium_only/Exchange/PackCsvRowMapper.php';
+require_once __DIR__ . '/Premium__premium_only/Exchange/IncomingCsvRowMapper.php';
+require_once __DIR__ . '/Premium__premium_only/Exchange/ReorderCsvRowMapper.php';
+require_once __DIR__ . '/Premium__premium_only/Admin/CsvExchangeController.php';
 
 /**
  * Give physically separate paid modules the completed shared composition root.
@@ -71,6 +79,12 @@ add_action(
 		$receiving           = new Premium\Receiving\ReceivingService( $suppliers, $container->stock_mutation_service() );
 		$reorder_policies    = new Premium\Replenishment\ReorderPolicyRepository( $wpdb );
 		$reorder_suggestions = new Premium\Replenishment\ReorderSuggestionService( $container->pool_repository(), $reorder_policies, $forecast_policies, $forecast_service, $suppliers );
+		$csv_mappers         = new Premium\Exchange\CsvRowMapperRegistry();
+		$csv_mappers->register( new Premium\Exchange\SupplierCsvRowMapper( $suppliers ) );
+		$csv_mappers->register( new Premium\Exchange\PackCsvRowMapper( $suppliers, $container->pool_repository(), $container->quantity_formatter(), $container->unit_registry() ) );
+		$csv_mappers->register( new Premium\Exchange\IncomingCsvRowMapper( $suppliers, $container->pool_repository() ) );
+		$csv_mappers->register( new Premium\Exchange\ReorderCsvRowMapper( $container->pool_repository(), $suppliers, $reorder_policies, $container->quantity_formatter(), $container->unit_registry() ) );
+		$csv_exchange = new Premium\Exchange\OperationsCsvService( $csv_mappers );
 		$loss_types->register( $container->movement_registry() );
 		$container->movement_registry()->register( new Inventory\MovementType( 'supplier_receipt', __( 'Supplier receipt', 'laqi-unit-stock-manager' ) ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\MovementLedgerSection( $container->movement_repository(), $container->movement_presenter(), new Admin\PaginationRenderer() ) );
@@ -88,6 +102,7 @@ add_action(
 		( new Premium\Admin\StockReportController( $report_settings, $report_scheduler ) )->register();
 		( new Premium\Admin\ReceivingController( $suppliers, $container->pool_repository(), $container->unit_registry(), $receiving ) )->register();
 		( new Premium\Admin\ReorderController( $reorder_policies, $container->pool_repository(), $suppliers, $container->unit_registry() ) )->register();
+		( new Premium\Admin\CsvExchangeController( $csv_exchange ) )->register();
 		$report_scheduler->register();
 		$alert_evaluator = new Premium\Alerts\LowStockAlertEvaluator( $alert_policies, $container->pool_repository(), $container->quantity_formatter(), $alert_channels, $alert_deliveries );
 		$alert_evaluator->register();

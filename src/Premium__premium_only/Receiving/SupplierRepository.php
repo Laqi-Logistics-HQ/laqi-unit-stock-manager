@@ -9,6 +9,9 @@ namespace LaqiUnitStockManager\Premium\Receiving;
 
 defined( 'ABSPATH' ) || exit;
 
+// Identity lookup parameter names are intentionally self-documenting.
+// phpcs:disable Squiz.Commenting.FunctionComment.MissingParamTag
+
 use InvalidArgumentException;
 use RuntimeException;
 use wpdb;
@@ -198,6 +201,12 @@ final class SupplierRepository {
 		return is_array( $rows ) ? $rows : array();
 	}
 
+	/** Find an active supplier by exact name. @param string $name Name. @return array<string,mixed>|null */
+	public function supplier_by_name( string $name ): ?array {
+		$row = $this->db->get_row( $this->db->prepare( 'SELECT * FROM ' . $this->table( 'suppliers' ) . ' WHERE name = %s AND active = 1 ORDER BY id ASC LIMIT 1', $name ), ARRAY_A );
+		return is_array( $row ) ? $row : null;
+	}
+
 	/** Active packs with names. @return array<int,array<string,mixed>> */
 	public function packs(): array {
 		$rows = $this->db->get_results( 'SELECT p.*, p.name AS pack_name, s.name AS supplier_name, s.lead_time_days, i.name AS pool_name, i.display_unit, i.family FROM ' . $this->table( 'supplier_packs' ) . ' p INNER JOIN ' . $this->table( 'suppliers' ) . ' s ON s.id = p.supplier_id INNER JOIN ' . $this->db->prefix . 'laqi_lusm_pools i ON i.id = p.pool_id WHERE p.active = 1 AND s.active = 1 ORDER BY s.name ASC, p.name ASC', ARRAY_A );
@@ -218,6 +227,12 @@ final class SupplierRepository {
 				}
 			)
 		);
+	}
+
+	/** Find a pack by supplier, pool, and exact name. @return array<string,mixed>|null */
+	public function pack_by_identity( int $supplier_id, int $pool_id, string $name ): ?array {
+		$row = $this->db->get_row( $this->db->prepare( 'SELECT id FROM ' . $this->table( 'supplier_packs' ) . ' WHERE supplier_id = %d AND pool_id = %d AND name = %s AND active = 1 ORDER BY id ASC LIMIT 1', $supplier_id, $pool_id, $name ), ARRAY_A );
+		return is_array( $row ) ? $this->pack( (int) $row['id'] ) : null;
 	}
 
 	/** Record a receipt once per movement.
@@ -319,6 +334,11 @@ final class SupplierRepository {
 	public function incoming_deliveries(): array {
 		$rows = $this->db->get_results( 'SELECT d.*, s.name AS supplier_name, p.name AS pack_name, i.name AS pool_name, i.display_unit, i.family FROM ' . $this->table( 'incoming_deliveries' ) . ' d INNER JOIN ' . $this->table( 'suppliers' ) . ' s ON s.id = d.supplier_id INNER JOIN ' . $this->table( 'supplier_packs' ) . ' p ON p.id = d.pack_id INNER JOIN ' . $this->db->prefix . "laqi_lusm_pools i ON i.id = d.pool_id WHERE d.status = 'pending' ORDER BY d.expected_date ASC, d.id ASC", ARRAY_A );
 		return is_array( $rows ) ? $rows : array();
+	}
+
+	/** Whether a pending delivery reference already exists. @param string $reference Reference. @return bool */
+	public function has_incoming_reference( string $reference ): bool {
+		return '' !== $reference && (bool) $this->db->get_var( $this->db->prepare( 'SELECT 1 FROM ' . $this->table( 'incoming_deliveries' ) . ' WHERE reference = %s AND status = %s LIMIT 1', $reference, 'pending' ) );
 	}
 
 	/** Exact pending incoming quantity for a pool.
