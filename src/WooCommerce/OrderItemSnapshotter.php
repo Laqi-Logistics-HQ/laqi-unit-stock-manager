@@ -97,7 +97,7 @@ final class OrderItemSnapshotter {
 		if ( is_array( $existing ) && 'checkout' === ( $existing['origin'] ?? '' ) ) {
 			return;
 		}
-		$this->snapshot_item( $item, 'admin' );
+		$this->snapshot_admin_demand( $item );
 	}
 
 	/**
@@ -110,26 +110,28 @@ final class OrderItemSnapshotter {
 		foreach ( $order->get_items() as $item ) {
 			$existing = $item->get_meta( self::META_KEY, true );
 			if ( ! is_array( $existing ) || 'checkout' !== ( $existing['origin'] ?? '' ) ) {
-				$this->snapshot_item( $item, 'admin' );
+				$this->snapshot_admin_demand( $item );
 				$item->save();
 			}
 		}
 	}
 
 	/**
-	 * Snapshot one item from its explicit saved mapping.
+	 * Snapshot one admin item from its explicit saved mapping.
 	 *
-	 * @param WC_Order_Item_Product $item   Order item.
-	 * @param string                $origin Snapshot origin.
-	 * @return void
+	 * This is also used when a line is added after an order has already reduced
+	 * stock, where the normal pre-reduction snapshot hook must remain disabled.
+	 *
+	 * @param WC_Order_Item_Product $item Order item.
+	 * @return array<string, mixed>|null Snapshot, or null for an unmapped item.
 	 */
-	private function snapshot_item( WC_Order_Item_Product $item, string $origin ): void {
+	public function snapshot_admin_demand( WC_Order_Item_Product $item ): ?array {
 		$mapping  = $this->mappings->find_for_product( $item->get_product_id(), $item->get_variation_id() );
 		$quantity = $item->get_quantity();
 		if ( null === $mapping || $quantity < 1 ) {
-			return;
+			return null;
 		}
-		$this->write_snapshot( $item, $mapping->id(), $mapping->calculator_type(), $quantity, $origin );
+		return $this->write_snapshot( $item, $mapping->id(), $mapping->calculator_type(), $quantity, 'admin' );
 	}
 
 	/**
@@ -140,24 +142,23 @@ final class OrderItemSnapshotter {
 	 * @param string                $calculator_type Calculator type.
 	 * @param int                   $quantity        Item quantity.
 	 * @param string                $origin          Snapshot origin.
-	 * @return void
+	 * @return array<string, mixed> Snapshot data.
 	 */
-	private function write_snapshot( WC_Order_Item_Product $item, int $mapping_id, string $calculator_type, int $quantity, string $origin ): void {
+	private function write_snapshot( WC_Order_Item_Product $item, int $mapping_id, string $calculator_type, int $quantity, string $origin ): array {
 		$mapping = $this->mappings->find_for_product( $item->get_product_id(), $item->get_variation_id() );
 		if ( null === $mapping ) {
-			return;
+			return array();
 		}
-		$demand = $this->calculators->get( $calculator_type )->calculate( $mapping, $quantity );
-		$item->update_meta_data(
-			self::META_KEY,
-			array(
-				'version'         => 1,
-				'origin'          => $origin,
-				'mapping_id'      => $mapping_id,
-				'mapping_version' => 1,
-				'item_quantity'   => $quantity,
-				'pool_demand'     => $demand,
-			)
+		$demand   = $this->calculators->get( $calculator_type )->calculate( $mapping, $quantity );
+		$snapshot = array(
+			'version'         => 1,
+			'origin'          => $origin,
+			'mapping_id'      => $mapping_id,
+			'mapping_version' => 1,
+			'item_quantity'   => $quantity,
+			'pool_demand'     => $demand,
 		);
+		$item->update_meta_data( self::META_KEY, $snapshot );
+		return $snapshot;
 	}
 }
