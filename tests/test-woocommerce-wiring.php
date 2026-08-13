@@ -22,6 +22,8 @@ class Test_WooCommerce_Wiring extends WP_UnitTestCase {
 		$this->assertNotFalse( has_action( 'woocommerce_reduce_order_stock' ) );
 		$this->assertNotFalse( has_action( 'woocommerce_restore_order_stock' ) );
 		$this->assertNotFalse( has_filter( 'woocommerce_can_restock_refunded_items' ) );
+		$this->assertNotFalse( has_action( 'admin_menu' ) );
+		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_adjust_stock' ) );
 		$this->assertSame( '_laqi_lusm_stock_snapshot', OrderItemSnapshotter::META_KEY );
 	}
 }

@@ -86,6 +86,40 @@ final class PoolRepository {
 			return null;
 		}
 
+		return $this->hydrate( $row );
+	}
+
+	/**
+	 * Find pools for the stock-management screen.
+	 *
+	 * @param string $search Optional name or internal SKU search.
+	 * @param int    $limit  Maximum rows.
+	 * @return Pool[]
+	 */
+	public function search( string $search = '', int $limit = 100 ): array {
+		$table = Schema::table( 'pools' );
+		$limit = max( 1, min( 500, $limit ) );
+
+		if ( '' === $search ) {
+			$rows = $this->db->get_results( $this->db->prepare( "SELECT * FROM {$table} ORDER BY name ASC, id ASC LIMIT %d", $limit ), ARRAY_A );
+		} else {
+			$like = '%' . $this->db->esc_like( $search ) . '%';
+			$rows = $this->db->get_results(
+				$this->db->prepare( "SELECT * FROM {$table} WHERE name LIKE %s OR internal_sku LIKE %s ORDER BY name ASC, id ASC LIMIT %d", $like, $like, $limit ),
+				ARRAY_A
+			);
+		}
+
+		return array_map( array( $this, 'hydrate' ), $rows );
+	}
+
+	/**
+	 * Hydrate a pool row.
+	 *
+	 * @param array<string, mixed> $row Database row.
+	 * @return Pool
+	 */
+	private function hydrate( array $row ): Pool {
 		return new Pool(
 			(int) $row['id'],
 			(string) $row['name'],

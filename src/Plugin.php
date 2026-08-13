@@ -67,6 +67,10 @@ final class Plugin {
 		( new WooCommerce\CartValidator( $container->availability_service() ) )->register();
 		( new WooCommerce\OrderItemSnapshotter( $container->mapping_repository(), $container->calculator_registry() ) )->register();
 		( new WooCommerce\OrderStockLifecycle( $container->stock_mutation_service() ) )->register();
+		$sections = $container->screen_section_catalog();
+		$sections->register( new Admin\PoolStockSection( $container->pool_repository(), $container->pool_presenter() ) );
+		( new Admin\UnitStockPage( $sections ) )->register();
+		( new Admin\StockAdjustmentController( $container->pool_repository(), $container->unit_registry(), $container->stock_mutation_service() ) )->register();
 
 		// WordPress privacy tools. Replace the boilerplate's no-data callbacks
 		// when this plugin stores or transmits personal data.
