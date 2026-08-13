@@ -47,6 +47,8 @@ final class PoolPresenter {
 			'quantity_base'    => $pool->quantity()->amount(),
 			'quantity_display' => $this->formatter->format( $pool->quantity(), $pool->display_unit() ),
 			'allow_backorders' => $pool->allows_backorders(),
+			'internal_sku'     => $pool->internal_sku(),
+			'version'          => $pool->version(),
 		);
 	}
 }

@@ -102,6 +102,8 @@ retired records remain stored so a historical key is never redefined accidentall
 The Stock tab searches pool names and internal SKUs together with linked product
 names, variation SKUs, and attributes. Results use repository-backed counts and
 25-row pages, so the admin screen does not silently stop at a fixed catalog size.
+Pool names, internal SKUs, and compatible display units can be corrected inline
+without changing the normalized balance; optimistic versions protect concurrent edits.
 The Activity tab uses the same shared pagination renderer to expose the complete
 append-only ledger in 50-row pages. The versioned movements REST endpoint accepts
 `page` and `limit` and returns matching pagination metadata alongside its items.

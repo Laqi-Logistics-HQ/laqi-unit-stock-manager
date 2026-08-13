@@ -46,6 +46,8 @@ class Test_Admin_Foundation extends WP_UnitTestCase {
 		$this->assertSame( 7, $row['id'] );
 		$this->assertSame( '0.25 g', $row['quantity_display'] );
 		$this->assertFalse( $row['allow_backorders'] );
+		$this->assertSame( '', $row['internal_sku'] );
+		$this->assertSame( 1, $row['version'] );
 	}
 
 	/**

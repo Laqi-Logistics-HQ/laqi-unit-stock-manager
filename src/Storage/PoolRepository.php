@@ -69,7 +69,7 @@ final class PoolRepository {
 			throw new RuntimeException( 'Could not create the inventory pool.' );
 		}
 
-		return new Pool( (int) $this->db->insert_id, $name, $opening_balance, $display_unit, $allow_backorders );
+		return new Pool( (int) $this->db->insert_id, $name, $opening_balance, $display_unit, $allow_backorders, $internal_sku );
 	}
 
 	/**
@@ -85,6 +85,44 @@ final class PoolRepository {
 	 */
 	public function create_empty( string $name, string $family, string $base_unit, string $display_unit, bool $allow_backorders = false, string $internal_sku = '' ): Pool {
 		return $this->create( $name, new Quantity( $family, 0 ), $base_unit, $display_unit, $allow_backorders, $internal_sku );
+	}
+
+	/**
+	 * Update operational pool details without changing its normalized balance.
+	 *
+	 * @param int    $pool_id          Pool ID.
+	 * @param string $name             Pool name.
+	 * @param string $internal_sku     Operational SKU.
+	 * @param string $display_unit     Compatible display unit.
+	 * @param int    $expected_version Required current version.
+	 * @return Pool
+	 * @throws \InvalidArgumentException When the pool or input is invalid.
+	 * @throws RuntimeException When the pool changed or persistence fails.
+	 */
+	public function update_details( int $pool_id, string $name, string $internal_sku, string $display_unit, int $expected_version ): Pool {
+		if ( '' === $name || '' === $display_unit || $expected_version < 1 ) {
+			throw new \InvalidArgumentException( 'Pool details are incomplete.' );
+		}
+		$updated = $this->db->query(
+			$this->db->prepare(
+				'UPDATE ' . Schema::table( 'pools' ) . ' SET name = %s, internal_sku = %s, display_unit = %s, version = version + 1, updated_at = %s WHERE id = %d AND version = %d',
+				$name,
+				$internal_sku,
+				$display_unit,
+				current_time( 'mysql', true ),
+				$pool_id,
+				$expected_version
+			)
+		);
+		if ( 1 !== $updated ) {
+			throw new RuntimeException( 'The inventory pool changed before this edit was saved.' );
+		}
+
+		$pool = $this->find( $pool_id );
+		if ( null === $pool ) {
+			throw new RuntimeException( 'Could not reload the inventory pool.' );
+		}
+		return $pool;
 	}
 
 	/**
@@ -210,7 +248,9 @@ final class PoolRepository {
 			(string) $row['name'],
 			new Quantity( (string) $row['family'], (int) $row['quantity_base'] ),
 			(string) $row['display_unit'],
-			(bool) $row['allow_backorders']
+			(bool) $row['allow_backorders'],
+			(string) $row['internal_sku'],
+			(int) $row['version']
 		);
 	}
 }

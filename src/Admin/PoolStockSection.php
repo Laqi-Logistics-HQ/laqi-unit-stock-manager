@@ -16,6 +16,7 @@ use LaqiUnitStockManager\Availability\AvailabilityService;
 use LaqiUnitStockManager\Diagnostics\MappingDiagnostics;
 use LaqiUnitStockManager\Domain\Quantity;
 use LaqiUnitStockManager\Presentation\QuantityFormatter;
+use LaqiUnitStockManager\Unit\UnitRegistry;
 
 /**
  * Renders searchable pool balances and inline adjustment controls.
@@ -67,6 +68,13 @@ final class PoolStockSection implements ScreenSectionInterface {
 	private $pagination;
 
 	/**
+	 * Unit definitions.
+	 *
+	 * @var UnitRegistry
+	 */
+	private $units;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param PoolRepository      $pools     Pool repository.
@@ -76,8 +84,9 @@ final class PoolStockSection implements ScreenSectionInterface {
 	 * @param QuantityFormatter   $formatter    Exact quantity formatting.
 	 * @param MappingDiagnostics  $diagnostics  Configuration diagnostics.
 	 * @param PaginationRenderer  $pagination   Shared admin pagination.
+	 * @param UnitRegistry        $units        Unit definitions.
 	 */
-	public function __construct( PoolRepository $pools, PoolPresenter $presenter, MappingRepository $mappings, AvailabilityService $availability, QuantityFormatter $formatter, MappingDiagnostics $diagnostics, PaginationRenderer $pagination ) {
+	public function __construct( PoolRepository $pools, PoolPresenter $presenter, MappingRepository $mappings, AvailabilityService $availability, QuantityFormatter $formatter, MappingDiagnostics $diagnostics, PaginationRenderer $pagination, UnitRegistry $units ) {
 		$this->pools        = $pools;
 		$this->presenter    = $presenter;
 		$this->mappings     = $mappings;
@@ -85,6 +94,7 @@ final class PoolStockSection implements ScreenSectionInterface {
 		$this->formatter    = $formatter;
 		$this->diagnostics  = $diagnostics;
 		$this->pagination   = $pagination;
+		$this->units        = $units;
 	}
 
 	/** Get the section ID. @return string */
@@ -127,7 +137,7 @@ final class PoolStockSection implements ScreenSectionInterface {
 			<?php endif; ?>
 			<?php foreach ( $rows as $row ) : ?>
 				<tr>
-					<th scope="row"><?php echo esc_html( $row['name'] ); ?></th>
+					<th scope="row"><?php $this->render_details_form( $row ); ?></th>
 					<td><strong><?php echo esc_html( $row['quantity_display'] ); ?></strong></td>
 					<td><?php $this->render_links( (int) $row['id'] ); ?></td>
 					<td><?php $this->render_adjustment_form( $row ); ?></td>
@@ -153,6 +163,35 @@ final class PoolStockSection implements ScreenSectionInterface {
 			);
 		}
 		?>
+		<?php
+	}
+
+	/** Render editable operational pool details.
+	 *
+	 * @param array<string, mixed> $row Pool row.
+	 * @return void
+	 */
+	private function render_details_form( array $row ): void {
+		?>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="laqi-lusm-pool-details">
+			<input type="hidden" name="action" value="laqi_lusm_update_pool" />
+			<input type="hidden" name="pool_id" value="<?php echo esc_attr( $row['id'] ); ?>" />
+			<input type="hidden" name="pool_version" value="<?php echo esc_attr( $row['version'] ); ?>" />
+			<?php wp_nonce_field( 'laqi_lusm_update_pool_' . $row['id'] ); ?>
+			<label class="screen-reader-text" for="laqi-lusm-pool-name-<?php echo esc_attr( $row['id'] ); ?>"><?php esc_html_e( 'Pool name', 'laqi-unit-stock-manager' ); ?></label>
+			<input id="laqi-lusm-pool-name-<?php echo esc_attr( $row['id'] ); ?>" name="pool_name" value="<?php echo esc_attr( $row['name'] ); ?>" required />
+			<label class="screen-reader-text" for="laqi-lusm-pool-sku-<?php echo esc_attr( $row['id'] ); ?>"><?php esc_html_e( 'Internal SKU', 'laqi-unit-stock-manager' ); ?></label>
+			<input id="laqi-lusm-pool-sku-<?php echo esc_attr( $row['id'] ); ?>" name="internal_sku" value="<?php echo esc_attr( $row['internal_sku'] ); ?>" placeholder="<?php esc_attr_e( 'Internal SKU', 'laqi-unit-stock-manager' ); ?>" />
+			<label class="screen-reader-text" for="laqi-lusm-pool-unit-<?php echo esc_attr( $row['id'] ); ?>"><?php esc_html_e( 'Display unit', 'laqi-unit-stock-manager' ); ?></label>
+			<select id="laqi-lusm-pool-unit-<?php echo esc_attr( $row['id'] ); ?>" name="display_unit">
+			<?php foreach ( $this->units->all() as $unit ) : ?>
+				<?php if ( $unit->family() === $row['family'] ) : ?>
+					<option value="<?php echo esc_attr( $unit->key() ); ?>" <?php selected( $unit->key(), $row['display_unit'] ); ?>><?php echo esc_html( $unit->key() ); ?></option>
+				<?php endif; ?>
+			<?php endforeach; ?>
+			</select>
+			<?php submit_button( __( 'Save details', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?>
+		</form>
 		<?php
 	}
 
