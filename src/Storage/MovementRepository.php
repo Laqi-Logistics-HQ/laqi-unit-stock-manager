@@ -49,4 +49,46 @@ final class MovementRepository {
 
 		return is_array( $rows ) ? $rows : array();
 	}
+
+	/**
+	 * Get movements attributed to one WordPress user.
+	 *
+	 * @param int $actor_id User ID.
+	 * @param int $page     One-based export page.
+	 * @param int $limit    Rows per page.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function for_actor( int $actor_id, int $page = 1, int $limit = 100 ): array {
+		$limit  = max( 1, min( 500, $limit ) );
+		$offset = ( max( 1, $page ) - 1 ) * $limit;
+		$rows   = $this->db->get_results(
+			$this->db->prepare(
+				'SELECT id, pool_id, type, delta_base, balance_base, source_type, source_id, reason, created_at FROM ' . Schema::table( 'movements' ) . ' WHERE actor_id = %d ORDER BY id ASC LIMIT %d OFFSET %d',
+				$actor_id,
+				$limit,
+				$offset
+			),
+			ARRAY_A
+		);
+
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
+	 * Remove the user association while retaining the immutable stock ledger.
+	 *
+	 * @param int $actor_id User ID.
+	 * @return int Number of anonymized movements.
+	 */
+	public function anonymize_actor( int $actor_id ): int {
+		$updated = $this->db->update(
+			Schema::table( 'movements' ),
+			array( 'actor_id' => 0 ),
+			array( 'actor_id' => $actor_id ),
+			array( '%d' ),
+			array( '%d' )
+		);
+
+		return false === $updated ? 0 : $updated;
+	}
 }

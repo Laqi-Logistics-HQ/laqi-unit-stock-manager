@@ -82,7 +82,7 @@ final class Plugin {
 
 		// WordPress privacy tools. Replace the boilerplate's no-data callbacks
 		// when this plugin stores or transmits personal data.
-		( new Privacy() )->register();
+		( new Privacy( $container->movement_repository() ) )->register();
 
 		// Register CSS/JS enqueues (admin + frontend).
 		( new Assets() )->register();
