@@ -24,11 +24,15 @@ class Test_Admin_Foundation extends WP_UnitTestCase {
 	 * Decimal output never uses floating-point arithmetic.
 	 */
 	public function test_quantity_formatter_supports_small_metric_values(): void {
-		$formatter = new QuantityFormatter( new UnitRegistry() );
+		$registry  = new UnitRegistry();
+		$formatter = new QuantityFormatter( $registry );
 
 		$this->assertSame( '0.1 g', $formatter->format( new Quantity( 'mass', 100000000 ), 'g' ) );
 		$this->assertSame( '0.25 g', $formatter->format( new Quantity( 'mass', 250000000 ), 'g' ) );
 		$this->assertSame( '10 kg', $formatter->format( new Quantity( 'mass', 10000000000000 ), 'kg' ) );
+		$this->assertSame( '0.25', $formatter->decimal( new Quantity( 'mass', 250000000 ), 'g' ) );
+		$registry->register_custom( 'triple_gram', '3', 'g' );
+		$this->assertSame( array( 'value' => '1000', 'unit' => 'mg' ), $formatter->editable( new Quantity( 'mass', 1000000000 ), 'triple_gram' ) );
 	}
 
 	/**

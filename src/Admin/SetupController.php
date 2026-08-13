@@ -90,7 +90,42 @@ final class SetupController {
 		add_action( 'admin_post_laqi_lusm_create_pool', array( $this, 'create_pool' ) );
 		add_action( 'admin_post_laqi_lusm_save_mapping', array( $this, 'save_mapping' ) );
 		add_action( 'admin_post_laqi_lusm_unlink_mapping', array( $this, 'unlink_mapping' ) );
+		add_action( 'admin_post_laqi_lusm_update_mapping', array( $this, 'update_mapping' ) );
 		add_action( 'admin_post_laqi_lusm_create_unit', array( $this, 'create_unit' ) );
+	}
+
+	/** Update an active mapping without repeating native-stock migration.
+	 *
+	 * @return void
+	 * @throws \InvalidArgumentException When edit input is invalid.
+	 */
+	public function update_mapping(): void {
+		$mapping_id = isset( $_POST['mapping_id'] ) ? absint( $_POST['mapping_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$this->authorize( 'laqi_lusm_update_mapping_' . $mapping_id );
+		try {
+			$mapping = $this->mappings->find_active( $mapping_id );
+			if ( null === $mapping ) {
+				throw new \InvalidArgumentException( 'The product mapping is not active.' );
+			}
+			$pool_id = isset( $_POST['pool_id'] ) ? absint( $_POST['pool_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$pool    = $this->pools->find( $pool_id );
+			if ( null === $pool ) {
+				throw new \InvalidArgumentException( 'A valid inventory pool is required.' );
+			}
+			$unit        = isset( $_POST['consumption_unit'] ) ? sanitize_key( wp_unslash( $_POST['consumption_unit'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$consumption = isset( $_POST['consumption'] ) ? sanitize_text_field( wp_unslash( $_POST['consumption'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$quantity    = $this->units->normalize( $consumption, $unit );
+			if ( $quantity->family() !== $pool->quantity()->family() || $quantity->amount() < 1 ) {
+				throw new \InvalidArgumentException( 'Consumption must use the pool measurement family and be greater than zero.' );
+			}
+			$version = isset( $_POST['mapping_version'] ) ? absint( $_POST['mapping_version'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$this->mappings->save_single_pool( $mapping->product_id(), $mapping->variation_id(), $pool_id, $quantity->amount(), true, $version );
+			do_action( 'laqi_lusm_mapping_changed', $mapping->product_id(), $mapping->variation_id(), $pool_id );
+			$this->redirect( 'mapping_updated' );
+		} catch ( Throwable $error ) {
+			unset( $error );
+			$this->redirect( 'setup_error' );
+		}
 	}
 
 	/** Deactivate a product mapping without changing historical snapshots. @return void */

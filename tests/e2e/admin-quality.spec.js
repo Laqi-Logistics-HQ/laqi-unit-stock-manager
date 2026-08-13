@@ -44,6 +44,7 @@ test( 'admin screen renders without serious accessibility or runtime failures', 
 	const blocking = [];
 	for ( const path of [
 		plugin.adminPath,
+		`${ plugin.adminPath }&section=setup`,
 		`${ plugin.adminPath }&section=activity`,
 	] ) {
 		await page.goto( path, { waitUntil: 'networkidle' } );

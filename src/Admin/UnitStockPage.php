@@ -127,6 +127,14 @@ final class UnitStockPage {
 					'dismissible' => true,
 				)
 			);
+		} elseif ( 'mapping_updated' === $result ) {
+			wp_admin_notice(
+				__( 'Product stock mapping updated.', 'laqi-unit-stock-manager' ),
+				array(
+					'type'        => 'success',
+					'dismissible' => true,
+				)
+			);
 		} elseif ( 'unit_created' === $result ) {
 			wp_admin_notice(
 				__( 'Custom stock unit created.', 'laqi-unit-stock-manager' ),

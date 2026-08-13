@@ -89,6 +89,10 @@ soft-unlinked in the same tab; historical mapping components remain available
 for immutable order restoration. The plugin has no frontend UI and registers no
 plugin-owned scripts or storefront assets.
 
+Mapping edits update the active pool and exact consumption rule without repeating
+the one-time native-stock migration decision. They use optimistic mapping versions,
+so a stale form cannot silently overwrite a newer administrator change.
+
 The Stock tab searches pool names and internal SKUs together with linked product
 names, variation SKUs, and attributes. Results use repository-backed counts and
 25-row pages, so the admin screen does not silently stop at a fixed catalog size.
