@@ -20,7 +20,7 @@ use wpdb;
 /** Stores receipt-backed quantities for later FEFO allocation and traceability. */
 final class BatchRepository {
 	const SCHEMA_OPTION = 'laqi_lusm_batch_schema_version';
-	const VERSION       = 1;
+	const VERSION       = 2;
 
 	/** @var wpdb */
 	private $db;
@@ -58,6 +58,20 @@ final class BatchRepository {
 			UNIQUE KEY receipt_movement_id (receipt_movement_id),
 			KEY pool_status_expiry (pool_id,status,expiry_date),
 			KEY supplier_lot (supplier_id,supplier_lot)
+			) {$charset};"
+		);
+		$events = $this->events_table();
+		dbDelta(
+			"CREATE TABLE {$events} (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			batch_id bigint(20) unsigned NOT NULL,
+			event_type varchar(20) NOT NULL,
+			quantity_base bigint(20) unsigned NOT NULL,
+			actor_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			reason varchar(191) NOT NULL DEFAULT '',
+			created_at datetime NOT NULL,
+			PRIMARY KEY  (id),
+			KEY batch_created (batch_id,created_at)
 		) {$charset};"
 		);
 		update_option( self::SCHEMA_OPTION, self::VERSION, false );
@@ -143,6 +157,70 @@ final class BatchRepository {
 		return (int) $this->db->get_var( $this->db->prepare( 'SELECT COALESCE(SUM(quantity_available_base),0) FROM ' . $this->table() . ' WHERE pool_id=%d AND status=%s AND expiry_date IS NOT NULL AND expiry_date<%s', $pool_id, 'active', current_time( 'Y-m-d' ) ) );
 	}
 
+	/** One batch with pool context. @return array<string,mixed>|null */
+	public function find( int $batch_id ): ?array {
+		$row = $this->db->get_row( $this->db->prepare( 'SELECT b.*,p.family,p.display_unit FROM ' . $this->table() . ' b INNER JOIN ' . $this->db->prefix . 'laqi_lusm_pools p ON p.id=b.pool_id WHERE b.id=%d', $batch_id ), ARRAY_A );
+		return is_array( $row ) ? $row : null;
+	}
+
+	/** Move a non-empty batch between active and quarantined and journal the transition. */
+	public function set_status( int $batch_id, string $from, string $to, int $actor_id = 0, string $reason = '' ): void {
+		if ( ! in_array( $from, array( 'active', 'quarantined' ), true ) || ! in_array( $to, array( 'active', 'quarantined' ), true ) || $from === $to ) {
+			throw new InvalidArgumentException( 'The batch status transition is invalid.' );
+		}
+		$this->db->query( 'START TRANSACTION' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		try {
+			$quantity = $this->db->get_var( $this->db->prepare( 'SELECT quantity_available_base FROM ' . $this->table() . ' WHERE id=%d AND status=%s AND quantity_available_base>0 FOR UPDATE', $batch_id, $from ) );
+			if ( null === $quantity ) {
+				throw new RuntimeException( 'The batch status could not be changed.' );
+			}
+			$now     = current_time( 'mysql', true );
+			$updated = $this->db->update(
+				$this->table(),
+				array(
+					'status'     => $to,
+					'updated_at' => $now,
+				),
+				array(
+					'id'     => $batch_id,
+					'status' => $from,
+				),
+				array( '%s', '%s' ),
+				array( '%d', '%s' )
+			);
+			$logged  = $this->db->insert(
+				$this->events_table(),
+				array(
+					'batch_id'      => $batch_id,
+					'event_type'    => 'quarantined' === $to ? 'quarantine' : 'release',
+					'quantity_base' => (int) $quantity,
+					'actor_id'      => max( 0, $actor_id ),
+					'reason'        => substr( trim( $reason ), 0, 191 ),
+					'created_at'    => $now,
+				),
+				array( '%d', '%s', '%d', '%d', '%s', '%s' )
+			);
+			if ( 1 !== $updated || false === $logged ) {
+				throw new RuntimeException( 'The batch status could not be changed.' );
+			}
+			$this->db->query( 'COMMIT' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		} catch ( Throwable $error ) {
+			$this->db->query( 'ROLLBACK' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			throw $error;
+		}
+	}
+
+	/** Status history for one batch, oldest first. @return array<int,array<string,mixed>> */
+	public function events( int $batch_id ): array {
+		$rows = $this->db->get_results( $this->db->prepare( 'SELECT * FROM ' . $this->events_table() . ' WHERE batch_id=%d ORDER BY id ASC', $batch_id ), ARRAY_A );
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/** Quarantined and expired quantity excluded from sale. */
+	public function unavailable_quantity( int $pool_id ): int {
+		return (int) $this->db->get_var( $this->db->prepare( 'SELECT COALESCE(SUM(quantity_available_base),0) FROM ' . $this->table() . ' WHERE pool_id=%d AND quantity_available_base>0 AND (status=%s OR (status=%s AND expiry_date IS NOT NULL AND expiry_date<%s))', $pool_id, 'quarantined', 'active', current_time( 'Y-m-d' ) ) );
+	}
+
 	/** Batch for an idempotent receipt movement. @return array<string,mixed>|null */
 	private function for_movement( int $movement_id ): ?array {
 		$row = $this->db->get_row( $this->db->prepare( 'SELECT * FROM ' . $this->table() . ' WHERE receipt_movement_id = %d', $movement_id ), ARRAY_A );
@@ -161,5 +239,10 @@ final class BatchRepository {
 	/** Table name. */
 	private function table(): string {
 		return $this->db->prefix . 'laqi_lusm_batches';
+	}
+
+	/** Event table name. */
+	private function events_table(): string {
+		return $this->db->prefix . 'laqi_lusm_batch_events';
 	}
 }

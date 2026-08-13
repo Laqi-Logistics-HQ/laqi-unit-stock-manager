@@ -7,10 +7,14 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T21:03:02+00:00\n"
+"POT-Creation-Date: 2026-08-13T21:40:40+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
+
+#: Admin/BatchOperationsController.php:68
+msgid "You are not allowed to manage batches."
+msgstr ""
 
 #: Admin/CsvExchangeController.php:35
 msgid "The operations export could not be created."
@@ -45,7 +49,7 @@ msgstr ""
 #: Admin/LowStockAlertsSection.php:105
 #: Admin/MovementLedgerExportController.php:86
 #: Admin/MovementLedgerSection.php:81
-#: Admin/ReceivingSection.php:65
+#: Admin/ReceivingSection.php:70
 #: Admin/ReorderSection.php:66
 #: Admin/ReservationsSection.php:40
 #: Admin/StockLossSection.php:70
@@ -426,257 +430,317 @@ msgid "Receiving"
 msgstr ""
 
 #: Admin/ReceivingSection.php:60
+msgid "Active"
+msgstr ""
+
+#. translators: %s: unit.
+#: Admin/ReceivingSection.php:61
+#: Admin/ReservationsSection.php:48
+#: Admin/ReservationsSection.php:49
+#: Admin/ReservationsSection.php:62
+msgid "Quarantined"
+msgstr ""
+
+#: Admin/ReceivingSection.php:62
+msgid "Depleted"
+msgstr ""
+
+#: Admin/ReceivingSection.php:65
 msgid "Add supplier"
 msgstr ""
 
-#: Admin/ReceivingSection.php:60
+#: Admin/ReceivingSection.php:65
 msgid "Supplier name"
 msgstr ""
 
-#: Admin/ReceivingSection.php:60
+#: Admin/ReceivingSection.php:65
 msgid "Email"
 msgstr ""
 
-#: Admin/ReceivingSection.php:60
+#: Admin/ReceivingSection.php:65
 msgid "Lead time (days)"
 msgstr ""
 
-#: Admin/ReceivingSection.php:61
+#: Admin/ReceivingSection.php:66
 msgid "Define supplier pack"
 msgstr ""
 
-#: Admin/ReceivingSection.php:61
+#: Admin/ReceivingSection.php:66
 msgid "Examples include a sack, drum, case, or pallet. The quantity is stored exactly for the selected pool."
 msgstr ""
 
-#: Admin/ReceivingSection.php:61
-#: Admin/ReceivingSection.php:84
+#: Admin/ReceivingSection.php:66
 #: Admin/ReceivingSection.php:89
-#: Admin/ReceivingSection.php:95
+#: Admin/ReceivingSection.php:94
+#: Admin/ReceivingSection.php:104
 msgid "Supplier"
 msgstr ""
 
-#: Admin/ReceivingSection.php:65
+#: Admin/ReceivingSection.php:70
 msgid "Pack name"
 msgstr ""
 
-#: Admin/ReceivingSection.php:65
+#: Admin/ReceivingSection.php:70
 msgid "25 kg sack"
 msgstr ""
 
-#: Admin/ReceivingSection.php:65
+#: Admin/ReceivingSection.php:70
 msgid "Quantity in the pool display unit"
 msgstr ""
 
-#: Admin/ReceivingSection.php:65
+#: Admin/ReceivingSection.php:70
 msgid "Define pack"
 msgstr ""
 
-#: Admin/ReceivingSection.php:66
+#: Admin/ReceivingSection.php:71
 msgid "Receive stock now"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReceivingSection.php:66
 #: Admin/ReceivingSection.php:71
+#: Admin/ReceivingSection.php:76
 #: Admin/ReorderSection.php:80
 msgid "Supplier pack"
 msgstr ""
 
-#: Admin/ReceivingSection.php:70
+#: Admin/ReceivingSection.php:75
 msgid "Packages received"
 msgstr ""
 
-#: Admin/ReceivingSection.php:70
+#: Admin/ReceivingSection.php:75
 msgid "Supplier lot (optional)"
 msgstr ""
 
-#: Admin/ReceivingSection.php:70
+#: Admin/ReceivingSection.php:75
 msgid "Expiry date (optional)"
 msgstr ""
 
-#: Admin/ReceivingSection.php:70
+#: Admin/ReceivingSection.php:75
 msgid "Total material cost (optional)"
 msgstr ""
 
-#: Admin/ReceivingSection.php:70
+#: Admin/ReceivingSection.php:75
 msgid "used for weighted-average material economics only; retail prices are never changed."
 msgstr ""
 
-#: Admin/ReceivingSection.php:70
+#: Admin/ReceivingSection.php:75
 msgid "Delivery reference"
 msgstr ""
 
-#: Admin/ReceivingSection.php:70
+#: Admin/ReceivingSection.php:75
 msgid "Receive into stock"
 msgstr ""
 
-#: Admin/ReceivingSection.php:71
-#: Admin/ReceivingSection.php:75
+#: Admin/ReceivingSection.php:76
+#: Admin/ReceivingSection.php:80
 msgid "Schedule incoming stock"
 msgstr ""
 
-#: Admin/ReceivingSection.php:71
+#: Admin/ReceivingSection.php:76
 msgid "Incoming quantities remain separate from on-hand stock until you confirm their arrival."
 msgstr ""
 
-#: Admin/ReceivingSection.php:75
+#: Admin/ReceivingSection.php:80
 msgid "Packages expected"
 msgstr ""
 
-#: Admin/ReceivingSection.php:75
+#: Admin/ReceivingSection.php:80
 msgid "Expected arrival"
 msgstr ""
 
-#: Admin/ReceivingSection.php:75
+#: Admin/ReceivingSection.php:80
 msgid "Order or delivery reference"
 msgstr ""
 
-#: Admin/ReceivingSection.php:76
+#: Admin/ReceivingSection.php:81
 msgid "Incoming deliveries"
 msgstr ""
 
-#: Admin/ReceivingSection.php:80
+#: Admin/ReceivingSection.php:85
 msgid "No incoming stock is currently scheduled."
 msgstr ""
 
-#: Admin/ReceivingSection.php:84
+#: Admin/ReceivingSection.php:89
 msgid "Expected"
 msgstr ""
 
-#: Admin/ReceivingSection.php:84
-#: Admin/ReceivingSection.php:95
+#: Admin/ReceivingSection.php:89
+#: Admin/ReceivingSection.php:104
 msgid "Pack"
 msgstr ""
 
 #. translators: %s: unit.
-#: Admin/ReceivingSection.php:84
 #: Admin/ReceivingSection.php:89
-#: Admin/ReceivingSection.php:95
+#: Admin/ReceivingSection.php:94
+#: Admin/ReceivingSection.php:104
 #: Admin/ReorderSection.php:80
 #: Admin/ReservationsSection.php:49
 msgid "Pool"
 msgstr ""
 
-#: Admin/ReceivingSection.php:84
+#: Admin/ReceivingSection.php:89
 msgid "Incoming quantity"
 msgstr ""
 
-#: Admin/ReceivingSection.php:84
-#: Admin/ReceivingSection.php:95
+#: Admin/ReceivingSection.php:89
+#: Admin/ReceivingSection.php:104
 msgid "Reference"
 msgstr ""
 
-#: Admin/ReceivingSection.php:84
+#: Admin/ReceivingSection.php:89
 msgid "Action"
 msgstr ""
 
-#: Admin/ReceivingSection.php:88
-#: Admin/ReceivingSection.php:89
+#: Admin/ReceivingSection.php:93
+#: Admin/ReceivingSection.php:94
 msgid "Supplier lot"
 msgstr ""
 
-#: Admin/ReceivingSection.php:88
+#: Admin/ReceivingSection.php:93
 msgid "Expiry date"
 msgstr ""
 
-#: Admin/ReceivingSection.php:88
+#: Admin/ReceivingSection.php:93
 msgid "Mark received"
 msgstr ""
 
-#: Admin/ReceivingSection.php:89
+#: Admin/ReceivingSection.php:94
 msgid "Received batches and lots"
 msgstr ""
 
-#: Admin/ReceivingSection.php:89
+#: Admin/ReceivingSection.php:94
 msgid "Each receipt creates a traceable batch. Empty supplier-lot and expiry fields remain valid and can be completed by later batch workflows."
 msgstr ""
 
-#: Admin/ReceivingSection.php:89
-#: Admin/ReceivingSection.php:95
+#: Admin/ReceivingSection.php:94
+#: Admin/ReceivingSection.php:104
 msgid "Received"
 msgstr ""
 
-#: Admin/ReceivingSection.php:89
+#: Admin/ReceivingSection.php:94
 msgid "Expiry"
 msgstr ""
 
-#: Admin/ReceivingSection.php:89
+#: Admin/ReceivingSection.php:94
 msgid "Received quantity"
 msgstr ""
 
-#: Admin/ReceivingSection.php:89
+#: Admin/ReceivingSection.php:94
 msgid "Available in batch"
 msgstr ""
 
-#: Admin/ReceivingSection.php:91
+#: Admin/ReceivingSection.php:96
 msgid "Not supplied"
 msgstr ""
 
-#: Admin/ReceivingSection.php:91
+#: Admin/ReceivingSection.php:96
 msgid "No expiry"
 msgstr ""
 
-#: Admin/ReceivingSection.php:94
+#: Admin/ReceivingSection.php:100
+msgid "Reason (optional)"
+msgstr ""
+
+#: Admin/ReceivingSection.php:100
+msgid "Quarantine batch"
+msgstr ""
+
+#: Admin/ReceivingSection.php:100
+msgid "Release batch"
+msgstr ""
+
+#: Admin/ReceivingSection.php:100
+msgid "Counted quantity"
+msgstr ""
+
+#: Admin/ReceivingSection.php:100
+msgid "Save batch count"
+msgstr ""
+
+#: Admin/ReceivingSection.php:100
+msgid "Write off batch"
+msgstr ""
+
+#: Admin/ReceivingSection.php:103
 msgid "CSV exchange"
 msgstr ""
 
-#: Admin/ReceivingSection.php:94
+#: Admin/ReceivingSection.php:103
 msgid "Export or import the versioned supplier, pack, incoming-delivery, and reorder-policy schema."
 msgstr ""
 
-#: Admin/ReceivingSection.php:94
+#: Admin/ReceivingSection.php:103
 msgid "Export operations CSV"
 msgstr ""
 
-#: Admin/ReceivingSection.php:94
+#: Admin/ReceivingSection.php:103
 msgid "Operations CSV"
 msgstr ""
 
-#: Admin/ReceivingSection.php:94
+#: Admin/ReceivingSection.php:103
 msgid "Import operations CSV"
 msgstr ""
 
-#: Admin/ReceivingSection.php:95
+#: Admin/ReceivingSection.php:104
 msgid "Recent receipts"
 msgstr ""
 
-#: Admin/ReceivingSection.php:95
+#: Admin/ReceivingSection.php:104
 msgid "Quantity"
 msgstr ""
 
-#: Admin/ReceivingSection.php:106
+#: Admin/ReceivingSection.php:115
 msgid "Supplier added."
 msgstr ""
 
-#: Admin/ReceivingSection.php:107
+#: Admin/ReceivingSection.php:116
 msgid "Supplier pack defined."
 msgstr ""
 
-#: Admin/ReceivingSection.php:108
+#: Admin/ReceivingSection.php:117
 msgid "Supplier stock received."
 msgstr ""
 
-#: Admin/ReceivingSection.php:109
+#: Admin/ReceivingSection.php:118
 msgid "Incoming stock scheduled."
 msgstr ""
 
-#: Admin/ReceivingSection.php:110
+#: Admin/ReceivingSection.php:119
 msgid "Incoming stock moved into on-hand inventory."
 msgstr ""
 
+#: Admin/ReceivingSection.php:120
+msgid "Batch quarantined."
+msgstr ""
+
+#: Admin/ReceivingSection.php:121
+msgid "Batch released."
+msgstr ""
+
+#: Admin/ReceivingSection.php:122
+msgid "Batch written off."
+msgstr ""
+
+#: Admin/ReceivingSection.php:123
+msgid "Batch count saved."
+msgstr ""
+
+#: Admin/ReceivingSection.php:124
+msgid "The batch operation could not be completed."
+msgstr ""
+
 #. translators: 1: created rows, 2: skipped rows.
-#: Admin/ReceivingSection.php:111
+#: Admin/ReceivingSection.php:125
 #, php-format
 msgid "CSV imported: %1$d created, %2$d already present."
 msgstr ""
 
 #. translators: 1: created rows, 2: skipped rows.
-#: Admin/ReceivingSection.php:112
+#: Admin/ReceivingSection.php:126
 msgid "The operations CSV could not be imported."
 msgstr ""
 
-#: Admin/ReceivingSection.php:113
+#: Admin/ReceivingSection.php:127
 msgid "The receiving operation could not be completed."
 msgstr ""
 
@@ -773,13 +837,6 @@ msgstr ""
 
 #: Admin/ReservationsSection.php:48
 msgid "State"
-msgstr ""
-
-#. translators: %s: unit.
-#: Admin/ReservationsSection.php:48
-#: Admin/ReservationsSection.php:49
-#: Admin/ReservationsSection.php:62
-msgid "Quarantined"
 msgstr ""
 
 #. translators: %s: unit.

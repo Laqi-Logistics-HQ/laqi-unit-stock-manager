@@ -98,6 +98,16 @@ final class BatchAllocationRepository {
 		}
 	}
 
+	/** Apply one operational movement to its explicitly selected batch. */
+	public function adjust_batch( int $pool_id, int $batch_id, int $delta, string $event_key ): void {
+		$batch = $this->db->get_row( $this->db->prepare( 'SELECT pool_id FROM ' . $this->batch_table() . ' WHERE id=%d FOR UPDATE', $batch_id ), ARRAY_A );
+		if ( ! is_array( $batch ) || $pool_id !== (int) $batch['pool_id'] ) {
+			throw new RuntimeException( 'The selected batch does not belong to this pool.' );
+		}
+		$this->change_batch( $batch_id, $delta );
+		$this->record( $event_key, 0, $pool_id, $batch_id, $delta < 0 ? -1 : 1, abs( $delta ) );
+	}
+
 	/** Journal rows for an order. @return array<int,array<string,mixed>> */
 	public function for_order( int $order_id ): array {
 		$rows = $this->db->get_results( $this->db->prepare( 'SELECT a.*,b.supplier_lot,b.expiry_date FROM ' . $this->table() . ' a LEFT JOIN ' . $this->batch_table() . ' b ON b.id=a.batch_id WHERE a.order_id=%d ORDER BY a.id', $order_id ), ARRAY_A );
