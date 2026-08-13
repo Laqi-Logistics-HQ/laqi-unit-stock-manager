@@ -9,6 +9,7 @@ use LaqiUnitStockManager\Inventory\InsufficientStockException;
 use LaqiUnitStockManager\Inventory\StockMutationService;
 use LaqiUnitStockManager\Storage\Schema;
 use LaqiUnitStockManager\Storage\MovementRepository;
+use LaqiUnitStockManager\Container;
 
 /**
  * Tests the single authoritative stock mutation path.
@@ -207,5 +208,19 @@ class Test_Stock_Mutation_Service extends WP_UnitTestCase {
 			$this->assertGreaterThanOrEqual( 1, $repo->count_search( $term ) );
 		}
 		$this->assertSame( 'Warehouse Operator', $repo->search( 'Warehouse Operator', 1 )[0]['actor_name'] );
+	}
+
+	/** Operational modules can record typed relative changes through shared validation. */
+	public function test_typed_stock_change_records_exact_loss_context(): void {
+		global $wpdb;
+		$service = ( new Container() )->stock_adjustment_service();
+		$result  = $service->change( $this->pool_id, -1, '0.25', 'kg', 'loss_damage', 'loss', 'Broken container', 7, 'loss-test:' . $this->pool_id );
+		$row     = ( new MovementRepository( $wpdb ) )->recent( 1 )[0];
+		$this->assertSame( -250000000000, (int) $row['delta_base'] );
+		$this->assertSame( 9750000000000, $result->balance() );
+		$this->assertSame( 'loss_damage', $row['type'] );
+		$this->assertSame( 'loss', $row['source_type'] );
+		$this->assertSame( 'Broken container', $row['reason'] );
+		$this->assertSame( 7, (int) $row['actor_id'] );
 	}
 }
