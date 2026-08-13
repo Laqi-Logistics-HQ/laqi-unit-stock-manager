@@ -64,6 +64,8 @@ final class Plugin {
 		$this->maybe_upgrade_schema();
 		$container = new Container();
 		$container->unit_registry();
+		( new WooCommerce\CartValidator( $container->availability_service() ) )->register();
+		( new WooCommerce\OrderItemSnapshotter( $container->mapping_repository(), $container->calculator_registry() ) )->register();
 
 		// WordPress privacy tools. Replace the boilerplate's no-data callbacks
 		// when this plugin stores or transmits personal data.

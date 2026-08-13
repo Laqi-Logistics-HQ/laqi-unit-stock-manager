@@ -11,6 +11,10 @@ defined( 'ABSPATH' ) || exit;
 
 use LaqiUnitStockManager\Inventory\StockMutationService;
 use LaqiUnitStockManager\Storage\CustomUnitRepository;
+use LaqiUnitStockManager\Storage\MappingRepository;
+use LaqiUnitStockManager\Storage\PoolRepository;
+use LaqiUnitStockManager\Consumption\CalculatorRegistry;
+use LaqiUnitStockManager\Availability\AvailabilityService;
 use LaqiUnitStockManager\Unit\UnitRegistry;
 
 /**
@@ -61,5 +65,49 @@ final class Container {
 		global $wpdb;
 
 		return new StockMutationService( $wpdb );
+	}
+
+	/**
+	 * Inventory pool persistence.
+	 *
+	 * @return PoolRepository
+	 */
+	public function pool_repository(): PoolRepository {
+		global $wpdb;
+
+		return new PoolRepository( $wpdb );
+	}
+
+	/**
+	 * Product mapping persistence.
+	 *
+	 * @return MappingRepository
+	 */
+	public function mapping_repository(): MappingRepository {
+		global $wpdb;
+
+		return new MappingRepository( $wpdb );
+	}
+
+	/**
+	 * Extensible consumption calculator registry.
+	 *
+	 * @return CalculatorRegistry
+	 */
+	public function calculator_registry(): CalculatorRegistry {
+		return new CalculatorRegistry();
+	}
+
+	/**
+	 * Combined shared-pool availability service.
+	 *
+	 * @return AvailabilityService
+	 */
+	public function availability_service(): AvailabilityService {
+		return new AvailabilityService(
+			$this->mapping_repository(),
+			$this->pool_repository(),
+			$this->calculator_registry()
+		);
 	}
 }
