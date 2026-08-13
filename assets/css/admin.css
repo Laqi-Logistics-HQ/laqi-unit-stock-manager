@@ -24,6 +24,30 @@
 	align-items: center;
 }
 
+.laqi-lusm-setup-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(26rem, 100%), 1fr));
+	gap: 1rem;
+	margin-top: 1rem;
+}
+
+.laqi-lusm-setup-grid .card {
+	max-width: none;
+}
+
+.laqi-lusm-setup-grid form {
+	display: grid;
+	grid-template-columns: minmax(10rem, 1fr) minmax(12rem, 2fr);
+	gap: 0.75rem 1rem;
+	align-items: center;
+}
+
+.laqi-lusm-setup-grid form .submit {
+	grid-column: 2;
+	margin: 0;
+	padding: 0;
+}
+
 @media screen and (max-width: 782px) {
 	.laqi-lusm-stock-table thead {
 		display: none;
@@ -34,5 +58,13 @@
 	.laqi-lusm-stock-table td {
 		display: block;
 		width: auto;
+	}
+
+	.laqi-lusm-setup-grid form {
+		grid-template-columns: 1fr;
+	}
+
+	.laqi-lusm-setup-grid form .submit {
+		grid-column: auto;
 	}
 }

@@ -48,6 +48,23 @@ final class MappingRepository {
 	 * @throws \Throwable When transactional persistence fails.
 	 */
 	public function create_single_pool( int $product_id, int $variation_id, int $pool_id, int $consumption ): ProductMapping {
+		return $this->save_single_pool( $product_id, $variation_id, $pool_id, $consumption, false );
+	}
+
+	/**
+	 * Create or update an explicit single-pool mapping.
+	 *
+	 * @param int  $product_id   Parent/simple product ID.
+	 * @param int  $variation_id Variation ID or zero.
+	 * @param int  $pool_id      Pool ID.
+	 * @param int  $consumption  Normalized consumption per sold item.
+	 * @param bool $replace      Whether an existing mapping may be replaced.
+	 * @return ProductMapping
+	 * @throws \InvalidArgumentException When mapping input is invalid.
+	 * @throws RuntimeException When persistence fails or mapping exists without replacement.
+	 * @throws \Throwable When transactional persistence fails.
+	 */
+	public function save_single_pool( int $product_id, int $variation_id, int $pool_id, int $consumption, bool $replace = true ): ProductMapping {
 		if ( $product_id < 1 || $pool_id < 1 || $consumption < 1 ) {
 			throw new \InvalidArgumentException( 'A mapping requires a product, pool, and positive consumption.' );
 		}
@@ -56,24 +73,40 @@ final class MappingRepository {
 		$this->db->query( 'START TRANSACTION' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 
 		try {
-			$inserted = $this->db->insert(
-				Schema::table( 'mappings' ),
-				array(
-					'product_id'      => $product_id,
-					'variation_id'    => $variation_id,
-					'calculator_type' => 'single_pool',
-					'created_at'      => $now,
-					'updated_at'      => $now,
-				),
-				array( '%d', '%d', '%s', '%s', '%s' )
+			$mapping_id = (int) $this->db->get_var(
+				$this->db->prepare(
+					'SELECT id FROM ' . Schema::table( 'mappings' ) . ' WHERE product_id = %d AND variation_id = %d FOR UPDATE',
+					$product_id,
+					$variation_id
+				)
 			);
-
-			if ( false === $inserted ) {
-				throw new RuntimeException( 'Could not create the product mapping.' );
+			if ( $mapping_id > 0 && ! $replace ) {
+				throw new RuntimeException( 'A mapping already exists for this product or variation.' );
 			}
-
-			$mapping_id = (int) $this->db->insert_id;
-			$inserted   = $this->db->insert(
+			if ( $mapping_id > 0 ) {
+				$updated = $this->db->query( $this->db->prepare( 'UPDATE ' . Schema::table( 'mappings' ) . ' SET calculator_type = %s, active = 1, version = version + 1, updated_at = %s WHERE id = %d', 'single_pool', $now, $mapping_id ) );
+				if ( false === $updated ) {
+					throw new RuntimeException( 'Could not update the product mapping.' );
+				}
+				$this->db->delete( Schema::table( 'mapping_components' ), array( 'mapping_id' => $mapping_id ), array( '%d' ) );
+			} else {
+				$inserted = $this->db->insert(
+					Schema::table( 'mappings' ),
+					array(
+						'product_id'      => $product_id,
+						'variation_id'    => $variation_id,
+						'calculator_type' => 'single_pool',
+						'created_at'      => $now,
+						'updated_at'      => $now,
+					),
+					array( '%d', '%d', '%s', '%s', '%s' )
+				);
+				if ( false === $inserted ) {
+					throw new RuntimeException( 'Could not create the product mapping.' );
+				}
+				$mapping_id = (int) $this->db->insert_id;
+			}
+			$inserted = $this->db->insert(
 				Schema::table( 'mapping_components' ),
 				array(
 					'mapping_id'       => $mapping_id,

@@ -110,4 +110,17 @@ class Test_Availability_Service extends WP_UnitTestCase {
 		$this->assertSame( 5, $this->service->saleable_quantity( 100, 102 ) );
 		$this->assertNull( $this->service->saleable_quantity( 999, 0 ) );
 	}
+
+	/**
+	 * Explicit setup edits replace the mapping component without duplicate rows.
+	 */
+	public function test_mapping_can_be_updated_through_shared_repository(): void {
+		global $wpdb;
+
+		$maps = new MappingRepository( $wpdb );
+		$maps->save_single_pool( 100, 101, $this->pool_id, 500000000 );
+
+		$this->assertSame( 20, $this->service->saleable_quantity( 100, 101 ) );
+		$this->assertSame( 1, (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . Schema::table( 'mapping_components' ) . ' WHERE mapping_id = (SELECT id FROM ' . Schema::table( 'mappings' ) . ' WHERE product_id = %d AND variation_id = %d)', 100, 101 ) ) );
+	}
 }
