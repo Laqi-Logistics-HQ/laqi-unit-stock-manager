@@ -101,14 +101,60 @@ final class CustomUnitRepository {
 	/**
 	 * List active merchant-defined unit metadata.
 	 *
-	 * @return array<int, array<string, string>>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function active(): array {
 		$rows = $this->db->get_results(
-			'SELECT unit_key, label, symbol, family, reference_value, reference_unit FROM ' . Schema::table( 'units' ) . ' WHERE active = 1 ORDER BY label ASC, id ASC', // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			'SELECT id, unit_key, label, symbol, family, reference_value, reference_unit FROM ' . Schema::table( 'units' ) . ' WHERE active = 1 ORDER BY label ASC, id ASC', // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 			ARRAY_A
 		); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
+	 * Deactivate an unused custom unit while retaining its stable key.
+	 *
+	 * @param int $unit_id Custom-unit ID.
+	 * @return void
+	 * @throws \InvalidArgumentException When the unit is inactive or in use.
+	 * @throws RuntimeException When persistence fails.
+	 */
+	public function deactivate( int $unit_id ): void {
+		$row = $this->db->get_row(
+			$this->db->prepare( 'SELECT unit_key FROM ' . Schema::table( 'units' ) . ' WHERE id = %d AND active = 1', $unit_id ),
+			ARRAY_A
+		);
+		if ( ! is_array( $row ) ) {
+			throw new \InvalidArgumentException( 'The custom stock unit is not active.' );
+		}
+
+		$key         = (string) $row['unit_key'];
+		$pool_uses   = (int) $this->db->get_var(
+			$this->db->prepare( 'SELECT COUNT(*) FROM ' . Schema::table( 'pools' ) . ' WHERE base_unit = %s OR display_unit = %s', $key, $key )
+		);
+		$custom_uses = (int) $this->db->get_var(
+			$this->db->prepare( 'SELECT COUNT(*) FROM ' . Schema::table( 'units' ) . ' WHERE reference_unit = %s AND active = 1 AND id <> %d', $key, $unit_id )
+		);
+		if ( $pool_uses > 0 || $custom_uses > 0 ) {
+			throw new \InvalidArgumentException( 'A custom stock unit cannot be retired while it is in use.' );
+		}
+
+		$updated = $this->db->update(
+			Schema::table( 'units' ),
+			array(
+				'active'     => 0,
+				'updated_at' => current_time( 'mysql', true ),
+			),
+			array(
+				'id'     => $unit_id,
+				'active' => 1,
+			),
+			array( '%d', '%s' ),
+			array( '%d', '%d' )
+		);
+		if ( 1 !== $updated ) {
+			throw new RuntimeException( 'Could not retire the custom stock unit.' );
+		}
 	}
 }

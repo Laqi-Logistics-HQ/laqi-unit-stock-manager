@@ -143,6 +143,16 @@ final class UnitStockPage {
 					'dismissible' => true,
 				)
 			);
+		} elseif ( 'unit_retired' === $result ) {
+			wp_admin_notice(
+				__( 'Custom stock unit retired.', 'laqi-unit-stock-manager' ),
+				array(
+					'type'        => 'success',
+					'dismissible' => true,
+				)
+			);
+		} elseif ( 'unit_in_use' === $result ) {
+			wp_admin_notice( __( 'The custom stock unit is still in use and could not be retired.', 'laqi-unit-stock-manager' ), array( 'type' => 'error' ) );
 		} elseif ( 'setup_error' === $result ) {
 			wp_admin_notice( __( 'The setup could not be saved. Check that the quantities and units are compatible.', 'laqi-unit-stock-manager' ), array( 'type' => 'error' ) );
 		} elseif ( 'error' === $result ) {
