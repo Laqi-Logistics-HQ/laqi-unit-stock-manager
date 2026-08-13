@@ -134,6 +134,7 @@ final class Container {
 			$this->movement_registry->register( new MovementType( 'manual_add', __( 'Manual addition', 'laqi-unit-stock-manager' ) ) );
 			$this->movement_registry->register( new MovementType( 'manual_subtract', __( 'Manual subtraction', 'laqi-unit-stock-manager' ) ) );
 			$this->movement_registry->register( new MovementType( 'migration_import', __( 'Existing stock migration', 'laqi-unit-stock-manager' ) ) );
+			$this->movement_registry->register( new MovementType( 'order_edit', __( 'Order quantity edit', 'laqi-unit-stock-manager' ) ) );
 		}
 		return $this->movement_registry;
 	}

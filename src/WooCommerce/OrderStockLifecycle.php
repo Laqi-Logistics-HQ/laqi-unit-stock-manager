@@ -18,13 +18,13 @@ use WC_Order;
 final class OrderStockLifecycle {
 
 	/** Order lifecycle state metadata key. */
-	private const STATE_META = '_laqi_lusm_pool_stock_state';
+	public const STATE_META = '_laqi_lusm_pool_stock_state';
 
 	/** Order lifecycle cycle metadata key. */
-	private const CYCLE_META = '_laqi_lusm_pool_stock_cycle';
+	public const CYCLE_META = '_laqi_lusm_pool_stock_cycle';
 
 	/** Restocked line-item quantity metadata key. */
-	private const RESTOCKED_QUANTITY_META = '_laqi_lusm_restocked_quantity';
+	public const RESTOCKED_QUANTITY_META = '_laqi_lusm_restocked_quantity';
 
 	/**
 	 * Stock mutation service.
@@ -34,12 +34,21 @@ final class OrderStockLifecycle {
 	private $mutations;
 
 	/**
+	 * Order item snapshot service.
+	 *
+	 * @var OrderItemSnapshotter
+	 */
+	private $snapshots;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param StockMutationService $mutations Stock mutation service.
+	 * @param OrderItemSnapshotter $snapshots Order item snapshots.
 	 */
-	public function __construct( StockMutationService $mutations ) {
+	public function __construct( StockMutationService $mutations, OrderItemSnapshotter $snapshots ) {
 		$this->mutations = $mutations;
+		$this->snapshots = $snapshots;
 	}
 
 	/**
@@ -60,6 +69,7 @@ final class OrderStockLifecycle {
 	 * @return void
 	 */
 	public function reduce( WC_Order $order ): void {
+		$this->snapshots->prepare_order( $order );
 		$cycle = max( 1, (int) $order->get_meta( self::CYCLE_META, true ) );
 		if ( 'restored' === $order->get_meta( self::STATE_META, true ) ) {
 			++$cycle;
