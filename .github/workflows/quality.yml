@@ -1,0 +1,220 @@
+name: quality
+
+on:
+  workflow_call:
+  # There is deliberately no `pull_request:` trigger. It fired on every push to a
+  # PR, which made iterating on a branch the largest single consumer of our
+  # Actions minutes. CI runs on a real merge to main, on demand via
+  # workflow_dispatch, or as the release gate below.
+  #
+  # This is not a loss of coverage at release time: release.yml calls this
+  # workflow through `workflow_call`, so a release still has to pass it.
+  #
+  # Verify before pushing instead — phpcs and phpunit in the wordpress_localhost
+  # stack, plus `npm run lint:js` and `npm run lint:css`.
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  coding-standards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "7.4"
+          tools: composer
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist
+      - run: composer lint
+      - name: Check PHP syntax
+        run: find . -path ./vendor -prune -o -name '*.php' -print0 | xargs -0 -n1 php -l
+      - run: bash -n bin/build.sh bin/install-wp-tests.sh
+
+  php-compatibility:
+    # `composer lint` pins PHPCompatibility 9.3.5 (the newest release that works
+    # with WPCS 3 / PHP_CodeSniffer 3), which predates the PHP 8.1-8.5 sniffs. The
+    # WooCommerce Marketplace code compatibility test runs current
+    # PHPCompatibilityWP, so run the same modern sniffs here - installed in their
+    # own project because they need PHP_CodeSniffer 4.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: composer
+          coverage: none
+      - name: Install current PHPCompatibility sniffs
+        run: |
+          mkdir -p "$RUNNER_TEMP/phpcompat"
+          cd "$RUNNER_TEMP/phpcompat"
+          printf '{"minimum-stability":"dev","prefer-stable":true,"config":{"allow-plugins":{"dealerdirect/phpcodesniffer-composer-installer":true}}}' > composer.json
+          composer require --no-interaction phpcompatibility/php-compatibility:dev-develop
+      - name: Scan for PHP 7.4-8.5 incompatibilities
+        run: |
+          "$RUNNER_TEMP/phpcompat/vendor/bin/phpcs" \
+            --standard=PHPCompatibility \
+            --runtime-set testVersion 7.4-8.5 \
+            --extensions=php \
+            --ignore='*/vendor/*,*/node_modules/*,*/dist/*,*/test-results/*' \
+            --warning-severity=1 \
+            -p .
+
+  phpunit:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: "7.4"
+            wordpress: "6.9.5"
+          - php: "7.4"
+            wordpress: "7.0.2"
+          - php: "8.3"
+            wordpress: "6.9.5"
+          - php: "8.3"
+            wordpress: "7.0.2"
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist
+      - name: Install WooCommerce test dependency
+        run: |
+          curl --fail --location --silent --show-error \
+            https://downloads.wordpress.org/plugin/woocommerce.10.9.0.zip \
+            --output /tmp/woocommerce.zip
+          unzip -q /tmp/woocommerce.zip -d ..
+      - name: Install WordPress test environment
+        run: |
+          bash bin/install-wp-tests.sh \
+            wordpress_test root root 127.0.0.1:3306 "${{ matrix.wordpress }}" \
+            >> "$GITHUB_ENV"
+      - run: composer test
+
+  admin-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: npx playwright install --with-deps chromium
+      - run: npm run wp-env start
+      - run: npm run test:admin-quality
+      - name: Show WordPress logs after a failure
+        if: failure()
+        run: npx wp-env logs --watch=false
+      - name: Upload browser diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-quality-diagnostics
+          path: test-results/
+      - name: Stop WordPress environment
+        if: always()
+        run: npm run wp-env stop
+
+  wordpressorg-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npm run build --if-present
+      - name: Build the WordPress.org submission package
+        run: |
+          bash bin/build.sh --channel wordpressorg
+          mkdir -p wordpressorg-build
+          unzip -q dist/*-wordpressorg.zip -d wordpressorg-build
+      # Not wordpress/plugin-check-action: its wp-version input is honoured only
+      # for the literal 'trunk' and maps every other value to `null`, so it
+      # cannot be told which WordPress to use and resolves "latest" as a git ref.
+      # api.wordpress.org offers a release before the mirror tags it, so runs
+      # fail for the hours in between. bin/ci-plugin-check.sh pins core to the
+      # release zip instead, which is current and cannot race. Reasoning in full
+      # is in that file.
+      - name: Run official WordPress Plugin Check
+        run: bash bin/ci-plugin-check.sh laqi-unit-stock-manager ./wordpressorg-build/laqi-unit-stock-manager
+
+  channel-archives:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "7.4"
+          tools: composer
+          coverage: none
+      - run: composer install --no-dev --optimize-autoloader --no-interaction
+      - name: Build and verify both sales channels
+        shell: bash
+        run: |
+          bash bin/build.sh --channel woocommerce --version 0.0.0-test
+          bash bin/build.sh --channel freemius --version 0.0.0-test
+
+          woo_archive="dist/laqi-unit-stock-manager-0.0.0-test-woocommerce.zip"
+          freemius_archive="dist/laqi-unit-stock-manager-0.0.0-test-freemius.zip"
+          woo_contents="$(unzip -Z1 "$woo_archive")"
+          freemius_contents="$(unzip -Z1 "$freemius_archive")"
+
+          for forbidden in .wp-env.json playwright.config.js docs/ tests/ test-results/ .github/ package.json package-lock.json; do
+            if grep -q "^laqi-unit-stock-manager/${forbidden}" <<< "$woo_contents$freemius_contents"; then
+              echo "::error::Release archive contains development-only path: $forbidden"
+              exit 1
+            fi
+          done
+
+          if grep -Eq '(^|/)\.[^/]+(/|$)|\.zip$' <<< "$woo_contents$freemius_contents"; then
+            echo "::error::Release archive contains a hidden path or nested ZIP."
+            exit 1
+          fi
+
+          if grep -q '^laqi-unit-stock-manager/vendor/' <<< "$woo_contents"; then
+            echo "::error::WooCommerce archive contains the Composer runtime tree."
+            exit 1
+          fi
+
+          if grep -q '"freemius/wordpress-sdk"' composer.json &&
+             ! grep -qx 'laqi-unit-stock-manager/vendor/freemius/wordpress-sdk/start.php' <<< "$freemius_contents"; then
+            echo "::error::Freemius archive is missing its configured SDK bootstrap."
+            exit 1
+          fi
+
+          for archive_contents in "$woo_contents" "$freemius_contents"; do
+            for required in \
+              laqi-unit-stock-manager/readme.txt \
+              laqi-unit-stock-manager/changelog.txt \
+              laqi-unit-stock-manager/languages/laqi-unit-stock-manager.pot; do
+              if ! grep -qx "$required" <<< "$archive_contents"; then
+                echo "::error::Channel archive is missing required file: $required"
+                exit 1
+              fi
+            done
+          done

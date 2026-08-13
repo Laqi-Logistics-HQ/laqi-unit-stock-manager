@@ -1,0 +1,4 @@
+*** Laqi Unit Stock Manager for WooCommerce Changelog ***
+
+2026-08-13 - version 0.1.0
+* Add - Initial development version.
