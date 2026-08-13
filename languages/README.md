@@ -20,7 +20,7 @@ cd /path/to/wordpress_localhost
 WORK="docker.exe compose exec -u www-data -w /var/www/html/wp-content/plugins/laqi-unit-stock-manager php-fpm"
 
 # 1. Extract every translatable string (PHP + JS) into the .pot template.
-$WORK wp i18n make-pot . languages/laqi-unit-stock-manager.pot --domain=laqi-unit-stock-manager
+$WORK wp i18n make-pot . languages/laqi-unit-stock-manager.pot --domain=laqi-unit-stock-manager --exclude=build,node_modules,vendor
 
 # 2. After translating .po files, compile them:
 $WORK wp i18n make-mo   languages                 # .po -> .mo  (PHP strings)

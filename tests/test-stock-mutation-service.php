@@ -116,4 +116,27 @@ class Test_Stock_Mutation_Service extends WP_UnitTestCase {
 			$this->assertSame( 0, (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . Schema::table( 'movements' ) . ' WHERE pool_id = %d', $this->pool_id ) ) );
 		}
 	}
+
+	/**
+	 * Failure in one pool rolls back every pool in the batch.
+	 */
+	public function test_batch_is_atomic_across_pools(): void {
+		global $wpdb;
+		$second = $this->pool_id + 100000;
+		$wpdb->query( $wpdb->prepare( 'INSERT INTO ' . Schema::table( 'pools' ) . ' (id,name,family,base_unit,display_unit,quantity_base,created_at,updated_at) VALUES (%d,%s,%s,%s,%s,%d,UTC_TIMESTAMP(),UTC_TIMESTAMP())', $second, 'Second', 'mass', 'ng', 'g', 100 ) );
+
+		try {
+			( new StockMutationService( $wpdb ) )->apply_batch(
+				array(
+					array( 'pool_id' => $this->pool_id, 'delta' => -100, 'type' => 'test', 'idempotency_key' => 'batch-a:' . $this->pool_id ),
+					array( 'pool_id' => $second, 'delta' => -101, 'type' => 'test', 'idempotency_key' => 'batch-b:' . $this->pool_id ),
+				)
+			);
+			$this->fail( 'Expected insufficient stock exception.' );
+		} catch ( InsufficientStockException $error ) {
+			$this->assertSame( 10000000000000, (int) $wpdb->get_var( $wpdb->prepare( 'SELECT quantity_base FROM ' . Schema::table( 'pools' ) . ' WHERE id = %d', $this->pool_id ) ) );
+			$this->assertSame( 100, (int) $wpdb->get_var( $wpdb->prepare( 'SELECT quantity_base FROM ' . Schema::table( 'pools' ) . ' WHERE id = %d', $second ) ) );
+		}
+		$wpdb->delete( Schema::table( 'pools' ), array( 'id' => $second ), array( '%d' ) );
+	}
 }
