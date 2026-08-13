@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T22:10:46+00:00\n"
+"POT-Creation-Date: 2026-08-13T22:25:10+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -39,19 +39,23 @@ msgstr ""
 msgid "https://laqi-logistics.com"
 msgstr ""
 
-#: src/premium-bootstrap__premium_only.php:132
+#: src/premium-bootstrap__premium_only.php:136
 msgid "Supplier receipt"
 msgstr ""
 
-#: src/premium-bootstrap__premium_only.php:133
+#: src/premium-bootstrap__premium_only.php:137
 msgid "Batch transfer out"
 msgstr ""
 
-#: src/premium-bootstrap__premium_only.php:134
+#: src/premium-bootstrap__premium_only.php:138
 msgid "Batch transfer in"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/BatchOperationsController.php:90
+#: src/Premium__premium_only/Admin/BatchExpiryController.php:41
+msgid "You are not allowed to manage batch expiry settings."
+msgstr ""
+
+#: src/Premium__premium_only/Admin/BatchOperationsController.php:96
 msgid "You are not allowed to manage batches."
 msgstr ""
 
@@ -88,7 +92,7 @@ msgstr ""
 #: src/Premium__premium_only/Admin/LowStockAlertsSection.php:105
 #: src/Premium__premium_only/Admin/MovementLedgerExportController.php:86
 #: src/Premium__premium_only/Admin/MovementLedgerSection.php:81
-#: src/Premium__premium_only/Admin/ReceivingSection.php:79
+#: src/Premium__premium_only/Admin/ReceivingSection.php:88
 #: src/Premium__premium_only/Admin/ReorderSection.php:66
 #: src/Premium__premium_only/Admin/ReservationsSection.php:40
 #: src/Premium__premium_only/Admin/StockLossSection.php:70
@@ -464,409 +468,441 @@ msgstr ""
 msgid "You are not allowed to manage receiving."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:59
+#: src/Premium__premium_only/Admin/ReceivingSection.php:66
 msgid "Receiving"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:67
+#: src/Premium__premium_only/Admin/ReceivingSection.php:74
 msgid "Active"
 msgstr ""
 
 #. translators: %s: unit.
-#: src/Premium__premium_only/Admin/ReceivingSection.php:68
+#: src/Premium__premium_only/Admin/ReceivingSection.php:75
 #: src/Premium__premium_only/Admin/ReservationsSection.php:48
 #: src/Premium__premium_only/Admin/ReservationsSection.php:49
 #: src/Premium__premium_only/Admin/ReservationsSection.php:62
 msgid "Quarantined"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:69
+#: src/Premium__premium_only/Admin/ReceivingSection.php:76
 msgid "Depleted"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:70
+#: src/Premium__premium_only/Admin/ReceivingSection.php:77
 msgid "Recalled"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:74
+#: src/Premium__premium_only/Admin/ReceivingSection.php:82
+msgid "Batch expiry alerts"
+msgstr ""
+
+#: src/Premium__premium_only/Admin/ReceivingSection.php:82
+msgid "Send one notification when a dated batch enters the warning window and another if stock remains when it expires."
+msgstr ""
+
+#: src/Premium__premium_only/Admin/ReceivingSection.php:82
+msgid "Warning window (days)"
+msgstr ""
+
+#: src/Premium__premium_only/Admin/ReceivingSection.php:82
+msgid "Expiry alert recipients"
+msgstr ""
+
+#: src/Premium__premium_only/Admin/ReceivingSection.php:82
+msgid "Save expiry alerts"
+msgstr ""
+
+#: src/Premium__premium_only/Admin/ReceivingSection.php:83
 msgid "Add supplier"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:74
+#: src/Premium__premium_only/Admin/ReceivingSection.php:83
 msgid "Supplier name"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:74
+#: src/Premium__premium_only/Admin/ReceivingSection.php:83
 msgid "Email"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:74
+#: src/Premium__premium_only/Admin/ReceivingSection.php:83
 msgid "Lead time (days)"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:75
+#: src/Premium__premium_only/Admin/ReceivingSection.php:84
 msgid "Define supplier pack"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:75
+#: src/Premium__premium_only/Admin/ReceivingSection.php:84
 msgid "Examples include a sack, drum, case, or pallet. The quantity is stored exactly for the selected pool."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:75
-#: src/Premium__premium_only/Admin/ReceivingSection.php:98
-#: src/Premium__premium_only/Admin/ReceivingSection.php:103
-#: src/Premium__premium_only/Admin/ReceivingSection.php:140
+#: src/Premium__premium_only/Admin/ReceivingSection.php:84
+#: src/Premium__premium_only/Admin/ReceivingSection.php:107
+#: src/Premium__premium_only/Admin/ReceivingSection.php:112
+#: src/Premium__premium_only/Admin/ReceivingSection.php:153
 msgid "Supplier"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:79
+#: src/Premium__premium_only/Admin/ReceivingSection.php:88
 msgid "Pack name"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:79
+#: src/Premium__premium_only/Admin/ReceivingSection.php:88
 msgid "25 kg sack"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:79
+#: src/Premium__premium_only/Admin/ReceivingSection.php:88
 msgid "Quantity in the pool display unit"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:79
+#: src/Premium__premium_only/Admin/ReceivingSection.php:88
 msgid "Define pack"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:80
+#: src/Premium__premium_only/Admin/ReceivingSection.php:89
 msgid "Receive stock now"
 msgstr ""
 
 #. translators: %s: unit.
-#: src/Premium__premium_only/Admin/ReceivingSection.php:80
-#: src/Premium__premium_only/Admin/ReceivingSection.php:85
+#: src/Premium__premium_only/Admin/ReceivingSection.php:89
+#: src/Premium__premium_only/Admin/ReceivingSection.php:94
 #: src/Premium__premium_only/Admin/ReorderSection.php:80
 msgid "Supplier pack"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:84
+#: src/Premium__premium_only/Admin/ReceivingSection.php:93
 msgid "Packages received"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:84
+#: src/Premium__premium_only/Admin/ReceivingSection.php:93
 msgid "Supplier lot (optional)"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:84
+#: src/Premium__premium_only/Admin/ReceivingSection.php:93
 msgid "Expiry date (optional)"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:84
+#: src/Premium__premium_only/Admin/ReceivingSection.php:93
 msgid "Total material cost (optional)"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:84
+#: src/Premium__premium_only/Admin/ReceivingSection.php:93
 msgid "used for weighted-average material economics only; retail prices are never changed."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:84
+#: src/Premium__premium_only/Admin/ReceivingSection.php:93
 msgid "Delivery reference"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:84
+#: src/Premium__premium_only/Admin/ReceivingSection.php:93
 msgid "Receive into stock"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:85
-#: src/Premium__premium_only/Admin/ReceivingSection.php:89
+#: src/Premium__premium_only/Admin/ReceivingSection.php:94
+#: src/Premium__premium_only/Admin/ReceivingSection.php:98
 msgid "Schedule incoming stock"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:85
+#: src/Premium__premium_only/Admin/ReceivingSection.php:94
 msgid "Incoming quantities remain separate from on-hand stock until you confirm their arrival."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:89
+#: src/Premium__premium_only/Admin/ReceivingSection.php:98
 msgid "Packages expected"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:89
+#: src/Premium__premium_only/Admin/ReceivingSection.php:98
 msgid "Expected arrival"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:89
+#: src/Premium__premium_only/Admin/ReceivingSection.php:98
 msgid "Order or delivery reference"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:90
+#: src/Premium__premium_only/Admin/ReceivingSection.php:99
 msgid "Incoming deliveries"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:94
+#: src/Premium__premium_only/Admin/ReceivingSection.php:103
 msgid "No incoming stock is currently scheduled."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:98
+#: src/Premium__premium_only/Admin/ReceivingSection.php:107
 msgid "Expected"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:98
-#: src/Premium__premium_only/Admin/ReceivingSection.php:140
+#: src/Premium__premium_only/Admin/ReceivingSection.php:107
+#: src/Premium__premium_only/Admin/ReceivingSection.php:153
 msgid "Pack"
 msgstr ""
 
 #. translators: %s: unit.
-#: src/Premium__premium_only/Admin/ReceivingSection.php:98
-#: src/Premium__premium_only/Admin/ReceivingSection.php:103
-#: src/Premium__premium_only/Admin/ReceivingSection.php:140
+#: src/Premium__premium_only/Admin/ReceivingSection.php:107
+#: src/Premium__premium_only/Admin/ReceivingSection.php:112
+#: src/Premium__premium_only/Admin/ReceivingSection.php:153
 #: src/Premium__premium_only/Admin/ReorderSection.php:80
 #: src/Premium__premium_only/Admin/ReservationsSection.php:49
 msgid "Pool"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:98
+#: src/Premium__premium_only/Admin/ReceivingSection.php:107
 msgid "Incoming quantity"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:98
-#: src/Premium__premium_only/Admin/ReceivingSection.php:140
+#: src/Premium__premium_only/Admin/ReceivingSection.php:107
+#: src/Premium__premium_only/Admin/ReceivingSection.php:153
 msgid "Reference"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:98
+#: src/Premium__premium_only/Admin/ReceivingSection.php:107
 msgid "Action"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:102
-#: src/Premium__premium_only/Admin/ReceivingSection.php:103
+#: src/Premium__premium_only/Admin/ReceivingSection.php:111
+#: src/Premium__premium_only/Admin/ReceivingSection.php:112
 msgid "Supplier lot"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:102
+#: src/Premium__premium_only/Admin/ReceivingSection.php:111
 msgid "Expiry date"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:102
+#: src/Premium__premium_only/Admin/ReceivingSection.php:111
 msgid "Mark received"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:103
+#: src/Premium__premium_only/Admin/ReceivingSection.php:112
 msgid "Received batches and lots"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:103
+#: src/Premium__premium_only/Admin/ReceivingSection.php:112
 msgid "Each receipt creates a traceable batch. Empty supplier-lot and expiry fields remain valid and can be completed by later batch workflows."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:103
-#: src/Premium__premium_only/Admin/ReceivingSection.php:140
+#: src/Premium__premium_only/Admin/ReceivingSection.php:112
+#: src/Premium__premium_only/Admin/ReceivingSection.php:153
 msgid "Received"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:103
+#: src/Premium__premium_only/Admin/ReceivingSection.php:112
 msgid "Expiry"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:103
+#: src/Premium__premium_only/Admin/ReceivingSection.php:112
 msgid "Received quantity"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:103
+#: src/Premium__premium_only/Admin/ReceivingSection.php:112
 msgid "Available in batch"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:103
+#: src/Premium__premium_only/Admin/ReceivingSection.php:112
 msgid "Recall"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:105
+#: src/Premium__premium_only/Admin/ReceivingSection.php:114
 msgid "Not supplied"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:105
+#: src/Premium__premium_only/Admin/ReceivingSection.php:114
 msgid "No expiry"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:109
+#: src/Premium__premium_only/Admin/ReceivingSection.php:118
+msgid "Record expired stock as waste"
+msgstr ""
+
+#: src/Premium__premium_only/Admin/ReceivingSection.php:122
 msgid "Reason (optional)"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:109
+#: src/Premium__premium_only/Admin/ReceivingSection.php:122
 msgid "Quarantine batch"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:109
+#: src/Premium__premium_only/Admin/ReceivingSection.php:122
 msgid "Release batch"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:109
+#: src/Premium__premium_only/Admin/ReceivingSection.php:122
 msgid "Counted quantity"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:109
+#: src/Premium__premium_only/Admin/ReceivingSection.php:122
 msgid "Save batch count"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:109
+#: src/Premium__premium_only/Admin/ReceivingSection.php:122
 msgid "Write off batch"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:109
+#: src/Premium__premium_only/Admin/ReceivingSection.php:122
 msgid "Destination pool"
 msgstr ""
 
 #. translators: %s: source pool display unit.
-#: src/Premium__premium_only/Admin/ReceivingSection.php:109
+#: src/Premium__premium_only/Admin/ReceivingSection.php:122
 #, php-format
 msgid "Transfer quantity (%s)"
 msgstr ""
 
 #. translators: %s: source pool display unit.
-#: src/Premium__premium_only/Admin/ReceivingSection.php:109
+#: src/Premium__premium_only/Admin/ReceivingSection.php:122
 msgid "Transfer reason"
 msgstr ""
 
 #. translators: %s: source pool display unit.
-#: src/Premium__premium_only/Admin/ReceivingSection.php:109
+#: src/Premium__premium_only/Admin/ReceivingSection.php:122
 msgid "Transfer batch stock"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:113
+#: src/Premium__premium_only/Admin/ReceivingSection.php:126
 msgid "Write off recalled stock"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:130
+#: src/Premium__premium_only/Admin/ReceivingSection.php:143
 msgid "Review recall"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:133
+#: src/Premium__premium_only/Admin/ReceivingSection.php:146
 msgid "Recall confirmed"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:139
+#: src/Premium__premium_only/Admin/ReceivingSection.php:152
 msgid "CSV exchange"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:139
+#: src/Premium__premium_only/Admin/ReceivingSection.php:152
 msgid "Export or import the versioned supplier, pack, incoming-delivery, and reorder-policy schema."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:139
+#: src/Premium__premium_only/Admin/ReceivingSection.php:152
 msgid "Export operations CSV"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:139
+#: src/Premium__premium_only/Admin/ReceivingSection.php:152
 msgid "Operations CSV"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:139
+#: src/Premium__premium_only/Admin/ReceivingSection.php:152
 msgid "Import operations CSV"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:140
+#: src/Premium__premium_only/Admin/ReceivingSection.php:153
 msgid "Recent receipts"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:140
+#: src/Premium__premium_only/Admin/ReceivingSection.php:153
 msgid "Quantity"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:159
+#: src/Premium__premium_only/Admin/ReceivingSection.php:172
 msgid "Review batch recall"
 msgstr ""
 
 #. translators: %s: supplier lot or batch number.
-#: src/Premium__premium_only/Admin/ReceivingSection.php:159
+#: src/Premium__premium_only/Admin/ReceivingSection.php:172
 #, php-format
 msgid "Review the affected orders for batch %s before confirming."
 msgstr ""
 
 #. translators: %s: supplier lot or batch number.
-#: src/Premium__premium_only/Admin/ReceivingSection.php:159
+#: src/Premium__premium_only/Admin/ReceivingSection.php:172
 msgid "Confirming a recall makes all remaining batch stock unavailable. Customers are never contacted automatically."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:163
+#: src/Premium__premium_only/Admin/ReceivingSection.php:176
 msgid "No orders currently contain outstanding quantity from this batch."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:164
+#: src/Premium__premium_only/Admin/ReceivingSection.php:177
 msgid "Order"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:164
+#: src/Premium__premium_only/Admin/ReceivingSection.php:177
 msgid "Quantity from batch"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:164
+#: src/Premium__premium_only/Admin/ReceivingSection.php:177
 msgid "Last allocated"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:179
+#: src/Premium__premium_only/Admin/ReceivingSection.php:192
 msgid "Recall reason"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:179
+#: src/Premium__premium_only/Admin/ReceivingSection.php:192
 msgid "Confirm batch recall"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:186
+#: src/Premium__premium_only/Admin/ReceivingSection.php:199
 msgid "Supplier added."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:187
+#: src/Premium__premium_only/Admin/ReceivingSection.php:200
 msgid "Supplier pack defined."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:188
+#: src/Premium__premium_only/Admin/ReceivingSection.php:201
 msgid "Supplier stock received."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:189
+#: src/Premium__premium_only/Admin/ReceivingSection.php:202
 msgid "Incoming stock scheduled."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:190
+#: src/Premium__premium_only/Admin/ReceivingSection.php:203
 msgid "Incoming stock moved into on-hand inventory."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:191
+#: src/Premium__premium_only/Admin/ReceivingSection.php:204
 msgid "Batch quarantined."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:192
+#: src/Premium__premium_only/Admin/ReceivingSection.php:205
 msgid "Batch released."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:193
+#: src/Premium__premium_only/Admin/ReceivingSection.php:206
 msgid "Batch written off."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:194
+#: src/Premium__premium_only/Admin/ReceivingSection.php:207
 msgid "Batch count saved."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:195
+#: src/Premium__premium_only/Admin/ReceivingSection.php:208
 msgid "Batch recall confirmed. Customers were not contacted."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:196
+#: src/Premium__premium_only/Admin/ReceivingSection.php:209
 msgid "Batch stock transferred."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:197
+#: src/Premium__premium_only/Admin/ReceivingSection.php:210
+msgid "Batch expiry alert settings saved."
+msgstr ""
+
+#: src/Premium__premium_only/Admin/ReceivingSection.php:211
+msgid "Expired batch stock recorded as waste."
+msgstr ""
+
+#: src/Premium__premium_only/Admin/ReceivingSection.php:212
 msgid "The batch operation could not be completed."
 msgstr ""
 
 #. translators: 1: created rows, 2: skipped rows.
-#: src/Premium__premium_only/Admin/ReceivingSection.php:198
+#: src/Premium__premium_only/Admin/ReceivingSection.php:213
 #, php-format
 msgid "CSV imported: %1$d created, %2$d already present."
 msgstr ""
 
 #. translators: 1: created rows, 2: skipped rows.
-#: src/Premium__premium_only/Admin/ReceivingSection.php:199
+#: src/Premium__premium_only/Admin/ReceivingSection.php:214
 msgid "The operations CSV could not be imported."
 msgstr ""
 
-#: src/Premium__premium_only/Admin/ReceivingSection.php:200
+#: src/Premium__premium_only/Admin/ReceivingSection.php:215
 msgid "The receiving operation could not be completed."
 msgstr ""
 
@@ -1259,6 +1295,30 @@ msgstr ""
 msgid "%1$s is at %2$s stock with a current balance of %3$s."
 msgstr ""
 
+#. translators: %s: supplier lot or batch ID.
+#: src/Premium__premium_only/Batches/BatchExpiryEvaluator.php:101
+#, php-format
+msgid "Expired batch: %s"
+msgstr ""
+
+#. translators: %s: supplier lot or batch ID.
+#: src/Premium__premium_only/Batches/BatchExpiryEvaluator.php:104
+#, php-format
+msgid "Batch nearing expiry: %s"
+msgstr ""
+
+#. translators: %d: normalized base-unit quantity.
+#: src/Premium__premium_only/Batches/BatchExpiryEvaluator.php:114
+#, php-format
+msgid "%d base units"
+msgstr ""
+
+#. translators: 1: batch, 2: pool, 3: quantity, 4: expiry date.
+#: src/Premium__premium_only/Batches/BatchExpiryEvaluator.php:124
+#, php-format
+msgid "Batch %1$s in %2$s has %3$s remaining and expires on %4$s."
+msgstr ""
+
 #: src/Premium__premium_only/Inventory/StockLossTypeCatalog.php:20
 msgid "Spillage"
 msgstr ""
@@ -1277,6 +1337,10 @@ msgstr ""
 
 #: src/Premium__premium_only/Inventory/StockLossTypeCatalog.php:24
 msgid "Samples or internal use"
+msgstr ""
+
+#: src/Premium__premium_only/Inventory/StockLossTypeCatalog.php:25
+msgid "Expired batch waste"
 msgstr ""
 
 #: src/Premium__premium_only/Reports/StockReportBuilder.php:61

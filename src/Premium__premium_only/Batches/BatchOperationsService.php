@@ -28,7 +28,7 @@ final class BatchOperationsService {
 		$this->batches->set_status( $batch_id, 'quarantined', 'active', $actor_id, $reason ); }
 	/** Confirm a merchant-reviewed recall without contacting customers. */ public function recall( int $batch_id, int $actor_id, string $reason ): void {
 		$this->batches->recall( $batch_id, $actor_id, $reason ); }
-	/** Permanently remove the remaining selected batch quantity. */ public function write_off( int $batch_id, int $actor_id ): void {
+	/** Permanently remove the remaining selected batch quantity. */ public function write_off( int $batch_id, int $actor_id, string $type = 'loss_damage', string $reason = 'Batch write-off' ): void {
 		$batch    = $this->required( $batch_id );
 		$quantity = (int) $batch['quantity_available_base'];
 		if ( $quantity < 1 ) {
@@ -36,14 +36,14 @@ final class BatchOperationsService {
 		$this->mutations->apply(
 			(int) $batch['pool_id'],
 			-$quantity,
-			'loss_damage',
-			'batch-writeoff:' . $batch_id,
+			$type,
+			'batch-writeoff:' . $type . ':' . $batch_id,
 			array(
 				'source_type' => 'batch',
 				'source_id'   => $batch_id,
 				'batch_id'    => $batch_id,
 				'actor_id'    => $actor_id,
-				'reason'      => 'Batch write-off',
+				'reason'      => $reason,
 			)
 		); }
 	/** Set the counted remaining quantity and reconcile the pool by the same delta. */ public function stocktake( int $batch_id, int $target, int $actor_id ): void {

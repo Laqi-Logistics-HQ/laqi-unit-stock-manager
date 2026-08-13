@@ -42,7 +42,10 @@ require_once __DIR__ . '/Premium__premium_only/Batches/ExpiredBatchAvailability.
 require_once __DIR__ . '/Premium__premium_only/Batches/BatchOperationsService.php';
 require_once __DIR__ . '/Premium__premium_only/Batches/BatchTransferReceiver.php';
 require_once __DIR__ . '/Premium__premium_only/Batches/BatchTransferService.php';
+require_once __DIR__ . '/Premium__premium_only/Batches/BatchExpirySettings.php';
+require_once __DIR__ . '/Premium__premium_only/Batches/BatchExpiryEvaluator.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/BatchOperationsController.php';
+require_once __DIR__ . '/Premium__premium_only/Admin/BatchExpiryController.php';
 require_once __DIR__ . '/Premium__premium_only/Receiving/ReceivingService.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/ReceivingController.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/ReceivingSection.php';
@@ -107,6 +110,7 @@ add_action(
 		( new Premium\Batches\ExpiredBatchAvailability( $batches ) )->register();
 		$batch_operations   = new Premium\Batches\BatchOperationsService( $batches, $container->stock_mutation_service() );
 		$batch_transfers    = new Premium\Batches\BatchTransferService( $batches, $container->pool_repository(), $container->stock_mutation_service() );
+		$batch_expiry       = new Premium\Batches\BatchExpirySettings();
 		$material_economics = new Premium\Costing\MaterialEconomicsService( $material_costs );
 		$reservations       = new Premium\Reservations\ReservationRepository( $wpdb );
 		$reservations->install();
@@ -138,7 +142,7 @@ add_action(
 		$container->screen_section_catalog()->register( new Premium\Admin\ForecastSection( $container->pool_repository(), $forecast_policies, $forecast_service, $container->quantity_formatter(), new Admin\PaginationRenderer() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\StockReportSection( $report_settings ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\StockScenarioSection( $container->pool_repository(), $scenario_planner, $container->quantity_formatter() ) );
-		$container->screen_section_catalog()->register( new Premium\Admin\ReceivingSection( $suppliers, $container->pool_repository(), $container->quantity_formatter(), $batches, $batch_allocations ) );
+		$container->screen_section_catalog()->register( new Premium\Admin\ReceivingSection( $suppliers, $container->pool_repository(), $container->quantity_formatter(), $batches, $batch_allocations, $batch_expiry ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ReorderSection( $container->pool_repository(), $suppliers, $reorder_policies, $reorder_suggestions, $container->quantity_formatter() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\MaterialCostsSection( $material_economics, $container->mapping_repository() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ReservationsSection( $stock_holds, $container->pool_repository(), $container->quantity_formatter(), $safety_stock, $supply_projections ) );
@@ -149,15 +153,19 @@ add_action(
 		( new Premium\Admin\StockReportController( $report_settings, $report_scheduler ) )->register();
 		( new Premium\Admin\ReceivingController( $suppliers, $container->pool_repository(), $container->unit_registry(), $receiving ) )->register();
 		( new Premium\Admin\BatchOperationsController( $batch_operations, $batches, $container->unit_registry(), $batch_transfers ) )->register();
+		( new Premium\Admin\BatchExpiryController( $batch_expiry ) )->register();
 		( new Premium\Admin\ReorderController( $reorder_policies, $container->pool_repository(), $suppliers, $container->unit_registry() ) )->register();
 		( new Premium\Admin\CsvExchangeController( $csv_exchange ) )->register();
 		( new Premium\Admin\SupplyStateController( $stock_hold_service, $container->pool_repository(), $container->unit_registry(), $safety_stock ) )->register();
 		$report_scheduler->register();
 		$alert_evaluator = new Premium\Alerts\LowStockAlertEvaluator( $alert_policies, $container->pool_repository(), $container->quantity_formatter(), $alert_channels, $alert_deliveries );
 		$alert_evaluator->register();
+		$batch_expiry_evaluator = new Premium\Batches\BatchExpiryEvaluator( $batches, $batch_expiry, $container->quantity_formatter(), $alert_channels, $alert_deliveries );
+		$batch_expiry_evaluator->register();
 		register_deactivation_hook( LAQI_LUSM_FILE, array( $alert_evaluator, 'unschedule' ) );
 		register_deactivation_hook( LAQI_LUSM_FILE, array( $report_scheduler, 'unschedule' ) );
 		register_deactivation_hook( LAQI_LUSM_FILE, array( $reservation_service, 'unschedule' ) );
+		register_deactivation_hook( LAQI_LUSM_FILE, array( $batch_expiry_evaluator, 'unschedule' ) );
 		do_action( 'laqi_lusm_premium_ready', $container );
 	}
 );
