@@ -31,6 +31,13 @@ use LaqiUnitStockManager\Unit\UnitRegistry;
 final class Container {
 
 	/**
+	 * Memoized services without dedicated mutable registry properties.
+	 *
+	 * @var array<string,object>
+	 */
+	private $services = array();
+
+	/**
 	 * Admin section extensions.
 	 *
 	 * @var ScreenSectionCatalog|null
@@ -80,9 +87,13 @@ final class Container {
 	 * @return CustomUnitRepository
 	 */
 	public function custom_unit_repository(): CustomUnitRepository {
-		global $wpdb;
-
-		return new CustomUnitRepository( $wpdb );
+		return $this->remember(
+			'custom_unit_repository',
+			static function () {
+				global $wpdb;
+				return new CustomUnitRepository( $wpdb );
+			}
+		);
 	}
 
 	/**
@@ -91,14 +102,23 @@ final class Container {
 	 * @return StockMutationService
 	 */
 	public function stock_mutation_service(): StockMutationService {
-		global $wpdb;
-
-		return new StockMutationService( $wpdb );
+		return $this->remember(
+			'stock_mutation_service',
+			static function () {
+				global $wpdb;
+				return new StockMutationService( $wpdb );
+			}
+		);
 	}
 
 	/** Shared exact manual adjustment rules. @return StockAdjustmentService */
 	public function stock_adjustment_service(): StockAdjustmentService {
-		return new StockAdjustmentService( $this->pool_repository(), $this->unit_registry(), $this->stock_mutation_service() );
+		return $this->remember(
+			'stock_adjustment_service',
+			function () {
+				return new StockAdjustmentService( $this->pool_repository(), $this->unit_registry(), $this->stock_mutation_service() );
+			}
+		);
 	}
 
 	/**
@@ -107,9 +127,13 @@ final class Container {
 	 * @return PoolRepository
 	 */
 	public function pool_repository(): PoolRepository {
-		global $wpdb;
-
-		return new PoolRepository( $wpdb );
+		return $this->remember(
+			'pool_repository',
+			static function () {
+				global $wpdb;
+				return new PoolRepository( $wpdb );
+			}
+		);
 	}
 
 	/**
@@ -118,15 +142,24 @@ final class Container {
 	 * @return MappingRepository
 	 */
 	public function mapping_repository(): MappingRepository {
-		global $wpdb;
-
-		return new MappingRepository( $wpdb );
+		return $this->remember(
+			'mapping_repository',
+			static function () {
+				global $wpdb;
+				return new MappingRepository( $wpdb );
+			}
+		);
 	}
 
 	/** Movement ledger reads. @return MovementRepository */
 	public function movement_repository(): MovementRepository {
-		global $wpdb;
-		return new MovementRepository( $wpdb );
+		return $this->remember(
+			'movement_repository',
+			static function () {
+				global $wpdb;
+				return new MovementRepository( $wpdb );
+			}
+		);
 	}
 
 	/** Extensible movement types. @return MovementRegistry */
@@ -148,7 +181,12 @@ final class Container {
 
 	/** Shared movement presenter. @return MovementPresenter */
 	public function movement_presenter(): MovementPresenter {
-		return new MovementPresenter( $this->quantity_formatter(), $this->movement_registry() );
+		return $this->remember(
+			'movement_presenter',
+			function () {
+				return new MovementPresenter( $this->quantity_formatter(), $this->movement_registry() );
+			}
+		);
 	}
 
 	/**
@@ -171,10 +209,15 @@ final class Container {
 	 * @return AvailabilityService
 	 */
 	public function availability_service(): AvailabilityService {
-		return new AvailabilityService(
-			$this->mapping_repository(),
-			$this->pool_repository(),
-			$this->calculator_registry()
+		return $this->remember(
+			'availability_service',
+			function () {
+				return new AvailabilityService(
+					$this->mapping_repository(),
+					$this->pool_repository(),
+					$this->calculator_registry()
+				);
+			}
 		);
 	}
 
@@ -184,12 +227,22 @@ final class Container {
 	 * @return PoolPresenter
 	 */
 	public function pool_presenter(): PoolPresenter {
-		return new PoolPresenter( $this->quantity_formatter() );
+		return $this->remember(
+			'pool_presenter',
+			function () {
+				return new PoolPresenter( $this->quantity_formatter() );
+			}
+		);
 	}
 
 	/** Exact quantity display formatter. @return QuantityFormatter */
 	public function quantity_formatter(): QuantityFormatter {
-		return new QuantityFormatter( $this->unit_registry() );
+		return $this->remember(
+			'quantity_formatter',
+			function () {
+				return new QuantityFormatter( $this->unit_registry() );
+			}
+		);
 	}
 
 	/**
@@ -202,5 +255,19 @@ final class Container {
 			$this->screen_sections = new ScreenSectionCatalog();
 		}
 		return $this->screen_sections;
+	}
+
+	/**
+	 * Build one shared service on first access.
+	 *
+	 * @param string   $key     Stable internal service key.
+	 * @param callable $factory Service factory.
+	 * @return object
+	 */
+	private function remember( string $key, callable $factory ) {
+		if ( ! isset( $this->services[ $key ] ) ) {
+			$this->services[ $key ] = $factory();
+		}
+		return $this->services[ $key ];
 	}
 }
