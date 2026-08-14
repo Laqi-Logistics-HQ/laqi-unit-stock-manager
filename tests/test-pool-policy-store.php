@@ -39,9 +39,24 @@ class Test_Pool_Policy_Store extends WP_UnitTestCase {
 		$this->assertSame( array(), $store->get( $this->pool_id, 'unknown_policy' ) );
 	}
 
+	/** Policy enumeration exposes IDs without leaking the shared envelope. */
+	public function test_configured_ids_are_namespaced(): void {
+		$store = $this->container->pool_policy_store();
+		$store->put( $this->pool_id, 'alerts', array( 'threshold_base' => 4 ) );
+
+		$this->assertContains( $this->pool_id, $store->configured_ids( 'alerts' ) );
+		$this->assertNotContains( $this->pool_id, $store->configured_ids( 'forecast' ) );
+	}
+
 	/** Invalid namespace keys are rejected before persistence. */
 	public function test_invalid_namespace_is_rejected(): void {
 		$this->expectException( InvalidArgumentException::class );
 		$this->container->pool_policy_store()->put( $this->pool_id, 'Forecast Settings', array() );
+	}
+
+	/** Invalid enumeration namespaces are rejected before querying. */
+	public function test_invalid_enumeration_namespace_is_rejected(): void {
+		$this->expectException( InvalidArgumentException::class );
+		$this->container->pool_policy_store()->configured_ids( 'Forecast Settings' );
 	}
 }

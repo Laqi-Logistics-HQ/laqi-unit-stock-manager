@@ -48,6 +48,43 @@ final class PoolPolicyStore {
 	}
 
 	/**
+	 * List pool IDs that have an extension-owned policy namespace.
+	 *
+	 * The shared JSON envelope and table scan remain internal to Free. Add-ons can
+	 * combine these IDs with the public pool repository when they need scheduled
+	 * evaluation or an administration index.
+	 *
+	 * @param string $key Stable namespace key.
+	 * @return int[]
+	 * @throws InvalidArgumentException When the namespace is invalid.
+	 */
+	public function configured_ids( string $key ): array {
+		$this->assert_key( $key );
+		$ids    = array();
+		$offset = 0;
+		do {
+			$rows = $this->db->get_results(
+				$this->db->prepare(
+					'SELECT id, policy_json FROM ' . Schema::table( 'pools' ) . " WHERE policy_json IS NOT NULL AND policy_json != '' ORDER BY id ASC LIMIT %d OFFSET %d",
+					500,
+					$offset
+				),
+				ARRAY_A
+			);
+			$rows = is_array( $rows ) ? $rows : array();
+			foreach ( $rows as $row ) {
+				$envelope = json_decode( (string) $row['policy_json'], true );
+				if ( is_array( $envelope ) && isset( $envelope[ $key ] ) && is_array( $envelope[ $key ] ) ) {
+					$ids[] = (int) $row['id'];
+				}
+			}
+			$batch_size = count( $rows );
+			$offset    += $batch_size;
+		} while ( 500 === $batch_size );
+		return $ids;
+	}
+
+	/**
 	 * Replace one extension-owned policy namespace atomically.
 	 *
 	 * @param int                 $pool_id   Pool ID.
@@ -100,7 +137,21 @@ final class PoolPolicyStore {
 	 * @throws InvalidArgumentException When identifiers are invalid.
 	 */
 	private function assert_identifiers( int $pool_id, string $key ): void {
-		if ( $pool_id < 1 || ! preg_match( '/^[a-z][a-z0-9_]{1,49}$/', $key ) ) {
+		if ( $pool_id < 1 ) {
+			throw new InvalidArgumentException( 'The pool policy identifiers are invalid.' );
+		}
+		$this->assert_key( $key );
+	}
+
+	/**
+	 * Validate a public policy namespace.
+	 *
+	 * @param string $key Namespace key.
+	 * @return void
+	 * @throws InvalidArgumentException When the namespace is invalid.
+	 */
+	private function assert_key( string $key ): void {
+		if ( ! preg_match( '/^[a-z][a-z0-9_]{1,49}$/', $key ) ) {
 			throw new InvalidArgumentException( 'The pool policy identifiers are invalid.' );
 		}
 	}
