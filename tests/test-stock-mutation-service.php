@@ -10,10 +10,6 @@ use LaqiUnitStockManager\Inventory\StockMutationService;
 use LaqiUnitStockManager\Storage\Schema;
 use LaqiUnitStockManager\Storage\MovementRepository;
 use LaqiUnitStockManager\Container;
-use LaqiUnitStockManager\Premium\Alerts\AlertDeliveryRepository;
-use LaqiUnitStockManager\Premium\Alerts\WebhookAlertChannel;
-use LaqiUnitStockManager\Premium\Forecasting\ForecastPolicyRepository;
-use LaqiUnitStockManager\Premium\Forecasting\StockForecastService;
 
 /**
  * Tests the single authoritative stock mutation path.
@@ -228,91 +224,4 @@ class Test_Stock_Mutation_Service extends WP_UnitTestCase {
 		$this->assertSame( 7, (int) $row['actor_id'] );
 	}
 
-	/** Webhook alerts send signed JSON and return the HTTP outcome. */
-	public function test_webhook_alert_channel_signs_normalized_payload(): void {
-		$captured = array();
-		add_filter(
-			'pre_http_request',
-			static function ( $preempt, array $args, string $url ) use ( &$captured ) {
-				$captured = array( 'args' => $args, 'url' => $url );
-				return array( 'headers' => array(), 'body' => '', 'response' => array( 'code' => 202, 'message' => 'Accepted' ), 'cookies' => array(), 'filename' => null );
-			},
-			10,
-			3
-		);
-		$event  = array( 'event_id' => 'evt-1', 'event' => 'stock.alert', 'severity' => 'critical' );
-		$result = ( new WebhookAlertChannel() )->deliver( $event, array( 'webhook_url' => 'https://example.com/stock-hook', 'webhook_secret' => 'test-secret' ) );
-		$this->assertTrue( $result['success'] );
-		$this->assertSame( 'https://example.com/stock-hook', $captured['url'] );
-		$this->assertSame( 'application/json', $captured['args']['headers']['Content-Type'] );
-		$this->assertSame( 'sha256=' . hash_hmac( 'sha256', wp_json_encode( $event ), 'test-secret' ), $captured['args']['headers']['X-Laqi-Signature'] );
-		$this->assertSame( $event, json_decode( $captured['args']['body'], true ) );
-	}
-
-	/** Forecasts use sales demand while excluding stock losses and replenishment. */
-	public function test_stock_forecast_uses_only_sales_consumption(): void {
-		global $wpdb;
-		$now = time();
-		foreach ( array( 12, 8, 3 ) as $days_ago ) {
-			$wpdb->insert(
-				Schema::table( 'movements' ),
-				array( 'pool_id' => $this->pool_id, 'type' => 'order_reduction', 'delta_base' => -1000000000000, 'balance_base' => 0, 'idempotency_key' => 'forecast-sale-' . $this->pool_id . '-' . $days_ago, 'created_at' => gmdate( 'Y-m-d H:i:s', $now - ( $days_ago * DAY_IN_SECONDS ) ) )
-			);
-		}
-		$wpdb->insert( Schema::table( 'movements' ), array( 'pool_id' => $this->pool_id, 'type' => 'loss_damage', 'delta_base' => -5000000000000, 'balance_base' => 0, 'idempotency_key' => 'forecast-loss-' . $this->pool_id, 'created_at' => gmdate( 'Y-m-d H:i:s', $now - ( 5 * DAY_IN_SECONDS ) ) ) );
-		$wpdb->insert( Schema::table( 'movements' ), array( 'pool_id' => $this->pool_id, 'type' => 'manual_add', 'delta_base' => 9000000000000, 'balance_base' => 0, 'idempotency_key' => 'forecast-add-' . $this->pool_id, 'created_at' => gmdate( 'Y-m-d H:i:s', $now - ( 14 * DAY_IN_SECONDS ) ) ) );
-		$container = new Container();
-		$forecast  = ( new StockForecastService( new MovementRepository( $wpdb ) ) )->forecast( $container->pool_repository()->find( $this->pool_id ), 30, $now );
-		$this->assertSame( 'forecast', $forecast['state'] );
-		$this->assertSame( 3000000000000, $forecast['consumed_base'] );
-		$this->assertSame( 3, $forecast['demand_days'] );
-		$this->assertEqualsWithDelta( 50.0, $forecast['days_cover'], 0.01 );
-		$this->assertSame( 'low', $forecast['confidence'] );
-	}
-
-	/** Forecast settings preserve other pool policy modules. */
-	public function test_forecast_window_preserves_policy_envelope(): void {
-		global $wpdb;
-		$wpdb->update( Schema::table( 'pools' ), array( 'policy_json' => wp_json_encode( array( 'low_stock' => array( 'threshold_base' => 5 ) ) ) ), array( 'id' => $this->pool_id ) );
-		$policies = new ForecastPolicyRepository( $wpdb );
-		$policies->save_window( $this->pool_id, 60 );
-		$stored = json_decode( (string) $wpdb->get_var( $wpdb->prepare( 'SELECT policy_json FROM ' . Schema::table( 'pools' ) . ' WHERE id = %d', $this->pool_id ) ), true );
-		$this->assertSame( 60, $policies->window( $this->pool_id ) );
-		$this->assertSame( 5, $stored['low_stock']['threshold_base'] );
-		$policies->save_window( $this->pool_id, 1 );
-		$this->assertSame( 7, $policies->window( $this->pool_id ) );
-		$policies->save_window( $this->pool_id, 999 );
-		$this->assertSame( 365, $policies->window( $this->pool_id ) );
-	}
-
-	/** Forecast states distinguish a new pool from an established pool without demand. */
-	public function test_stock_forecast_reports_insufficient_data_and_no_demand(): void {
-		global $wpdb;
-		$now       = time();
-		$container = new Container();
-		$service   = new StockForecastService( new MovementRepository( $wpdb ) );
-		$pool      = $container->pool_repository()->find( $this->pool_id );
-		$this->assertSame( 'insufficient_data', $service->forecast( $pool, 30, $now )['state'] );
-		$wpdb->insert( Schema::table( 'movements' ), array( 'pool_id' => $this->pool_id, 'type' => 'manual_add', 'delta_base' => 1000000000000, 'balance_base' => 10000000000000, 'idempotency_key' => 'forecast-observation-' . $this->pool_id, 'created_at' => gmdate( 'Y-m-d H:i:s', $now - ( 14 * DAY_IN_SECONDS ) ) ) );
-		$forecast = $service->forecast( $pool, 30, $now );
-		$this->assertSame( 'no_demand', $forecast['state'] );
-		$this->assertSame( 15, $forecast['observed_days'] );
-		$this->assertSame( 0, $forecast['consumed_base'] );
-	}
-
-	/** Broad, frequent demand earns a high-confidence label. */
-	public function test_stock_forecast_confidence_reflects_history_depth(): void {
-		global $wpdb;
-		$now = time();
-		$wpdb->insert( Schema::table( 'movements' ), array( 'pool_id' => $this->pool_id, 'type' => 'opening', 'delta_base' => 0, 'balance_base' => 10000000000000, 'idempotency_key' => 'forecast-history-' . $this->pool_id, 'created_at' => gmdate( 'Y-m-d H:i:s', $now - ( 29 * DAY_IN_SECONDS ) ) ) );
-		for ( $day = 1; $day <= 14; ++$day ) {
-			$wpdb->insert( Schema::table( 'movements' ), array( 'pool_id' => $this->pool_id, 'type' => 'order_reduction', 'delta_base' => -1000000000, 'balance_base' => 0, 'idempotency_key' => 'forecast-confidence-' . $this->pool_id . '-' . $day, 'created_at' => gmdate( 'Y-m-d H:i:s', $now - ( $day * DAY_IN_SECONDS ) ) ) );
-		}
-		$container = new Container();
-		$forecast  = ( new StockForecastService( new MovementRepository( $wpdb ) ) )->forecast( $container->pool_repository()->find( $this->pool_id ), 30, $now );
-		$this->assertSame( 'forecast', $forecast['state'] );
-		$this->assertSame( 'high', $forecast['confidence'] );
-		$this->assertSame( 30, $forecast['observed_days'] );
-		$this->assertSame( 14, $forecast['demand_days'] );
-	}
 }

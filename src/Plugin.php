@@ -56,7 +56,6 @@ final class Plugin {
 	 * @return void
 	 */
 	public function boot(): void {
-		$this->load_premium_features();
 
 		// Translations load themselves. WordPress reads the Text Domain and Domain
 		// Path headers and loads the .mo file when a string is first translated,
@@ -87,23 +86,6 @@ final class Plugin {
 
 		// New add-ons receive only the documented, versioned public context.
 		do_action( 'laqi_lusm_extensions_ready', new ExtensionContext( $container ) );
-
-		// Transitional compatibility for the in-tree paid edition. New extensions
-		// must use laqi_lusm_extensions_ready; remove this hook after Pro extraction.
-		do_action( 'laqi_lusm_booted', $container );
-	}
-
-	/**
-	 * Load optional Pro wiring when the build contains it.
-	 *
-	 * @return void
-	 */
-	private function load_premium_features(): void {
-		$bootstrap = LAQI_LUSM_PATH . 'src/premium-bootstrap__premium_only.php';
-
-		if ( is_readable( $bootstrap ) ) {
-			require_once $bootstrap;
-		}
 	}
 
 	/**

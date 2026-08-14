@@ -113,7 +113,6 @@ final class Schema {
 			"CREATE TABLE {$moves} (
 				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 				pool_id bigint(20) unsigned NOT NULL,
-				batch_id bigint(20) unsigned NOT NULL DEFAULT 0,
 				type varchar(50) NOT NULL,
 				delta_base bigint(20) NOT NULL,
 				balance_base bigint(20) NOT NULL,
