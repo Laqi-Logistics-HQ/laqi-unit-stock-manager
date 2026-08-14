@@ -52,6 +52,105 @@ final class MappingRepository {
 	}
 
 	/**
+	 * Persist a mapping whose calculator consumes several pool components.
+	 *
+	 * This shared persistence seam lets physically removable calculators define
+	 * their own component rules without teaching Free code about paid types.
+	 *
+	 * @param int                $product_id       Parent/simple product ID.
+	 * @param int                $variation_id     Variation ID or zero.
+	 * @param string             $calculator_type  Registered calculator type.
+	 * @param MappingComponent[] $components       Positive component definitions.
+	 * @param bool               $replace          Whether an existing mapping may be replaced.
+	 * @param int|null           $expected_version Optional version required for an edit.
+	 * @return ProductMapping
+	 * @throws \InvalidArgumentException When mapping input is invalid.
+	 * @throws RuntimeException When persistence fails or optimistic locking fails.
+	 * @throws \Throwable When transactional persistence fails.
+	 */
+	public function save_components( int $product_id, int $variation_id, string $calculator_type, array $components, bool $replace = true, ?int $expected_version = null ): ProductMapping {
+		if ( $product_id < 1 || '' === $calculator_type || array() === $components ) {
+			throw new \InvalidArgumentException( 'A component mapping requires a product, calculator, and components.' );
+		}
+
+		$seen = array();
+		foreach ( $components as $component ) {
+			if ( ! $component instanceof MappingComponent || $component->pool_id() < 1 || $component->consumption() < 1 || '' === $component->role() ) {
+				throw new \InvalidArgumentException( 'Every mapping component requires a pool, positive consumption, and role.' );
+			}
+			$key = $component->pool_id() . ':' . $component->role();
+			if ( isset( $seen[ $key ] ) ) {
+				throw new \InvalidArgumentException( 'A mapping cannot repeat the same pool and component role.' );
+			}
+			$seen[ $key ] = true;
+		}
+
+		$now = current_time( 'mysql', true );
+		$this->db->query( 'START TRANSACTION' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		try {
+			$row        = $this->db->get_row(
+				$this->db->prepare( 'SELECT id, version FROM ' . Schema::table( 'mappings' ) . ' WHERE product_id = %d AND variation_id = %d FOR UPDATE', $product_id, $variation_id ),
+				ARRAY_A
+			);
+			$mapping_id = is_array( $row ) ? (int) $row['id'] : 0;
+			if ( $mapping_id > 0 && ! $replace ) {
+				throw new RuntimeException( 'A mapping already exists for this product or variation.' );
+			}
+			if ( null !== $expected_version && ( 0 === $mapping_id || (int) $row['version'] !== $expected_version ) ) {
+				throw new RuntimeException( 'The product mapping changed before this edit was saved.' );
+			}
+			if ( $mapping_id > 0 ) {
+				$updated = $this->db->query( $this->db->prepare( 'UPDATE ' . Schema::table( 'mappings' ) . ' SET calculator_type = %s, active = 1, version = version + 1, updated_at = %s WHERE id = %d', $calculator_type, $now, $mapping_id ) );
+				if ( false === $updated || false === $this->db->delete( Schema::table( 'mapping_components' ), array( 'mapping_id' => $mapping_id ), array( '%d' ) ) ) {
+					throw new RuntimeException( 'Could not update the product mapping.' );
+				}
+			} else {
+				$inserted = $this->db->insert(
+					Schema::table( 'mappings' ),
+					array(
+						'product_id'      => $product_id,
+						'variation_id'    => $variation_id,
+						'calculator_type' => $calculator_type,
+						'created_at'      => $now,
+						'updated_at'      => $now,
+					),
+					array( '%d', '%d', '%s', '%s', '%s' )
+				);
+				if ( false === $inserted ) {
+					throw new RuntimeException( 'Could not create the product mapping.' );
+				}
+				$mapping_id = (int) $this->db->insert_id;
+			}
+
+			foreach ( array_values( $components ) as $position => $component ) {
+				$inserted = $this->db->insert(
+					Schema::table( 'mapping_components' ),
+					array(
+						'mapping_id'       => $mapping_id,
+						'pool_id'          => $component->pool_id(),
+						'consumption_base' => $component->consumption(),
+						'role_key'         => $component->role(),
+						'position'         => $position,
+						'created_at'       => $now,
+						'updated_at'       => $now,
+					),
+					array( '%d', '%d', '%d', '%s', '%d', '%s', '%s' )
+				);
+				if ( false === $inserted ) {
+					throw new RuntimeException( 'Could not create a mapping component.' );
+				}
+			}
+			$this->db->query( 'COMMIT' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		} catch ( \Throwable $error ) {
+			$this->db->query( 'ROLLBACK' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			throw $error;
+		}
+
+		$version = (int) $this->db->get_var( $this->db->prepare( 'SELECT version FROM ' . Schema::table( 'mappings' ) . ' WHERE id = %d', $mapping_id ) );
+		return new ProductMapping( $mapping_id, $product_id, $variation_id, $calculator_type, array_values( $components ), $version );
+	}
+
+	/**
 	 * Create or update an explicit single-pool mapping.
 	 *
 	 * @param int      $product_id       Parent/simple product ID.

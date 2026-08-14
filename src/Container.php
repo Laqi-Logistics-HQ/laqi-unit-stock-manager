@@ -52,6 +52,13 @@ final class Container {
 	private $movement_registry;
 
 	/**
+	 * Runtime consumption calculators, including paid extensions.
+	 *
+	 * @var CalculatorRegistry|null
+	 */
+	private $calculator_registry;
+
+	/**
 	 * Runtime unit registry, including merchant units.
 	 *
 	 * @return UnitRegistry
@@ -150,7 +157,12 @@ final class Container {
 	 * @return CalculatorRegistry
 	 */
 	public function calculator_registry(): CalculatorRegistry {
-		return new CalculatorRegistry();
+		if ( null === $this->calculator_registry ) {
+			$this->calculator_registry = new CalculatorRegistry();
+			do_action( 'laqi_lusm_register_calculators', $this->calculator_registry );
+		}
+
+		return $this->calculator_registry;
 	}
 
 	/**
