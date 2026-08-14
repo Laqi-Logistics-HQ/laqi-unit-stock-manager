@@ -54,17 +54,20 @@ This plugin is its own git repo. To ship a version, publish a **GitHub Release**
 
 - `laqi-unit-stock-manager-<version>-woocommerce.zip` — the active channel (WooCommerce.com
   handles updates/licensing; the Freemius SDK is stripped).
-- `laqi-unit-stock-manager-<version>-freemius.zip` — ready for when the Freemius SDK is added.
+- `laqi-unit-stock-manager-<version>-freemius.zip` — a channel package only; do not
+  distribute it until the Freemius product and SDK are configured and the package
+  contains the SDK bootstrap.
 - `laqi-unit-stock-manager-<version>-wordpressorg.zip` — complete Free edition with
   every `__premium_only` file physically removed.
 
 The workflow is **OFF until** you set the repo variable
 `RELEASE_BUILDS_ENABLED=true` (`gh variable set RELEASE_BUILDS_ENABLED --body true`).
-Every pull request still runs `quality.yml`: coding standards, PHP syntax,
-PHPUnit across the supported PHP/WordPress matrix, and all three channel archive
-checks. It also starts a real WordPress/WooCommerce environment and runs an
-authenticated Playwright + axe admin-quality gate. Customize the plugin URL and
-root selectors in `tests/e2e/admin-quality.spec.js` when scaffolding a plugin.
+The merge-gated `quality.yml` workflow runs on pushes to `main`, manual dispatch,
+and release workflow calls; it intentionally does not run on pull requests.
+Before merging a PR, run the relevant checks locally. The hosted gate covers
+coding standards, PHP syntax, PHPUnit across the supported PHP/WordPress matrix,
+all three channel archives, and an authenticated Playwright + axe admin-quality
+test in a real WordPress/WooCommerce environment.
 Complete the manual screen-reader, keyboard, zoom, contrast, and performance
 checks in `docs/release-quality-checklist.md` before a Marketplace upload.
 Releases call that same workflow and cannot package until it passes.
