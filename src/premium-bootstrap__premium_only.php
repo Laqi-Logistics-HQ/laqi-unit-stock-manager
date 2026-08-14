@@ -13,9 +13,6 @@ require_once __DIR__ . '/Premium__premium_only/Admin/MovementLedgerSection.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/MovementLedgerExportController.php';
 require_once __DIR__ . '/Premium__premium_only/Anomalies/StockAnomalyDetector.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/StockAnomaliesSection.php';
-require_once __DIR__ . '/Premium__premium_only/Inventory/StockLossTypeCatalog.php';
-require_once __DIR__ . '/Premium__premium_only/Admin/StockLossController.php';
-require_once __DIR__ . '/Premium__premium_only/Admin/StockLossSection.php';
 require_once __DIR__ . '/Premium__premium_only/Alerts/LowStockPolicyRepository.php';
 require_once __DIR__ . '/Premium__premium_only/Alerts/LowStockAlertEvaluator.php';
 require_once __DIR__ . '/Premium__premium_only/Alerts/AlertChannelInterface.php';
@@ -104,7 +101,6 @@ add_action(
 add_action(
 	'laqi_lusm_booted',
 	static function ( Container $container ): void {
-		$loss_types = new Premium\Inventory\StockLossTypeCatalog();
 		global $wpdb;
 		$alert_policies   = new Premium\Alerts\LowStockPolicyRepository( $wpdb );
 		$alert_deliveries = new Premium\Alerts\AlertDeliveryRepository( $wpdb );
@@ -153,7 +149,6 @@ add_action(
 		$csv_mappers->register( new Premium\Exchange\IncomingCsvRowMapper( $suppliers, $container->pool_repository() ) );
 		$csv_mappers->register( new Premium\Exchange\ReorderCsvRowMapper( $container->pool_repository(), $suppliers, $reorder_policies, $container->quantity_formatter(), $container->unit_registry() ) );
 		$csv_exchange = new Premium\Exchange\OperationsCsvService( $csv_mappers );
-		$loss_types->register( $container->movement_registry() );
 		$container->movement_registry()->register( new Inventory\MovementType( 'supplier_receipt', __( 'Supplier receipt', 'laqi-unit-stock-manager' ) ) );
 		$container->movement_registry()->register( new Inventory\MovementType( 'batch_transfer_out', __( 'Batch transfer out', 'laqi-unit-stock-manager' ) ) );
 		$container->movement_registry()->register( new Inventory\MovementType( 'batch_transfer_in', __( 'Batch transfer in', 'laqi-unit-stock-manager' ) ) );
@@ -162,7 +157,6 @@ add_action(
 		$container->screen_section_catalog()->register( new Premium\Admin\MovementLedgerSection( $container->movement_repository(), $container->movement_presenter(), new Admin\PaginationRenderer() ) );
 		$anomaly_detector = new Premium\Anomalies\StockAnomalyDetector( $container->movement_repository(), $container->mapping_repository(), new Diagnostics\MappingDiagnostics() );
 		$container->screen_section_catalog()->register( new Premium\Admin\StockAnomaliesSection( $anomaly_detector ) );
-		$container->screen_section_catalog()->register( new Premium\Admin\StockLossSection( $container->pool_repository(), $container->quantity_formatter(), $loss_types ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\LowStockAlertsSection( $alert_policies, $container->pool_repository(), $container->quantity_formatter(), $alert_deliveries ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ForecastSection( $container->pool_repository(), $forecast_policies, $forecast_service, $container->quantity_formatter(), new Admin\PaginationRenderer() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\StockReportSection( $report_settings ) );
@@ -174,7 +168,6 @@ add_action(
 		$container->screen_section_catalog()->register( new Premium\Admin\RecipeSection( $container->unit_registry() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\MobileStocktakeSection() );
 		( new Premium\Admin\MovementLedgerExportController( $container->movement_repository(), $container->movement_presenter() ) )->register();
-		( new Premium\Admin\StockLossController( $container->stock_adjustment_service(), $loss_types ) )->register();
 		( new Premium\Admin\LowStockAlertController( $alert_policies, $container->pool_repository(), $container->unit_registry() ) )->register();
 		( new Premium\Admin\ForecastController( $forecast_policies, $container->pool_repository() ) )->register();
 		( new Premium\Admin\StockReportController( $report_settings, $report_scheduler ) )->register();

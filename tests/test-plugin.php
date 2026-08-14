@@ -93,4 +93,14 @@ class Test_Plugin extends WP_UnitTestCase {
 		$this->assertTrue( apply_filters( 'laqi_lusm_adjustment_authorized', true, 1, 1, 'manual_add', 1, 'Count' ) );
 		$this->assertSame( array(), apply_filters( 'laqi_lusm_adjustment_reason_templates', array(), 'manual' ) );
 	}
+
+	/**
+	 * The typed stock-loss UI and movement catalog live in the Pro add-on.
+	 */
+	public function test_stock_loss_implementation_is_not_bundled(): void {
+		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Inventory\StockLossTypeCatalog' ) );
+		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Admin\StockLossSection' ) );
+		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Admin\StockLossController' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_record_loss' ) );
+	}
 }
