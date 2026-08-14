@@ -145,4 +145,13 @@ class Test_Plugin extends WP_UnitTestCase {
 		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Admin\ForecastController' ) );
 		$this->assertFalse( has_action( 'admin_post_laqi_lusm_save_forecast' ) );
 	}
+
+	/**
+	 * Read-only pricing rule fields belong only to the Pro add-on.
+	 */
+	public function test_pricing_rule_field_provider_is_not_bundled(): void {
+		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Integrations\StockPricingRuleFieldProvider' ) );
+		$this->assertFalse( has_filter( 'laqi_lusm_read_only_rule_field_catalog' ) );
+		$this->assertFalse( has_filter( 'laqi_lusm_read_only_rule_field_values' ) );
+	}
 }

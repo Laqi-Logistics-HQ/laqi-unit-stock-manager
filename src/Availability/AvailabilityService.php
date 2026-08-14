@@ -125,4 +125,15 @@ final class AvailabilityService {
 
 		return PHP_INT_MAX === $max ? null : $max;
 	}
+
+	/**
+	 * Return the filtered quantity currently available from one pool.
+	 *
+	 * @param int $pool_id Inventory pool ID.
+	 * @return int Zero when the pool does not exist.
+	 */
+	public function pool_quantity( int $pool_id ): int {
+		$pool = $this->pools->find( $pool_id );
+		return null === $pool ? 0 : (int) apply_filters( 'laqi_lusm_pool_available_quantity', $pool->quantity()->amount(), $pool_id );
+	}
 }

@@ -66,7 +66,6 @@ require_once __DIR__ . '/Premium__premium_only/Supply/SupplyProjectionService.ph
 require_once __DIR__ . '/Premium__premium_only/Admin/SupplyStateController.php';
 require_once __DIR__ . '/Premium__premium_only/Integrations/SubscriptionRenewalAdapter.php';
 require_once __DIR__ . '/Premium__premium_only/Integrations/MobileOrderAdapter.php';
-require_once __DIR__ . '/Premium__premium_only/Integrations/StockPricingRuleFieldProvider.php';
 
 /**
  * Give physically separate paid modules the completed shared composition root.
@@ -145,7 +144,6 @@ add_action(
 		( new Premium\Integrations\SubscriptionRenewalAdapter( $renewal_snapshots, $reservation_service ) )->register();
 		$mobile_snapshots = new WooCommerce\OrderItemSnapshotter( $container->mapping_repository(), $container->calculator_registry() );
 		( new Premium\Integrations\MobileOrderAdapter( $mobile_snapshots, $reservation_service ) )->register();
-		( new Premium\Integrations\StockPricingRuleFieldProvider( $container->mapping_repository(), $container->pool_repository(), $container->calculator_registry(), $container->availability_service(), $forecast_policies, $forecast_service ) )->register();
 		$report_scheduler->register();
 		$alert_evaluator = new Premium\Alerts\LowStockAlertEvaluator( $alert_policies, $container->pool_repository(), $container->quantity_formatter(), $alert_channels, $alert_deliveries );
 		$alert_evaluator->register();
