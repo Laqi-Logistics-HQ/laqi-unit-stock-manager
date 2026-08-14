@@ -8,7 +8,12 @@
 namespace LaqiUnitStockManager;
 
 use LaqiUnitStockManager\Storage\Schema;
-use LaqiUnitStockManager\Diagnostics\MappingDiagnostics;
+use LaqiUnitStockManager\Extension\ExtensionContext;
+use LaqiUnitStockManager\Module\AdminModule;
+use LaqiUnitStockManager\Module\InventoryModule;
+use LaqiUnitStockManager\Module\PrivacyModule;
+use LaqiUnitStockManager\Module\RestModule;
+use LaqiUnitStockManager\Module\WooCommerceModule;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -69,35 +74,22 @@ final class Plugin {
 
 		$this->maybe_upgrade_schema();
 		$container = new Container();
-		$container->unit_registry();
-		( new WooCommerce\CartValidator( $container->availability_service() ) )->register();
-		$snapshotter = new WooCommerce\OrderItemSnapshotter( $container->mapping_repository(), $container->calculator_registry() );
-		$snapshotter->register();
-		( new WooCommerce\OrderStockLifecycle( $container->stock_mutation_service(), $snapshotter ) )->register();
-		( new WooCommerce\ReducedOrderItemEditor( $container->stock_mutation_service(), $snapshotter ) )->register();
-		( new WooCommerce\StockStatusSynchronizer( $container->mapping_repository(), $container->availability_service() ) )->register();
-		$sections   = $container->screen_section_catalog();
-		$pagination = new Admin\PaginationRenderer();
-		$sections->register( new Admin\PoolStockSection( $container->pool_repository(), $container->pool_presenter(), $container->mapping_repository(), $container->availability_service(), $container->quantity_formatter(), new MappingDiagnostics(), $pagination, $container->unit_registry() ) );
-		$sections->register( new Admin\SetupSection( $container->pool_repository(), $container->unit_registry(), $container->custom_unit_repository(), $container->mapping_repository(), $container->quantity_formatter(), $pagination ) );
-		$sections->register( new Admin\ActivitySection( $container->movement_repository(), $container->movement_presenter(), $pagination ) );
-		( new Admin\UnitStockPage( $sections ) )->register();
-		( new Admin\StockAdjustmentController( $container->stock_adjustment_service() ) )->register();
-		( new Admin\SetupController( $container->pool_repository(), $container->mapping_repository(), $container->unit_registry(), $container->stock_mutation_service(), $container->custom_unit_repository(), new WooCommerce\ExistingStockMigrator( $container->stock_mutation_service() ), new WooCommerce\PurchasableResolver() ) )->register();
-		( new Admin\PoolSearchController( $container->pool_repository() ) )->register();
-		( new Admin\PoolDetailsController( $container->pool_repository(), $container->unit_registry() ) )->register();
-		( new Rest\InventoryController( $container->pool_repository(), $container->pool_presenter(), $container->movement_repository(), $container->movement_presenter(), $container->stock_adjustment_service() ) )->register();
+		$modules   = array(
+			new InventoryModule(),
+			new WooCommerceModule(),
+			new AdminModule(),
+			new RestModule(),
+			new PrivacyModule(),
+		);
+		foreach ( $modules as $module ) {
+			$module->register( $container );
+		}
 
-		// WordPress privacy tools. Replace the boilerplate's no-data callbacks
-		// when this plugin stores or transmits personal data.
-		( new Privacy( $container->movement_repository() ) )->register();
+		// New add-ons receive only the documented, versioned public context.
+		do_action( 'laqi_lusm_extensions_ready', new ExtensionContext( $container ) );
 
-		// Register CSS/JS enqueues (admin + frontend).
-		( new Assets() )->register();
-
-		// Pro modules self-register from a physically removable bootstrap. Shared
-		// code never names a Pro class, so the WordPress.org build remains whole
-		// when premium files are stripped.
+		// Transitional compatibility for the in-tree paid edition. New extensions
+		// must use laqi_lusm_extensions_ready; remove this hook after Pro extraction.
 		do_action( 'laqi_lusm_booted', $container );
 	}
 

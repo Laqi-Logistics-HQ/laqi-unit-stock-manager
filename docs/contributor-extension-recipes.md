@@ -12,8 +12,8 @@ they must not write pool balances, ledger rows, or plugin tables directly.
   through `UnitRegistry`; never use floating point for stock.
 - Send every balance change through `StockMutationService` or the higher-level
   `StockAdjustmentService`, with a stable idempotency key and audit context.
-- Put paid implementations in a `__premium_only` file or directory and compose
-  them from `premium-bootstrap__premium_only.php`.
+- Put new paid implementations in the separately distributed Premium add-on.
+  The in-tree `__premium_only` boundary exists only until extraction is complete.
 - Add focused PHPUnit coverage and verify all three channel archives whenever a
   recipe changes packaged behavior.
 
@@ -21,13 +21,15 @@ The public composition points are:
 
 ```php
 add_action( 'laqi_lusm_register_calculators', $callback );
-add_action( 'laqi_lusm_booted', $callback );
-add_action( 'laqi_lusm_premium_ready', $callback );
+add_action( 'laqi_lusm_extensions_ready', $callback );
 ```
 
 Use `laqi_lusm_register_calculators` only for calculators, because the container
-builds that registry lazily. Use `laqi_lusm_booted` for Free-compatible modules
-and `laqi_lusm_premium_ready` when a module depends on paid services.
+builds that registry lazily. `laqi_lusm_extensions_ready` receives an
+`ExtensionContextInterface`, which is the supported, versioned add-on API. Check
+`LAQI_LUSM_API_VERSION` before booting an add-on. The concrete `Container`,
+`laqi_lusm_booted`, and `laqi_lusm_premium_ready` are transitional internals for
+the current in-tree paid edition and must not be used by new extensions.
 
 ## Add a unit
 
@@ -37,10 +39,10 @@ For a code-owned unit, register a `UnitDefinition` on the container registry:
 
 ```php
 add_action(
-	'laqi_lusm_booted',
-	static function ( \LaqiUnitStockManager\Container $container ): void {
+	'laqi_lusm_extensions_ready',
+	static function ( \LaqiUnitStockManager\Extension\ExtensionContextInterface $context ): void {
 		// One metric tonne is exactly 1,000 kg in the mass base representation.
-		$container->unit_registry()->register(
+		$context->units()->register(
 			new \LaqiUnitStockManager\Unit\UnitDefinition(
 				'metric_tonne',
 				'mass',
@@ -64,9 +66,9 @@ Movement types supply presentation labels; they do not mutate stock themselves:
 
 ```php
 add_action(
-	'laqi_lusm_booted',
-	static function ( \LaqiUnitStockManager\Container $container ): void {
-		$container->movement_registry()->register(
+	'laqi_lusm_extensions_ready',
+	static function ( \LaqiUnitStockManager\Extension\ExtensionContextInterface $context ): void {
+		$context->movements()->register(
 			new \LaqiUnitStockManager\Inventory\MovementType(
 				'quality_sample',
 				__( 'Quality-control sample', 'your-text-domain' )
@@ -126,9 +128,9 @@ escaped renderer. Register it after boot:
 
 ```php
 add_action(
-	'laqi_lusm_booted',
-	static function ( \LaqiUnitStockManager\Container $container ): void {
-		$container->screen_section_catalog()->register( new ExampleSection() );
+	'laqi_lusm_extensions_ready',
+	static function ( \LaqiUnitStockManager\Extension\ExtensionContextInterface $context ): void {
+		$context->admin_sections()->register( new ExampleSection() );
 	}
 );
 ```
@@ -168,9 +170,9 @@ rejection, exact unit conversion, partial invalid input, and round trips.
 
 There is deliberately no generic order-adapter registry yet. WooCommerce
 extensions expose different lifecycle contracts, so adapters are small classes
-that register their documented hooks from `laqi_lusm_booted` or
-`laqi_lusm_premium_ready`. Reuse `OrderItemSnapshotter`, reservations, and the
-normal `OrderStockLifecycle`; do not call the mutation service a second time for
+that register their documented hooks from `laqi_lusm_extensions_ready`. Reuse
+the public extension context and the normal `OrderStockLifecycle`; do not call
+the mutation service a second time for
 an event core WooCommerce already emits.
 
 An adapter test matrix should cover creation and update, classic and Store API
