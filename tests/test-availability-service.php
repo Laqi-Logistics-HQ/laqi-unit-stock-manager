@@ -111,6 +111,17 @@ class Test_Availability_Service extends WP_UnitTestCase {
 		$this->assertNull( $this->service->saleable_quantity( 999, 0 ) );
 	}
 
+	/** Public pool reads apply the same availability adjustments as saleability. */
+	public function test_pool_quantity_exposes_filtered_availability(): void {
+		$filter = static function ( int $quantity, int $pool_id ): int {
+			return $pool_id > 0 ? $quantity - 25 : $quantity;
+		};
+		add_filter( 'laqi_lusm_pool_available_quantity', $filter, 10, 2 );
+		$this->assertSame( 9999999975, $this->service->pool_quantity( $this->pool_id ) );
+		remove_filter( 'laqi_lusm_pool_available_quantity', $filter, 10 );
+		$this->assertSame( 0, $this->service->pool_quantity( PHP_INT_MAX ) );
+	}
+
 	/**
 	 * Explicit setup edits replace the mapping component without duplicate rows.
 	 */

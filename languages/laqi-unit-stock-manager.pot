@@ -1805,22 +1805,6 @@ msgstr ""
 msgid "The scanned product is not mapped to pooled stock."
 msgstr ""
 
-#: src/Premium__premium_only/Integrations/StockPricingRuleFieldProvider.php:73
-msgid "Unit Stock: mapped"
-msgstr ""
-
-#: src/Premium__premium_only/Integrations/StockPricingRuleFieldProvider.php:78
-msgid "Unit Stock: saleable product quantity"
-msgstr ""
-
-#: src/Premium__premium_only/Integrations/StockPricingRuleFieldProvider.php:84
-msgid "Unit Stock: minimum days of cover"
-msgstr ""
-
-#: src/Premium__premium_only/Integrations/StockPricingRuleFieldProvider.php:90
-msgid "Unit Stock: mapped pools"
-msgstr ""
-
 #: src/Premium__premium_only/Reports/StockReportBuilder.php:61
 msgid "Pool ID"
 msgstr ""
