@@ -27,8 +27,6 @@ require_once __DIR__ . '/Premium__premium_only/Reports/StockReportBuilder.php';
 require_once __DIR__ . '/Premium__premium_only/Reports/StockReportScheduler.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/StockReportController.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/StockReportSection.php';
-require_once __DIR__ . '/Premium__premium_only/Planning/StockScenarioPlanner.php';
-require_once __DIR__ . '/Premium__premium_only/Admin/StockScenarioSection.php';
 require_once __DIR__ . '/Premium__premium_only/Receiving/SupplierRepository.php';
 require_once __DIR__ . '/Premium__premium_only/Batches/BatchRepository.php';
 require_once __DIR__ . '/Premium__premium_only/Batches/BatchAllocationRepository.php';
@@ -93,7 +91,6 @@ add_action(
 		$report_settings   = new Premium\Reports\StockReportSettings();
 		$report_builder    = new Premium\Reports\StockReportBuilder( $container->pool_repository(), $container->quantity_formatter(), $alert_policies, $forecast_policies, $forecast_service );
 		$report_scheduler  = new Premium\Reports\StockReportScheduler( $report_settings, $report_builder );
-		$scenario_planner  = new Premium\Planning\StockScenarioPlanner( $container->pool_repository(), $container->mapping_repository(), $forecast_policies, $forecast_service );
 		$suppliers         = new Premium\Receiving\SupplierRepository( $wpdb );
 		$suppliers->install();
 		$material_costs = new Premium\Costing\MaterialCostRepository( $wpdb );
@@ -135,7 +132,6 @@ add_action(
 		$container->screen_section_catalog()->register( new Premium\Admin\LowStockAlertsSection( $alert_policies, $container->pool_repository(), $container->quantity_formatter(), $alert_deliveries ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ForecastSection( $container->pool_repository(), $forecast_policies, $forecast_service, $container->quantity_formatter(), new Admin\PaginationRenderer() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\StockReportSection( $report_settings ) );
-		$container->screen_section_catalog()->register( new Premium\Admin\StockScenarioSection( $container->pool_repository(), $scenario_planner, $container->quantity_formatter() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ReceivingSection( $suppliers, $container->pool_repository(), $container->quantity_formatter(), $batches, $batch_allocations, $batch_expiry ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ReorderSection( $container->pool_repository(), $suppliers, $reorder_policies, $reorder_suggestions, $container->quantity_formatter() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\MaterialCostsSection( $material_economics, $container->mapping_repository() ) );
