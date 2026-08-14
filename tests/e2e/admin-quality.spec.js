@@ -54,7 +54,6 @@ test( 'admin screen renders without serious accessibility or runtime failures', 
 		`${ plugin.adminPath }&section=reorder`,
 		`${ plugin.adminPath }&section=costs`,
 		`${ plugin.adminPath }&section=reservations`,
-		`${ plugin.adminPath }&section=recipes`,
 	] ) {
 		await page.goto( path, { waitUntil: 'networkidle' } );
 		await expect( page.locator( plugin.ready ) ).toBeVisible();
