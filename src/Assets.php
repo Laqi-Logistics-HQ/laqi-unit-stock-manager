@@ -62,21 +62,6 @@ final class Assets {
 				'nonce'   => wp_create_nonce( 'laqi_lusm_search_pools' ),
 			)
 		);
-		wp_localize_script(
-			'laqi-unit-stock-manager-admin',
-			'laqi_lusm_mobile_stocktake',
-			array(
-				'restUrl' => esc_url_raw( rest_url( 'laqi-lusm/v1/' ) ),
-				'nonce'   => wp_create_nonce( 'wp_rest' ),
-				'strings' => array(
-					'finding' => __( 'Finding stock…', 'laqi-unit-stock-manager' ),
-					'saving'  => __( 'Saving count…', 'laqi-unit-stock-manager' ),
-					'saved'   => __( 'Physical count saved.', 'laqi-unit-stock-manager' ),
-					'camera'  => __( 'Point the camera at a barcode.', 'laqi-unit-stock-manager' ),
-					'error'   => __( 'The stocktaking request could not be completed.', 'laqi-unit-stock-manager' ),
-				),
-			)
-		);
 		wp_enqueue_style( 'woocommerce_admin_styles' );
 	}
 }
