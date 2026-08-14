@@ -74,6 +74,11 @@ final class ExtensionContext implements ExtensionContextInterface {
 		return $this->container->pool_repository();
 	}
 
+	/** Namespaced inventory-pool policy persistence. @return PoolPolicyStore */
+	public function pool_policies(): PoolPolicyStore {
+		return $this->container->pool_policy_store();
+	}
+
 	/** Product-mapping persistence. @return MappingRepository */
 	public function mappings(): MappingRepository {
 		return $this->container->mapping_repository();

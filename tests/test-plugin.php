@@ -36,6 +36,7 @@ class Test_Plugin extends WP_UnitTestCase {
 		$this->assertInstanceOf( \LaqiUnitStockManager\Unit\UnitRegistry::class, $context->units() );
 		$this->assertInstanceOf( \LaqiUnitStockManager\Admin\ScreenSectionCatalog::class, $context->admin_sections() );
 		$this->assertInstanceOf( \LaqiUnitStockManager\Diagnostics\MappingDiagnostics::class, $context->mapping_diagnostics() );
+		$this->assertInstanceOf( \LaqiUnitStockManager\Extension\PoolPolicyStore::class, $context->pool_policies() );
 		$this->assertSame( 1, did_action( 'laqi_lusm_extensions_ready' ) );
 	}
 
@@ -47,6 +48,7 @@ class Test_Plugin extends WP_UnitTestCase {
 
 		$this->assertSame( $context->pools(), $context->pools() );
 		$this->assertSame( $context->mappings(), $context->mappings() );
+		$this->assertSame( $context->pool_policies(), $context->pool_policies() );
 		$this->assertSame( $context->mapping_diagnostics(), $context->mapping_diagnostics() );
 		$this->assertSame( $context->movement_history(), $context->movement_history() );
 		$this->assertSame( $context->stock_mutations(), $context->stock_mutations() );
