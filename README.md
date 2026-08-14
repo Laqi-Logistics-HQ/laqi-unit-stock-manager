@@ -131,6 +131,14 @@ cover, and an aligned collection of pool balance, filtered availability,
 consumption, and forecast data. The contract contains no write callback and does
 not expose the stock mutation service.
 
+The Pro Anomalies tab performs a read-only review of the latest 500 ledger rows
+and all active mappings. It highlights large manual, count, or external changes;
+repeated negative balances; order consumption without an order source;
+restorations that exceed the matching recent reductions; and mapping conflicts.
+The default large-change threshold is 50% of the preceding balance and can be
+adjusted with `laqi_lusm_large_adjustment_ratio`. Consumers may add or rank
+findings with `laqi_lusm_stock_anomalies`; detection never changes stock.
+
 Custom units use soft retirement. The repository prevents retirement while a pool
 uses the key as its base/display unit or another active custom unit references it;
 retired records remain stored so a historical key is never redefined accidentally.

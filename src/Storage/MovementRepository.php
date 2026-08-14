@@ -39,7 +39,7 @@ final class MovementRepository {
 	 * @return array<int, array<string, mixed>>
 	 */
 	public function recent( int $limit = 50, int $offset = 0 ): array {
-		$limit  = max( 1, min( 100, $limit ) );
+		$limit  = max( 1, min( 500, $limit ) );
 		$offset = max( 0, $offset );
 		$rows   = $this->db->get_results(
 			$this->db->prepare(
