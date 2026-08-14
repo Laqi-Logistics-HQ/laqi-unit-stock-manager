@@ -116,6 +116,13 @@ Authorized inventory clients can resolve a scanned product SKU or WooCommerce
 GTIN/UPC/EAN/ISBN through `GET /wp-json/laqi-lusm/v1/scan?code=...` and receive
 its exact per-sale pool demand, available pool balances, and saleable quantity.
 
+ERP and WMS clients can submit up to 100 relative pool changes as one authenticated
+event through `POST /wp-json/laqi-lusm/v1/external-movements`. Pool SKUs must be
+unambiguous, quantities are normalized through the registered unit system, the
+whole event commits or rolls back together, and stable event IDs make safe retries
+return the original movement results. External clients never write balances or
+ledger rows directly.
+
 Custom units use soft retirement. The repository prevents retirement while a pool
 uses the key as its base/display unit or another active custom unit references it;
 retired records remain stored so a historical key is never redefined accidentally.

@@ -160,6 +160,23 @@ final class PoolRepository {
 		return is_array( $row ) ? $this->hydrate( $row ) : null;
 	}
 
+	/** Find one externally addressable pool by an unambiguous exact SKU.
+	 *
+	 * @param string $internal_sku Internal SKU.
+	 * @return Pool|null
+	 * @throws RuntimeException When more than one pool uses the SKU.
+	 */
+	public function find_by_external_sku( string $internal_sku ): ?Pool {
+		if ( '' === $internal_sku ) {
+			return null;
+		}
+		$rows = $this->db->get_results( $this->db->prepare( 'SELECT * FROM ' . Schema::table( 'pools' ) . ' WHERE internal_sku = %s ORDER BY id ASC LIMIT 2', $internal_sku ), ARRAY_A );
+		if ( count( $rows ) > 1 ) {
+			throw new RuntimeException( 'The external pool SKU is ambiguous.' );
+		}
+		return isset( $rows[0] ) ? $this->hydrate( $rows[0] ) : null;
+	}
+
 	/**
 	 * Find pools for the stock-management screen.
 	 *

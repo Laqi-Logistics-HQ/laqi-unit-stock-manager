@@ -144,6 +144,15 @@ final class StockMutationService {
 		if ( array() === $movements ) {
 			throw new \InvalidArgumentException( 'A stock movement batch cannot be empty.' );
 		}
+		$keys = array();
+		foreach ( $movements as $command ) {
+			$this->validate_command( $command );
+			$key = (string) $command['idempotency_key'];
+			if ( isset( $keys[ $key ] ) ) {
+				throw new \InvalidArgumentException( 'A stock movement batch cannot repeat an idempotency key.' );
+			}
+			$keys[ $key ] = true;
+		}
 
 		usort(
 			$movements,
@@ -159,15 +168,17 @@ final class StockMutationService {
 		try {
 			$existing_results = array();
 			foreach ( $movements as $command ) {
-				$this->validate_command( $command );
 				$existing = $this->db->get_row(
 					$this->db->prepare(
-						"SELECT id, balance_base FROM {$moves} WHERE idempotency_key = %s FOR UPDATE",
+						"SELECT id, pool_id, type, delta_base, balance_base FROM {$moves} WHERE idempotency_key = %s FOR UPDATE",
 						$command['idempotency_key']
 					),
 					ARRAY_A
 				);
 				if ( is_array( $existing ) ) {
+					if ( (int) $existing['pool_id'] !== (int) $command['pool_id'] || (int) $existing['delta_base'] !== (int) $command['delta'] || (string) $existing['type'] !== (string) $command['type'] ) {
+						throw new RuntimeException( 'An idempotency key cannot be reused for a different stock movement.' );
+					}
 					$existing_results[] = new MovementResult( (int) $existing['id'], (int) $existing['balance_base'], true );
 				}
 			}
