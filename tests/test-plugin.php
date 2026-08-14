@@ -154,4 +154,11 @@ class Test_Plugin extends WP_UnitTestCase {
 		$this->assertFalse( has_filter( 'laqi_lusm_read_only_rule_field_catalog' ) );
 		$this->assertFalse( has_filter( 'laqi_lusm_read_only_rule_field_values' ) );
 	}
+
+	/** Scheduled stock reports belong only to the Pro add-on. */
+	public function test_stock_report_implementation_is_not_bundled(): void {
+		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Reports\StockReportScheduler' ) );
+		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Admin\StockReportSection' ) );
+		$this->assertFalse( has_action( 'laqi_lusm_send_stock_report' ) );
+	}
 }
