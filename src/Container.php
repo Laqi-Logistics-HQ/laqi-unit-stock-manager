@@ -21,6 +21,7 @@ use LaqiUnitStockManager\Consumption\CalculatorRegistry;
 use LaqiUnitStockManager\Availability\AvailabilityService;
 use LaqiUnitStockManager\Admin\ScreenSectionCatalog;
 use LaqiUnitStockManager\Diagnostics\MappingDiagnostics;
+use LaqiUnitStockManager\Extension\PoolPolicyStore;
 use LaqiUnitStockManager\Presentation\PoolPresenter;
 use LaqiUnitStockManager\Presentation\QuantityFormatter;
 use LaqiUnitStockManager\Presentation\MovementPresenter;
@@ -133,6 +134,17 @@ final class Container {
 			static function () {
 				global $wpdb;
 				return new PoolRepository( $wpdb );
+			}
+		);
+	}
+
+	/** Namespaced extension policy persistence. @return PoolPolicyStore */
+	public function pool_policy_store(): PoolPolicyStore {
+		return $this->remember(
+			'pool_policy_store',
+			static function () {
+				global $wpdb;
+				return new PoolPolicyStore( $wpdb );
 			}
 		);
 	}

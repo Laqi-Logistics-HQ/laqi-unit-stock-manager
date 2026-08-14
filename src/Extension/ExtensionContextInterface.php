@@ -49,6 +49,9 @@ interface ExtensionContextInterface {
 	/** Inventory-pool persistence. @return PoolRepository */
 	public function pools(): PoolRepository;
 
+	/** Namespaced inventory-pool policy persistence. @return PoolPolicyStore */
+	public function pool_policies(): PoolPolicyStore;
+
 	/** Product-mapping persistence. @return MappingRepository */
 	public function mappings(): MappingRepository;
 
