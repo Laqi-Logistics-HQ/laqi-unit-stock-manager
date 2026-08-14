@@ -22,6 +22,20 @@ class Test_Plugin extends WP_UnitTestCase {
 	 */
 	public function test_version_constant_defined(): void {
 		$this->assertTrue( defined( 'LAQI_LUSM_VERSION' ) );
+		$this->assertSame( '1.0', LAQI_LUSM_API_VERSION );
+	}
+
+	/**
+	 * Add-ons receive a versioned context instead of the internal container.
+	 */
+	public function test_public_extension_context_is_available(): void {
+		$context = new \LaqiUnitStockManager\Extension\ExtensionContext( new \LaqiUnitStockManager\Container() );
+
+		$this->assertInstanceOf( \LaqiUnitStockManager\Extension\ExtensionContextInterface::class, $context );
+		$this->assertSame( LAQI_LUSM_API_VERSION, $context->api_version() );
+		$this->assertInstanceOf( \LaqiUnitStockManager\Unit\UnitRegistry::class, $context->units() );
+		$this->assertInstanceOf( \LaqiUnitStockManager\Admin\ScreenSectionCatalog::class, $context->admin_sections() );
+		$this->assertSame( 1, did_action( 'laqi_lusm_extensions_ready' ) );
 	}
 
 	/**
