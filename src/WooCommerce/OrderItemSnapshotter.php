@@ -66,7 +66,9 @@ final class OrderItemSnapshotter {
 	 * @return void
 	 */
 	public function snapshot( WC_Order_Item_Product $item, string $cart_item_key, array $values, WC_Order $order ): void {
-		unset( $cart_item_key, $order );
+		if ( ! apply_filters( 'laqi_lusm_include_checkout_item_stock_demand', true, $item, $values, $cart_item_key, $order ) ) {
+			return;
+		}
 		$product_id   = isset( $values['product_id'] ) ? (int) $values['product_id'] : $item->get_product_id();
 		$variation_id = isset( $values['variation_id'] ) ? (int) $values['variation_id'] : $item->get_variation_id();
 		$quantity     = isset( $values['quantity'] ) ? (int) $values['quantity'] : $item->get_quantity();
@@ -126,6 +128,9 @@ final class OrderItemSnapshotter {
 	 * @return array<string, mixed>|null Snapshot, or null for an unmapped item.
 	 */
 	public function snapshot_admin_demand( WC_Order_Item_Product $item ): ?array {
+		if ( ! apply_filters( 'laqi_lusm_include_order_item_stock_demand', true, $item ) ) {
+			return null;
+		}
 		$mapping  = $this->mappings->find_for_product( $item->get_product_id(), $item->get_variation_id() );
 		$quantity = $item->get_quantity();
 		if ( null === $mapping || $quantity < 1 ) {

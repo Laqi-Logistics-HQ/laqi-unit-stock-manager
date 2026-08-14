@@ -82,7 +82,10 @@ final class CartValidator {
 	 */
 	public function check_cart( WC_Cart $cart ): AvailabilityResult {
 		$lines = array();
-		foreach ( $cart->get_cart() as $item ) {
+		foreach ( $cart->get_cart() as $cart_item_key => $item ) {
+			if ( ! apply_filters( 'laqi_lusm_include_cart_item_stock_demand', true, $item, $cart_item_key, $cart ) ) {
+				continue;
+			}
 			$lines[] = array(
 				'product_id'   => isset( $item['product_id'] ) ? (int) $item['product_id'] : 0,
 				'variation_id' => isset( $item['variation_id'] ) ? (int) $item['variation_id'] : 0,
