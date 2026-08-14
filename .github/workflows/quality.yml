@@ -73,12 +73,16 @@ jobs:
         include:
           - php: "7.4"
             wordpress: "6.9.5"
+            woocommerce: "10.9.4"
           - php: "7.4"
             wordpress: "7.0.2"
+            woocommerce: "11.0.0"
           - php: "8.3"
             wordpress: "6.9.5"
+            woocommerce: "10.9.4"
           - php: "8.3"
             wordpress: "7.0.2"
+            woocommerce: "11.0.0"
     services:
       mysql:
         image: mysql:8.0
@@ -102,7 +106,7 @@ jobs:
       - name: Install WooCommerce test dependency
         run: |
           curl --fail --location --silent --show-error \
-            https://downloads.wordpress.org/plugin/woocommerce.10.9.0.zip \
+            https://downloads.wordpress.org/plugin/woocommerce.${{ matrix.woocommerce }}.zip \
             --output /tmp/woocommerce.zip
           unzip -q /tmp/woocommerce.zip -d ..
       - name: Install WordPress test environment
@@ -116,7 +120,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: "20"
           cache: npm
@@ -130,7 +134,7 @@ jobs:
         run: npx wp-env logs --watch=false
       - name: Upload browser diagnostics
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: admin-quality-diagnostics
           path: test-results/
@@ -142,7 +146,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: "20"
           cache: npm

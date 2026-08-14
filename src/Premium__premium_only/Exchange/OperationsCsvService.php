@@ -45,7 +45,7 @@ final class OperationsCsvService {
 		$handle = fopen( $file, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		if ( false === $handle ) {
 			throw new RuntimeException( 'Could not open the CSV file.' ); }
-		$headers = fgetcsv( $handle );
+		$headers = fgetcsv( $handle, 0, ',', '"', '' );
 		if ( ! is_array( $headers ) ) {
 			fclose( $handle );
 			throw new InvalidArgumentException( 'The CSV file has no header.' ); } // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
@@ -58,7 +58,7 @@ final class OperationsCsvService {
 			'skipped' => 0,
 		);
 		$count  = 0;
-		while ( false !== ( $values = fgetcsv( $handle ) ) ) {
+		while ( false !== ( $values = fgetcsv( $handle, 0, ',', '"', '' ) ) ) {
 			if ( ++$count > self::MAX_ROWS ) {
 				fclose( $handle );
 				throw new InvalidArgumentException( 'The CSV file contains too many rows.' );

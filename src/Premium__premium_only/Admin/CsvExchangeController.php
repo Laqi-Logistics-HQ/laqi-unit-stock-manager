@@ -34,9 +34,9 @@ final class CsvExchangeController {
 		if ( false === $output ) {
 			wp_die( esc_html__( 'The operations export could not be created.', 'laqi-unit-stock-manager' ) );
 		} fwrite( $output, "\xEF\xBB\xBF" );
-		fputcsv( $output, $this->exchange->headers() );
+		fputcsv( $output, $this->exchange->headers(), ',', '"', '' );
 		foreach ( $this->exchange->rows() as $row ) {
-			fputcsv( $output, array_values( $row ) );
+			fputcsv( $output, array_values( $row ), ',', '"', '' );
 		} fclose( $output );
 		exit; }
 	/** Import upload. @return void */
