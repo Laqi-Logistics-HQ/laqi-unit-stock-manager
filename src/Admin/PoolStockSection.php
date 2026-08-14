@@ -243,6 +243,8 @@ final class PoolStockSection implements ScreenSectionInterface {
 	 * @return void
 	 */
 	private function render_adjustment_form( array $row ): void {
+		$reason_templates = apply_filters( 'laqi_lusm_adjustment_reason_templates', array(), 'manual' );
+		$list_id          = 'laqi-lusm-reasons-' . $row['id'];
 		?>
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="laqi-lusm-adjustment">
 			<input type="hidden" name="action" value="laqi_lusm_adjust_stock" />
@@ -259,7 +261,15 @@ final class PoolStockSection implements ScreenSectionInterface {
 			<input id="laqi-lusm-quantity-<?php echo esc_attr( $row['id'] ); ?>" name="quantity" type="text" inputmode="decimal" required size="10" />
 			<span><?php echo esc_html( $row['display_unit'] ); ?></span>
 			<label class="screen-reader-text" for="laqi-lusm-reason-<?php echo esc_attr( $row['id'] ); ?>"><?php esc_html_e( 'Reason', 'laqi-unit-stock-manager' ); ?></label>
-			<input id="laqi-lusm-reason-<?php echo esc_attr( $row['id'] ); ?>" name="reason" type="text" placeholder="<?php esc_attr_e( 'Reason (optional)', 'laqi-unit-stock-manager' ); ?>" />
+			<input id="laqi-lusm-reason-<?php echo esc_attr( $row['id'] ); ?>" name="reason" type="text" placeholder="<?php esc_attr_e( 'Reason (optional)', 'laqi-unit-stock-manager' ); ?>" <?php echo ! empty( $reason_templates ) ? 'list="' . esc_attr( $list_id ) . '"' : ''; ?> />
+			<?php
+			if ( ! empty( $reason_templates ) ) :
+				?>
+				<datalist id="<?php echo esc_attr( $list_id ); ?>">
+				<?php
+				foreach ( $reason_templates as $template ) :
+					?>
+				<option value="<?php echo esc_attr( $template ); ?>"></option><?php endforeach; ?></datalist><?php endif; ?>
 			<?php submit_button( __( 'Apply', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?>
 		</form>
 		<?php

@@ -25,6 +25,7 @@ final class MobileStocktakeSection implements ScreenSectionInterface {
 
 	/** Render the progressively enhanced workflow. @return void */
 	public function render(): void {
+		$reason_templates = apply_filters( 'laqi_lusm_adjustment_reason_templates', array(), 'mobile_stocktake' );
 		?>
 		<section id="laqi-lusm-mobile-stocktake" class="card laqi-lusm-mobile-stocktake">
 			<h2><?php esc_html_e( 'Scan and count stock', 'laqi-unit-stock-manager' ); ?></h2>
@@ -40,7 +41,15 @@ final class MobileStocktakeSection implements ScreenSectionInterface {
 				<label for="laqi-lusm-mobile-pool"><?php esc_html_e( 'Inventory pool', 'laqi-unit-stock-manager' ); ?></label><select id="laqi-lusm-mobile-pool" required></select>
 				<p class="laqi-lusm-mobile-balance"></p>
 				<label for="laqi-lusm-mobile-quantity"><?php esc_html_e( 'Physical quantity counted', 'laqi-unit-stock-manager' ); ?></label><div class="laqi-lusm-mobile-quantity"><input id="laqi-lusm-mobile-quantity" inputmode="decimal" required /><span class="laqi-lusm-mobile-unit"></span></div>
-				<label for="laqi-lusm-mobile-reason"><?php esc_html_e( 'Count reason or reference', 'laqi-unit-stock-manager' ); ?></label><input id="laqi-lusm-mobile-reason" maxlength="255" required />
+				<label for="laqi-lusm-mobile-reason"><?php esc_html_e( 'Count reason or reference', 'laqi-unit-stock-manager' ); ?></label><input id="laqi-lusm-mobile-reason" maxlength="255" required <?php echo ! empty( $reason_templates ) ? 'list="laqi-lusm-mobile-reasons"' : ''; ?> />
+				<?php
+				if ( ! empty( $reason_templates ) ) :
+					?>
+					<datalist id="laqi-lusm-mobile-reasons">
+					<?php
+					foreach ( $reason_templates as $template ) :
+						?>
+					<option value="<?php echo esc_attr( $template ); ?>"></option><?php endforeach; ?></datalist><?php endif; ?>
 				<button type="submit" class="button button-primary button-hero"><?php esc_html_e( 'Save physical count', 'laqi-unit-stock-manager' ); ?></button>
 			</form>
 		</section>
