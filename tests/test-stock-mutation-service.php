@@ -10,8 +10,6 @@ use LaqiUnitStockManager\Inventory\StockMutationService;
 use LaqiUnitStockManager\Storage\Schema;
 use LaqiUnitStockManager\Storage\MovementRepository;
 use LaqiUnitStockManager\Container;
-use LaqiUnitStockManager\Premium\Alerts\LowStockPolicyRepository;
-use LaqiUnitStockManager\Premium\Alerts\LowStockAlertEvaluator;
 use LaqiUnitStockManager\Premium\Alerts\AlertDeliveryRepository;
 use LaqiUnitStockManager\Premium\Alerts\WebhookAlertChannel;
 use LaqiUnitStockManager\Premium\Forecasting\ForecastPolicyRepository;
@@ -228,86 +226,6 @@ class Test_Stock_Mutation_Service extends WP_UnitTestCase {
 		$this->assertSame( 'loss', $row['source_type'] );
 		$this->assertSame( 'Broken container', $row['reason'] );
 		$this->assertSame( 7, (int) $row['actor_id'] );
-	}
-
-	/** Low-stock email fires once per crossing and rearms after recovery. */
-	public function test_low_stock_alert_fires_once_per_threshold_crossing(): void {
-		global $wpdb;
-		$sent = 0;
-		add_filter(
-			'pre_wp_mail',
-			static function () use ( &$sent ): bool {
-				++$sent;
-				return true;
-			}
-		);
-		$policies = new LowStockPolicyRepository( $wpdb );
-		$wpdb->update( Schema::table( 'pools' ), array( 'policy_json' => wp_json_encode( array( 'allocation' => 'future-strategy' ) ) ), array( 'id' => $this->pool_id ) );
-		$policies->save( $this->pool_id, 9000000000000, array( 'stock@example.com' ) );
-		$envelope = json_decode( (string) $wpdb->get_var( $wpdb->prepare( 'SELECT policy_json FROM ' . Schema::table( 'pools' ) . ' WHERE id = %d', $this->pool_id ) ), true );
-		$this->assertSame( 'future-strategy', $envelope['allocation'] );
-		$service = new StockMutationService( $wpdb );
-		$service->apply( $this->pool_id, -2000000000000, 'manual_subtract', 'alert-low:' . $this->pool_id );
-		$service->apply( $this->pool_id, -1000000000000, 'manual_subtract', 'alert-still-low:' . $this->pool_id );
-		$this->assertSame( 1, $sent );
-		$this->assertTrue( (bool) $policies->find( $this->pool_id )['is_low'] );
-		$service->apply( $this->pool_id, 4000000000000, 'manual_add', 'alert-recover:' . $this->pool_id );
-		$service->apply( $this->pool_id, -3000000000000, 'manual_subtract', 'alert-low-again:' . $this->pool_id );
-		$this->assertSame( 2, $sent );
-		$this->assertSame( 'email', ( new AlertDeliveryRepository( $wpdb ) )->recent( 1 )[0]['channel'] );
-	}
-
-	/** Alert severity escalates and scheduled reminders respect delivery state. */
-	public function test_low_stock_alert_escalates_and_sends_due_reminder(): void {
-		global $wpdb;
-		$sent = 0;
-		add_filter(
-			'pre_wp_mail',
-			static function () use ( &$sent ): bool {
-				++$sent;
-				return true;
-			}
-		);
-		$container = new Container();
-		$policies  = new LowStockPolicyRepository( $wpdb );
-		$policies->save( $this->pool_id, 9000000000000, array( 'stock@example.com' ), 5000000000000, 24 );
-		$service = new StockMutationService( $wpdb );
-		$service->apply( $this->pool_id, -2000000000000, 'manual_subtract', 'severity-warning:' . $this->pool_id );
-		$this->assertSame( 'warning', $policies->find( $this->pool_id )['severity'] );
-		$service->apply( $this->pool_id, -4000000000000, 'manual_subtract', 'severity-critical:' . $this->pool_id );
-		$this->assertSame( 'critical', $policies->find( $this->pool_id )['severity'] );
-		$this->assertSame( 2, $sent );
-		$policies->set_evaluation_state( $this->pool_id, 'critical', time() - ( 25 * HOUR_IN_SECONDS ) );
-		$evaluator = new LowStockAlertEvaluator( $policies, $container->pool_repository(), $container->quantity_formatter() );
-		$evaluator->evaluate( array( $this->pool_id ) );
-		$this->assertSame( 3, $sent );
-		$evaluator->schedule();
-		$this->assertNotFalse( wp_next_scheduled( LowStockAlertEvaluator::CRON_HOOK ) );
-		$evaluator->unschedule();
-	}
-
-	/** Quiet hours defer a crossing until a later evaluation. */
-	public function test_low_stock_quiet_hours_defer_delivery(): void {
-		global $wpdb;
-		$sent = 0;
-		add_filter(
-			'pre_wp_mail',
-			static function () use ( &$sent ): bool {
-				++$sent;
-				return true;
-			}
-		);
-		$hour       = (int) wp_date( 'G' );
-		$policies   = new LowStockPolicyRepository( $wpdb );
-		$container  = new Container();
-		$evaluator  = new LowStockAlertEvaluator( $policies, $container->pool_repository(), $container->quantity_formatter() );
-		$policies->save( $this->pool_id, 9000000000000, array( 'stock@example.com' ), 5000000000000, 24, $hour, ( $hour + 1 ) % 24 );
-		( new StockMutationService( $wpdb ) )->apply( $this->pool_id, -2000000000000, 'manual_subtract', 'quiet-warning:' . $this->pool_id );
-		$this->assertSame( 0, $sent );
-		$this->assertSame( 'warning', $policies->find( $this->pool_id )['severity'] );
-		$policies->save( $this->pool_id, 9000000000000, array( 'stock@example.com' ), 5000000000000, 24 );
-		$evaluator->evaluate( array( $this->pool_id ) );
-		$this->assertSame( 1, $sent );
 	}
 
 	/** Webhook alerts send signed JSON and return the HTTP outcome. */

@@ -9,15 +9,11 @@ namespace LaqiUnitStockManager;
 
 defined( 'ABSPATH' ) || exit;
 
-require_once __DIR__ . '/Premium__premium_only/Alerts/LowStockPolicyRepository.php';
-require_once __DIR__ . '/Premium__premium_only/Alerts/LowStockAlertEvaluator.php';
 require_once __DIR__ . '/Premium__premium_only/Alerts/AlertChannelInterface.php';
 require_once __DIR__ . '/Premium__premium_only/Alerts/AlertChannelRegistry.php';
 require_once __DIR__ . '/Premium__premium_only/Alerts/EmailAlertChannel.php';
 require_once __DIR__ . '/Premium__premium_only/Alerts/WebhookAlertChannel.php';
 require_once __DIR__ . '/Premium__premium_only/Alerts/AlertDeliveryRepository.php';
-require_once __DIR__ . '/Premium__premium_only/Admin/LowStockAlertController.php';
-require_once __DIR__ . '/Premium__premium_only/Admin/LowStockAlertsSection.php';
 require_once __DIR__ . '/Premium__premium_only/Forecasting/ForecastPolicyRepository.php';
 require_once __DIR__ . '/Premium__premium_only/Forecasting/StockForecastService.php';
 require_once __DIR__ . '/Premium__premium_only/Receiving/SupplierRepository.php';
@@ -72,7 +68,6 @@ add_action(
 	'laqi_lusm_booted',
 	static function ( Container $container ): void {
 		global $wpdb;
-		$alert_policies   = new Premium\Alerts\LowStockPolicyRepository( $wpdb );
 		$alert_deliveries = new Premium\Alerts\AlertDeliveryRepository( $wpdb );
 		$alert_deliveries->install();
 		$alert_channels = new Premium\Alerts\AlertChannelRegistry();
@@ -118,12 +113,10 @@ add_action(
 		$container->movement_registry()->register( new Inventory\MovementType( 'supplier_receipt', __( 'Supplier receipt', 'laqi-unit-stock-manager' ) ) );
 		$container->movement_registry()->register( new Inventory\MovementType( 'batch_transfer_out', __( 'Batch transfer out', 'laqi-unit-stock-manager' ) ) );
 		$container->movement_registry()->register( new Inventory\MovementType( 'batch_transfer_in', __( 'Batch transfer in', 'laqi-unit-stock-manager' ) ) );
-		$container->screen_section_catalog()->register( new Premium\Admin\LowStockAlertsSection( $alert_policies, $container->pool_repository(), $container->quantity_formatter(), $alert_deliveries ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ReceivingSection( $suppliers, $container->pool_repository(), $container->quantity_formatter(), $batches, $batch_allocations, $batch_expiry ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ReorderSection( $container->pool_repository(), $suppliers, $reorder_policies, $reorder_suggestions, $container->quantity_formatter() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\MaterialCostsSection( $material_economics, $container->mapping_repository() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ReservationsSection( $stock_holds, $container->pool_repository(), $container->quantity_formatter(), $safety_stock, $supply_projections ) );
-		( new Premium\Admin\LowStockAlertController( $alert_policies, $container->pool_repository(), $container->unit_registry() ) )->register();
 		( new Premium\Admin\ReceivingController( $suppliers, $container->pool_repository(), $container->unit_registry(), $receiving ) )->register();
 		( new Premium\Admin\BatchOperationsController( $batch_operations, $batches, $container->unit_registry(), $batch_transfers ) )->register();
 		( new Premium\Admin\BatchExpiryController( $batch_expiry ) )->register();
@@ -134,11 +127,8 @@ add_action(
 		( new Premium\Integrations\SubscriptionRenewalAdapter( $renewal_snapshots, $reservation_service ) )->register();
 		$mobile_snapshots = new WooCommerce\OrderItemSnapshotter( $container->mapping_repository(), $container->calculator_registry() );
 		( new Premium\Integrations\MobileOrderAdapter( $mobile_snapshots, $reservation_service ) )->register();
-		$alert_evaluator = new Premium\Alerts\LowStockAlertEvaluator( $alert_policies, $container->pool_repository(), $container->quantity_formatter(), $alert_channels, $alert_deliveries );
-		$alert_evaluator->register();
 		$batch_expiry_evaluator = new Premium\Batches\BatchExpiryEvaluator( $batches, $batch_expiry, $container->quantity_formatter(), $alert_channels, $alert_deliveries );
 		$batch_expiry_evaluator->register();
-		register_deactivation_hook( LAQI_LUSM_FILE, array( $alert_evaluator, 'unschedule' ) );
 		register_deactivation_hook( LAQI_LUSM_FILE, array( $reservation_service, 'unschedule' ) );
 		register_deactivation_hook( LAQI_LUSM_FILE, array( $batch_expiry_evaluator, 'unschedule' ) );
 		do_action( 'laqi_lusm_premium_ready', $container );
