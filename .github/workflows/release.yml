@@ -6,19 +6,8 @@
 #   New variable: RELEASE_BUILDS_ENABLED = true
 # (or: `gh variable set RELEASE_BUILDS_ENABLED --body true`)
 #
-# Produces two artifacts, attached to the release:
-#   laqi-unit-stock-manager-<version>-woocommerce.zip  (active channel — Woo handles updates)
-#   laqi-unit-stock-manager-<version>-freemius.zip      (Freemius channel — bundles the SDK)
-#
-# OPTIONAL: auto-deploy the Freemius zip to Freemius on release. That step is
-# gated on its own variable `FREEMIUS_DEPLOY_ENABLED` (set it to true to enable),
-# so it stays off until this plugin has a Freemius product. It needs, on the repo:
-#   Variables: FREEMIUS_DEV_ID, FREEMIUS_PLUGIN_ID
-#   Secrets:   FREEMIUS_PUBLIC_KEY, FREEMIUS_SECRET_KEY
-# IMPORTANT: PUBLIC_KEY/SECRET_KEY are your DEVELOPER (account) keys, the ones
-# shown next to your Developer ID, NOT the plugin's Settings -> Keys (the action
-# authenticates at the 'developer' scope; plugin keys give a 401). It uploads as
-# a "pending" version, so review and release it on the Freemius dashboard.
+# Produces the complete Free archive:
+#   laqi-unit-stock-manager-<version>-wordpressorg.zip
 name: release
 
 on:
@@ -38,41 +27,11 @@ jobs:
     if: ${{ vars.RELEASE_BUILDS_ENABLED == 'true' }}
     uses: ./.github/workflows/quality.yml
 
-  dependency-check:
-    # Block the whole release before either channel builds when a configured
-    # Freemius SDK lock is behind the latest stable Composer package.
-    if: ${{ vars.RELEASE_BUILDS_ENABLED == 'true' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Set up PHP 7.4
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "7.4"
-          tools: composer
-
-      - name: Require the current Freemius WordPress SDK
-        shell: bash
-        run: |
-          if ! grep -q '"freemius/wordpress-sdk"' composer.json; then
-            echo "Freemius SDK is not configured; skipping the version gate."
-            exit 0
-          fi
-
-          if ! composer outdated --locked --direct --strict --no-interaction freemius/wordpress-sdk; then
-            echo "::error::composer.lock does not contain the latest stable Freemius WordPress SDK. Run: composer update freemius/wordpress-sdk --with-dependencies"
-            exit 1
-          fi
-
   build:
     # Master off-switch — see header. Remove this line (or set the variable) to enable.
     if: ${{ vars.RELEASE_BUILDS_ENABLED == 'true' }}
-    needs: [quality, dependency-check]
+    needs: [quality]
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        channel: [woocommerce, freemius, wordpressorg]
     steps:
       - uses: actions/checkout@v5
 
@@ -81,9 +40,6 @@ jobs:
         with:
           php-version: "7.4"
           tools: composer
-
-      - name: Install production dependencies
-        run: composer install --no-dev --optimize-autoloader --no-interaction
 
       - name: Build optional production assets
         # The lockfile also supports browser QA, so its presence alone no longer
@@ -103,8 +59,8 @@ jobs:
             echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Build ${{ matrix.channel }} zip
-        run: bash bin/build.sh --channel ${{ matrix.channel }} --version "${{ steps.ver.outputs.version }}"
+      - name: Build the WordPress.org zip
+        run: bash bin/build.sh --channel wordpressorg --version "${{ steps.ver.outputs.version }}"
 
       # NOTE: quality.yml carries an equivalent archive check. Keep the two in
       # step. On laqi-order-status-workflows a rule was corrected in one and
@@ -113,10 +69,10 @@ jobs:
       - name: Verify channel archive
         shell: bash
         run: |
-          archive="dist/laqi-unit-stock-manager-${{ steps.ver.outputs.version }}-${{ matrix.channel }}.zip"
+          archive="dist/laqi-unit-stock-manager-${{ steps.ver.outputs.version }}-wordpressorg.zip"
           contents="$(unzip -Z1 "$archive")"
 
-          for forbidden in .wp-env.json playwright.config.js docs/ tests/ test-results/ .github/ package.json package-lock.json; do
+          for forbidden in .wp-env.json playwright.config.js docs/ tests/ test-results/ .github/ package.json package-lock.json README.md phpunit.integration.xml.dist vendor/ freemius/; do
             if grep -q "^laqi-unit-stock-manager/${forbidden}" <<< "$contents"; then
               echo "::error::Release archive contains development-only path: $forbidden"
               exit 1
@@ -138,23 +94,8 @@ jobs:
             fi
           done
 
-          premium_bootstrap='laqi-unit-stock-manager/src/premium-bootstrap__premium_only.php'
-          if [ "${{ matrix.channel }}" = "wordpressorg" ]; then
-            expected_name='Laqi Unit Stock Manager for WooCommerce'
-          else
-            expected_name='Laqi Unit Stock Manager Pro for WooCommerce'
-          fi
-          if ! unzip -p "$archive" laqi-unit-stock-manager/laqi-unit-stock-manager.php | grep -Fx " * Plugin Name:       $expected_name" > /dev/null; then
-            echo "::error::Archive has the wrong Plugins-screen edition name."
-            exit 1
-          fi
-          if [ "${{ matrix.channel }}" = "wordpressorg" ]; then
-            if grep -q '__premium_only' <<< "$contents"; then
-              echo "::error::WordPress.org archive contains paid-only files."
-              exit 1
-            fi
-          elif ! grep -qx "$premium_bootstrap" <<< "$contents"; then
-            echo "::error::Paid archive is missing its optional composition bootstrap."
+          if ! unzip -p "$archive" laqi-unit-stock-manager/laqi-unit-stock-manager.php | grep -Fx ' * Plugin Name:       Laqi Unit Stock Manager for WooCommerce' > /dev/null; then
+            echo "::error::Archive is missing the Free plugin name."
             exit 1
           fi
 
@@ -169,108 +110,10 @@ jobs:
             done
           fi
 
-          if [ "${{ matrix.channel }}" = "woocommerce" ]; then
-            if grep -q '^laqi-unit-stock-manager/vendor/' <<< "$contents"; then
-              echo "::error::WooCommerce archive must not include the Composer runtime tree."
-              exit 1
-            fi
-
-            # bin/build.sh removes a manually dropped freemius/ tree as well as
-            # vendor/. Check both, so the guard matches what the build removes.
-            if grep -q '^laqi-unit-stock-manager/freemius/' <<< "$contents"; then
-              echo "::error::WooCommerce archive must not bundle the Freemius SDK."
-              exit 1
-            fi
-
-            work="$(mktemp -d)"
-            unzip -q "$archive" -d "$work"
-
-            # Freemius strips premium code only when IT generates the free build.
-            # This channel never runs that processor, and the *_fs() accessor
-            # returns null with the SDK gone, so a surviving premium-marker call
-            # site is a method call on null: a fatal on every install.
-            # Split premium code out by file instead. See the meta-repo doc
-            # docs/freemius-free-paid-split.md.
-            #
-            # Comments are stripped before looking. The documentation for this rule
-            # has to name the marker, so a plain text search flags our own
-            # explanation as a violation and every release fails. That is not
-            # hypothetical: it happened on shipment-tracking-notify.
-            offenders="$(
-              find "$work" -name '*.php' -print0 | xargs -0 -r php -r '
-                foreach ( array_slice( $argv, 1 ) as $file ) {
-                    $code = "";
-                    foreach ( token_get_all( file_get_contents( $file ) ) as $token ) {
-                        if ( is_array( $token ) && in_array( $token[0], array( T_COMMENT, T_DOC_COMMENT ), true ) ) {
-                            continue;
-                        }
-                        $code .= is_array( $token ) ? $token[1] : $token;
-                    }
-                    if ( false !== strpos( $code, "is__premium_only" ) ) {
-                        echo $file, "\n";
-                    }
-                }
-              '
-            )"
-            if [ -n "$offenders" ]; then
-              echo "$offenders"
-              echo "::error::WooCommerce archive contains an is__premium_only() call site in executable code. The SDK accessor is null in this channel, so this fatals at runtime. Use file-level premium exclusion instead."
-              exit 1
-            fi
-
-            # Prove the archive parses with no Composer runtime tree present.
-            if ! find "$work" -name '*.php' -print0 | xargs -0 -r -n1 php -l > /dev/null; then
-              echo "::error::WooCommerce archive failed PHP syntax checking without the vendor tree."
-              exit 1
-            fi
-          fi
-
-          if [ "${{ matrix.channel }}" = "freemius" ] \
-            && grep -q '"freemius/wordpress-sdk"' composer.json \
-            && ! grep -qx 'laqi-unit-stock-manager/vendor/freemius/wordpress-sdk/start.php' <<< "$contents"; then
-            echo "::error::Freemius archive is missing the configured SDK bootstrap."
-            exit 1
-          fi
-
-      # Deploy the Freemius build to Freemius. Freemius-channel only, and only when
-      # FREEMIUS_DEPLOY_ENABLED=true. The action wants the zip in the repo root.
-      - name: Stage the Freemius zip
-        if: ${{ matrix.channel == 'freemius' && vars.FREEMIUS_DEPLOY_ENABLED == 'true' }}
-        run: cp dist/*-freemius.zip ./freemius-build.zip
-
-      - name: Deploy to Freemius (pending)
-        if: ${{ matrix.channel == 'freemius' && vars.FREEMIUS_DEPLOY_ENABLED == 'true' }}
-        uses: buttonizer/freemius-deploy@dcbf3a1a0217c8235657b66ac86704437f87d5ee # v0.1.3
-        with:
-          file_name: freemius-build.zip
-          version: ${{ steps.ver.outputs.version }}
-          release_mode: pending
-        env:
-          DEV_ID: ${{ vars.FREEMIUS_DEV_ID }}
-          PLUGIN_ID: ${{ vars.FREEMIUS_PLUGIN_ID }}
-          PLUGIN_SLUG: "laqi-unit-stock-manager"
-          # PUBLIC_KEY / SECRET_KEY are the DEVELOPER (account) keys, NOT the
-          # plugin's keys: the action authenticates at the 'developer' scope.
-          PUBLIC_KEY: ${{ secrets.FREEMIUS_PUBLIC_KEY }}
-          SECRET_KEY: ${{ secrets.FREEMIUS_SECRET_KEY }}
-
-      # The deploy action swallows API errors and still exits 0 (it die()s without
-      # a failure status on, e.g., a 401). It only writes the downloaded
-      # *__free.zip after a successful deploy, so treat that file as the success
-      # signal and fail the job if it is missing.
-      - name: Verify the Freemius deploy succeeded
-        if: ${{ matrix.channel == 'freemius' && vars.FREEMIUS_DEPLOY_ENABLED == 'true' }}
-        run: |
-          if [ ! -f freemius-build__free.zip ]; then
-            echo "::error::Freemius deploy did not complete (no build was returned). The deploy action reports success even on API errors, so check the 'Deploy to Freemius' step log above. A 401 'Invalid Authorization header' means PUBLIC_KEY/SECRET_KEY are not the DEVELOPER (account) keys."
-            exit 1
-          fi
-          echo "Freemius deploy verified (build returned)."
-
       - name: Upload artifact
         uses: actions/upload-artifact@v5
         with:
-          name: "laqi-unit-stock-manager-${{ matrix.channel }}"
+          name: "laqi-unit-stock-manager-wordpressorg"
           path: dist/*.zip
 
       - name: Attach to release
@@ -290,9 +133,6 @@ jobs:
       # declared. Nothing noticed, because a number in one repo has no
       # relationship to the release it claims to describe.
       #
-      # Runs on one channel only. The matrix would otherwise publish the same
-      # manifest several times and race with itself.
-      #
       # Requires, per repo:
       #   variable  R2_PUBLISH_ENABLED = true
       #   secrets   R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_ENDPOINT
@@ -301,7 +141,7 @@ jobs:
       # token: those cannot be scoped to a single Worker, so one leaking would
       # let someone replace the live company website.
       - name: Publish the release manifest to R2
-        if: ${{ matrix.channel == 'woocommerce' && github.event_name == 'release' && vars.R2_PUBLISH_ENABLED == 'true' }}
+        if: ${{ github.event_name == 'release' && vars.R2_PUBLISH_ENABLED == 'true' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
@@ -343,10 +183,8 @@ jobs:
           fi
           echo "Published laqi-unit-stock-manager $served to files.laqi-logistics.com" >> "$GITHUB_STEP_SUMMARY"
 
-      # Only when this plugin has a free edition, which means a `wordpressorg`
-      # channel in the matrix above. Delete this step if it never will.
       - name: Publish the free build to R2
-        if: ${{ matrix.channel == 'wordpressorg' && github.event_name == 'release' && vars.R2_PUBLISH_ENABLED == 'true' }}
+        if: ${{ github.event_name == 'release' && vars.R2_PUBLISH_ENABLED == 'true' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
