@@ -33,6 +33,12 @@ API 1.x should check `supports( '1.0', '2.0' )`. The concrete `Container`,
 `laqi_lusm_booted`, and `laqi_lusm_premium_ready` are transitional internals for
 the current in-tree paid edition and must not be used by new extensions.
 
+Read-only extensions that review mapping health should use
+`$context->mapping_diagnostics()->inspect( $mapping )`. This keeps WooCommerce
+product-state checks owned by Free and avoids coupling add-ons to Free's internal
+composition container. Obtain mappings from `$context->mappings()` and do not
+reconstruct the diagnostic rules in an add-on.
+
 ## Add a unit
 
 For a site-managed unit, prefer the existing custom-unit UI/repository. It stores

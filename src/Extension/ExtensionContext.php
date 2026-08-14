@@ -13,6 +13,7 @@ use LaqiUnitStockManager\Admin\ScreenSectionCatalog;
 use LaqiUnitStockManager\Availability\AvailabilityService;
 use LaqiUnitStockManager\Consumption\CalculatorRegistry;
 use LaqiUnitStockManager\Container;
+use LaqiUnitStockManager\Diagnostics\MappingDiagnostics;
 use LaqiUnitStockManager\Inventory\MovementRegistry;
 use LaqiUnitStockManager\Inventory\StockAdjustmentService;
 use LaqiUnitStockManager\Inventory\StockMutationService;
@@ -76,6 +77,11 @@ final class ExtensionContext implements ExtensionContextInterface {
 	/** Product-mapping persistence. @return MappingRepository */
 	public function mappings(): MappingRepository {
 		return $this->container->mapping_repository();
+	}
+
+	/** Read-only product-mapping diagnostics. @return MappingDiagnostics */
+	public function mapping_diagnostics(): MappingDiagnostics {
+		return $this->container->mapping_diagnostics();
 	}
 
 	/** Movement-ledger reads. @return MovementRepository */
