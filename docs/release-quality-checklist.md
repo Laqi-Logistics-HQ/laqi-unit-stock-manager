@@ -31,6 +31,31 @@ passed on commit `2b3b23a`: official Plugin Check, browser/axe coverage, PHP
 WordPress/PHP/WooCommerce 10.9.4/11.0.0 PHPUnit lanes are green. This completes
 the repository release sign-off for 0.1.0.
 
+### Release handoff
+
+Repository implementation and automated sign-off are complete. Publishing and
+marketplace submission remain deliberate owner actions:
+
+1. Complete and record the manual accessibility and performance checks below.
+2. Set the repository variable `RELEASE_BUILDS_ENABLED=true` only when 0.1.0 is
+   approved for publication. No release variables or secrets were configured at
+   sign-off.
+3. Publish GitHub tag/release `0.1.0`, then wait for the release workflow and its
+   reused quality workflow to pass.
+4. Download the workflow-built archives and verify their checksums. Use only the
+   `-wordpressorg.zip` package for a WordPress.org submission and only the
+   `-woocommerce.zip` package for Woo Marketplace submission.
+5. Complete the canonical WordPress.org or Woo Marketplace submission checklist
+   against that exact archive immediately before uploading it. Woo's vendor-side
+   QIT results are an additional blocking gate.
+6. Do not upload or distribute the `-freemius.zip` package until a Freemius
+   product and `freemius/wordpress-sdk` dependency are configured and its deploy
+   credentials and gate have been reviewed.
+
+Publishing the GitHub release, enabling deployment variables, and submitting an
+archive are intentionally outside this repository sign-off; each changes an
+external release channel and requires explicit owner approval.
+
 Woo's submission-only QIT API, E2E, activation, security, PHPCompatibility,
 malware, and validation checks still run in the vendor submission flow. Passing
 this repository gate does not replace those checks; a QIT failure blocks the
