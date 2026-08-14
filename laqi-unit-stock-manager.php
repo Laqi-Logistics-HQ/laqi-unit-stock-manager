@@ -47,24 +47,24 @@ define( 'LAQI_LUSM_FILE', __FILE__ );
 define( 'LAQI_LUSM_PATH', plugin_dir_path( __FILE__ ) );
 define( 'LAQI_LUSM_URL', plugin_dir_url( __FILE__ ) );
 
-// Composer PSR-4 autoloader if present; otherwise register a minimal PSR-4
-// autoloader for src/ so the plugin still works when dropped in without Composer.
+// Load bundled dependencies when present. Always register the local PSR-4
+// loader as well: an SDK's generated Composer metadata must never be able to
+// prevent the plugin's own classes from loading after an edition upgrade.
 if ( is_readable( LAQI_LUSM_PATH . 'vendor/autoload.php' ) ) {
 	require LAQI_LUSM_PATH . 'vendor/autoload.php';
-} else {
-	spl_autoload_register(
-		static function ( $class_name ) {
-			$prefix = 'LaqiUnitStockManager\\';
-			if ( 0 !== strpos( $class_name, $prefix ) ) {
-				return;
-			}
-			$file = LAQI_LUSM_PATH . 'src/' . str_replace( '\\', '/', substr( $class_name, strlen( $prefix ) ) ) . '.php';
-			if ( is_readable( $file ) ) {
-				require $file;
-			}
-		}
-	);
 }
+spl_autoload_register(
+	static function ( $class_name ) {
+		$prefix = 'LaqiUnitStockManager\\';
+		if ( 0 !== strpos( $class_name, $prefix ) ) {
+			return;
+		}
+		$file = LAQI_LUSM_PATH . 'src/' . str_replace( '\\', '/', substr( $class_name, strlen( $prefix ) ) ) . '.php';
+		if ( is_readable( $file ) ) {
+			require $file;
+		}
+	}
+);
 
 // Lifecycle hooks must be registered in the main file (not on a later hook).
 register_activation_hook( __FILE__, array( '\LaqiUnitStockManager\Plugin', 'on_activate' ) );
