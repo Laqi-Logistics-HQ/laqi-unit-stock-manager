@@ -25,6 +25,10 @@ make npm p=laqi-unit-stock-manager c="install"
 make npm p=laqi-unit-stock-manager c="run build"
 ```
 
+See [Contributor extension recipes](docs/contributor-extension-recipes.md) for
+the supported unit, movement, calculator, admin-section, notification, exchange,
+order-adapter, and allocation extension patterns.
+
 ## Structure
 
 ```
