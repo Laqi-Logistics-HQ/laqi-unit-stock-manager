@@ -115,4 +115,14 @@ class Test_Plugin extends WP_UnitTestCase {
 		$this->assertFalse( has_filter( 'laqi_lusm_include_checkout_item_stock_demand' ) );
 		$this->assertFalse( has_filter( 'laqi_lusm_include_order_item_stock_demand' ) );
 	}
+
+	/**
+	 * Read-only stock anomaly workflows belong only to the Pro add-on.
+	 */
+	public function test_stock_anomaly_implementation_is_not_bundled(): void {
+		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Anomalies\StockAnomalyDetector' ) );
+		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Admin\StockAnomaliesSection' ) );
+		$this->assertFalse( has_filter( 'laqi_lusm_large_adjustment_ratio' ) );
+		$this->assertFalse( has_filter( 'laqi_lusm_stock_anomalies' ) );
+	}
 }

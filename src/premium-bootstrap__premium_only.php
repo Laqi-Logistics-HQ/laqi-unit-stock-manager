@@ -11,8 +11,6 @@ defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/Premium__premium_only/Admin/MovementLedgerSection.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/MovementLedgerExportController.php';
-require_once __DIR__ . '/Premium__premium_only/Anomalies/StockAnomalyDetector.php';
-require_once __DIR__ . '/Premium__premium_only/Admin/StockAnomaliesSection.php';
 require_once __DIR__ . '/Premium__premium_only/Alerts/LowStockPolicyRepository.php';
 require_once __DIR__ . '/Premium__premium_only/Alerts/LowStockAlertEvaluator.php';
 require_once __DIR__ . '/Premium__premium_only/Alerts/AlertChannelInterface.php';
@@ -154,8 +152,6 @@ add_action(
 		$container->movement_registry()->register( new Inventory\MovementType( 'external_add', __( 'External stock addition', 'laqi-unit-stock-manager' ) ) );
 		$container->movement_registry()->register( new Inventory\MovementType( 'external_subtract', __( 'External stock subtraction', 'laqi-unit-stock-manager' ) ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\MovementLedgerSection( $container->movement_repository(), $container->movement_presenter(), new Admin\PaginationRenderer() ) );
-		$anomaly_detector = new Premium\Anomalies\StockAnomalyDetector( $container->movement_repository(), $container->mapping_repository(), new Diagnostics\MappingDiagnostics() );
-		$container->screen_section_catalog()->register( new Premium\Admin\StockAnomaliesSection( $anomaly_detector ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\LowStockAlertsSection( $alert_policies, $container->pool_repository(), $container->quantity_formatter(), $alert_deliveries ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ForecastSection( $container->pool_repository(), $forecast_policies, $forecast_service, $container->quantity_formatter(), new Admin\PaginationRenderer() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\StockReportSection( $report_settings ) );
