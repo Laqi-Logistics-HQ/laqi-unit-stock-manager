@@ -68,19 +68,9 @@ require_once __DIR__ . '/Premium__premium_only/Supply/SafetyStockPolicyRepositor
 require_once __DIR__ . '/Premium__premium_only/Supply/SafetyStockAvailability.php';
 require_once __DIR__ . '/Premium__premium_only/Supply/SupplyProjectionService.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/SupplyStateController.php';
-require_once __DIR__ . '/Premium__premium_only/Recipes/RecipeCalculator.php';
-require_once __DIR__ . '/Premium__premium_only/Admin/RecipeSection.php';
-require_once __DIR__ . '/Premium__premium_only/Admin/RecipeController.php';
 require_once __DIR__ . '/Premium__premium_only/Integrations/SubscriptionRenewalAdapter.php';
 require_once __DIR__ . '/Premium__premium_only/Integrations/MobileOrderAdapter.php';
 require_once __DIR__ . '/Premium__premium_only/Integrations/StockPricingRuleFieldProvider.php';
-
-add_action(
-	'laqi_lusm_register_calculators',
-	static function ( Consumption\CalculatorRegistry $calculators ): void {
-		$calculators->register( new Premium\Recipes\RecipeCalculator() );
-	}
-);
 
 /**
  * Give physically separate paid modules the completed shared composition root.
@@ -150,7 +140,6 @@ add_action(
 		$container->screen_section_catalog()->register( new Premium\Admin\ReorderSection( $container->pool_repository(), $suppliers, $reorder_policies, $reorder_suggestions, $container->quantity_formatter() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\MaterialCostsSection( $material_economics, $container->mapping_repository() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ReservationsSection( $stock_holds, $container->pool_repository(), $container->quantity_formatter(), $safety_stock, $supply_projections ) );
-		$container->screen_section_catalog()->register( new Premium\Admin\RecipeSection( $container->unit_registry() ) );
 		( new Premium\Admin\LowStockAlertController( $alert_policies, $container->pool_repository(), $container->unit_registry() ) )->register();
 		( new Premium\Admin\ForecastController( $forecast_policies, $container->pool_repository() ) )->register();
 		( new Premium\Admin\StockReportController( $report_settings, $report_scheduler ) )->register();
@@ -160,7 +149,6 @@ add_action(
 		( new Premium\Admin\ReorderController( $reorder_policies, $container->pool_repository(), $suppliers, $container->unit_registry() ) )->register();
 		( new Premium\Admin\CsvExchangeController( $csv_exchange ) )->register();
 		( new Premium\Admin\SupplyStateController( $stock_hold_service, $container->pool_repository(), $container->unit_registry(), $safety_stock ) )->register();
-		( new Premium\Admin\RecipeController( $container->mapping_repository(), $container->pool_repository(), $container->unit_registry(), new WooCommerce\PurchasableResolver() ) )->register();
 		$renewal_snapshots = new WooCommerce\OrderItemSnapshotter( $container->mapping_repository(), $container->calculator_registry() );
 		( new Premium\Integrations\SubscriptionRenewalAdapter( $renewal_snapshots, $reservation_service ) )->register();
 		$mobile_snapshots = new WooCommerce\OrderItemSnapshotter( $container->mapping_repository(), $container->calculator_registry() );

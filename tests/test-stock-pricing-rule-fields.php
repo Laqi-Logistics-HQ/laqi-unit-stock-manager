@@ -2,7 +2,6 @@
 /** Read-only Stock & Pricing Automation field tests. @package LaqiUnitStockManager */
 
 use LaqiUnitStockManager\Container;
-use LaqiUnitStockManager\Domain\MappingComponent;
 use LaqiUnitStockManager\Domain\Quantity;
 use LaqiUnitStockManager\Premium\Forecasting\ForecastPolicyRepository;
 use LaqiUnitStockManager\Premium\Forecasting\StockForecastService;
@@ -17,7 +16,7 @@ class Test_Stock_Pricing_Rule_Fields extends WP_UnitTestCase {
 	/** @var WC_Product_Simple */ private $product;
 	/** @var int[] */ private $pool_ids = array();
 
-	/** Create one recipe product backed by two forecastable pools. */
+	/** Create one mapped product backed by a forecastable pool. */
 	public function set_up(): void {
 		parent::set_up();
 		global $wpdb;
@@ -32,17 +31,10 @@ class Test_Stock_Pricing_Rule_Fields extends WP_UnitTestCase {
 		}
 		$wpdb->delete( Schema::table( 'mappings' ), array( 'product_id' => $this->product->get_id() ), array( '%d' ) );
 
-		$first = $this->container->pool_repository()->create( 'Rule contents ' . wp_generate_uuid4(), new Quantity( 'count', 100 ), 'unit', 'unit', false, 'RULE-A-' . wp_generate_uuid4() );
-		$second = $this->container->pool_repository()->create( 'Rule packaging ' . wp_generate_uuid4(), new Quantity( 'count', 30 ), 'unit', 'unit', false, 'RULE-B-' . wp_generate_uuid4() );
-		$this->pool_ids = array( $first->id(), $second->id() );
-		$this->container->mapping_repository()->save_components(
-			$this->product->get_id(),
-			0,
-			'recipe',
-			array( new MappingComponent( $first->id(), 4, 'contents' ), new MappingComponent( $second->id(), 2, 'packaging' ) )
-		);
+		$first          = $this->container->pool_repository()->create( 'Rule contents ' . wp_generate_uuid4(), new Quantity( 'count', 100 ), 'unit', 'unit', false, 'RULE-A-' . wp_generate_uuid4() );
+		$this->pool_ids = array( $first->id() );
+		$this->container->mapping_repository()->create_single_pool( $this->product->get_id(), 0, $first->id(), 4 );
 		$this->seed_forecast_history( $first->id() );
-		$this->seed_forecast_history( $second->id() );
 		$policies = new ForecastPolicyRepository( $wpdb );
 		$forecasts = new StockForecastService( new MovementRepository( $wpdb ) );
 		$this->provider = new StockPricingRuleFieldProvider( $this->container->mapping_repository(), $this->container->pool_repository(), $this->container->calculator_registry(), $this->container->availability_service(), $policies, $forecasts );
@@ -73,17 +65,17 @@ class Test_Stock_Pricing_Rule_Fields extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'setter', $catalog['laqi_lusm_pools'] );
 	}
 
-	/** Recipe-backed products expose limiting and per-pool values. */
+	/** Mapped products expose limiting and per-pool values. */
 	public function test_values_expose_limiting_quantity_and_pool_collection(): void {
 		global $wpdb;
 		$before = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . Schema::table( 'movements' ) );
 		$values = $this->provider->values( array( 'consumer_value' => 7 ), $this->product->get_id() );
 		$this->assertSame( 7, $values['consumer_value'] );
 		$this->assertTrue( $values['laqi_lusm_is_mapped'] );
-		$this->assertSame( 15, $values['laqi_lusm_saleable_quantity'] );
-		$this->assertCount( 2, $values['laqi_lusm_pools'] );
-		$this->assertSame( array( 4, 2 ), wp_list_pluck( $values['laqi_lusm_pools'], 'consumption_base' ) );
-		$this->assertEqualsWithDelta( 45.0, $values['laqi_lusm_minimum_days_cover'], 0.01 );
+		$this->assertSame( 25, $values['laqi_lusm_saleable_quantity'] );
+		$this->assertCount( 1, $values['laqi_lusm_pools'] );
+		$this->assertSame( array( 4 ), wp_list_pluck( $values['laqi_lusm_pools'], 'consumption_base' ) );
+		$this->assertEqualsWithDelta( 150.0, $values['laqi_lusm_minimum_days_cover'], 0.01 );
 		$this->assertSame( $before, (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . Schema::table( 'movements' ) ) );
 	}
 
