@@ -82,6 +82,8 @@ require_once __DIR__ . '/Premium__premium_only/Integrations/GroupedProductAdapte
 require_once __DIR__ . '/Premium__premium_only/Integrations/SubscriptionRenewalAdapter.php';
 require_once __DIR__ . '/Premium__premium_only/Integrations/MobileOrderAdapter.php';
 require_once __DIR__ . '/Premium__premium_only/Integrations/MobileStockLookupController.php';
+require_once __DIR__ . '/Premium__premium_only/Integrations/MobileStocktakeController.php';
+require_once __DIR__ . '/Premium__premium_only/Admin/MobileStocktakeSection.php';
 require_once __DIR__ . '/Premium__premium_only/Integrations/ExternalMovementService.php';
 require_once __DIR__ . '/Premium__premium_only/Integrations/ExternalMovementController.php';
 require_once __DIR__ . '/Premium__premium_only/Integrations/StockPricingRuleFieldProvider.php';
@@ -170,6 +172,7 @@ add_action(
 		$container->screen_section_catalog()->register( new Premium\Admin\MaterialCostsSection( $material_economics, $container->mapping_repository() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ReservationsSection( $stock_holds, $container->pool_repository(), $container->quantity_formatter(), $safety_stock, $supply_projections ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\RecipeSection( $container->unit_registry() ) );
+		$container->screen_section_catalog()->register( new Premium\Admin\MobileStocktakeSection() );
 		( new Premium\Admin\MovementLedgerExportController( $container->movement_repository(), $container->movement_presenter() ) )->register();
 		( new Premium\Admin\StockLossController( $container->stock_adjustment_service(), $loss_types ) )->register();
 		( new Premium\Admin\LowStockAlertController( $alert_policies, $container->pool_repository(), $container->unit_registry() ) )->register();
@@ -188,6 +191,7 @@ add_action(
 		$mobile_snapshots = new WooCommerce\OrderItemSnapshotter( $container->mapping_repository(), $container->calculator_registry() );
 		( new Premium\Integrations\MobileOrderAdapter( $mobile_snapshots, $reservation_service ) )->register();
 		( new Premium\Integrations\MobileStockLookupController( $container->mapping_repository(), $container->pool_repository(), $container->pool_presenter(), $container->availability_service(), $container->calculator_registry() ) )->register();
+		( new Premium\Integrations\MobileStocktakeController( $container->stock_adjustment_service(), $container->pool_repository(), $container->pool_presenter() ) )->register();
 		$external_movements = new Premium\Integrations\ExternalMovementService( $container->pool_repository(), $container->unit_registry(), $container->stock_mutation_service() );
 		( new Premium\Integrations\ExternalMovementController( $external_movements ) )->register();
 		( new Premium\Integrations\StockPricingRuleFieldProvider( $container->mapping_repository(), $container->pool_repository(), $container->calculator_registry(), $container->availability_service(), $forecast_policies, $forecast_service ) )->register();

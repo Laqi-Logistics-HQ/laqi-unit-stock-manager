@@ -91,4 +91,39 @@ class Test_Mobile_Order_Scanning extends WP_UnitTestCase {
 		wp_set_current_user( 0 ); $request = new WP_REST_Request( 'GET', '/laqi-lusm/v1/scan' ); $request->set_query_params( array( 'code' => $this->product->get_sku() ) );
 		$this->assertSame( 401, rest_get_server()->dispatch( $request )->get_status() );
 	}
+
+	/** Authenticated physical counts are exact, audited, and idempotent. */
+	public function test_mobile_stocktake_sets_pool_balance_once(): void {
+		wp_set_current_user( $this->user_id );
+		$request = new WP_REST_Request( 'POST', '/laqi-lusm/v1/pools/' . $this->pool_id . '/stocktake' );
+		$request->set_body_params( array( 'quantity' => '87', 'unit' => 'unit', 'reason' => 'Aisle count A-12', 'idempotency_key' => 'mobile-count-' . $this->pool_id ) );
+		$first = rest_get_server()->dispatch( $request );
+		$retry = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $first->get_status() );
+		$this->assertFalse( $first->get_data()['duplicate'] );
+		$this->assertTrue( $retry->get_data()['duplicate'] );
+		$this->assertSame( 87, $retry->get_data()['pool']['quantity_base'] );
+		global $wpdb;
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT type, source_type, actor_id, reason FROM ' . Schema::table( 'movements' ) . ' WHERE id = %d', $first->get_data()['movement_id'] ), ARRAY_A );
+		$this->assertSame( 'manual_set', $row['type'] );
+		$this->assertSame( 'mobile_stocktake', $row['source_type'] );
+		$this->assertSame( $this->user_id, (int) $row['actor_id'] );
+		$this->assertSame( 'Aisle count A-12', $row['reason'] );
+	}
+
+	/** Mobile counts require an audit reason. */
+	public function test_mobile_stocktake_rejects_empty_reason(): void {
+		wp_set_current_user( $this->user_id );
+		$request = new WP_REST_Request( 'POST', '/laqi-lusm/v1/pools/' . $this->pool_id . '/stocktake' );
+		$request->set_body_params( array( 'quantity' => '87', 'unit' => 'unit', 'reason' => '', 'idempotency_key' => 'missing-reason-' . $this->pool_id ) );
+		$this->assertSame( 400, rest_get_server()->dispatch( $request )->get_status() );
+	}
+
+	/** Anonymous clients cannot record physical counts. */
+	public function test_anonymous_mobile_stocktake_is_forbidden(): void {
+		wp_set_current_user( 0 );
+		$request = new WP_REST_Request( 'POST', '/laqi-lusm/v1/pools/' . $this->pool_id . '/stocktake' );
+		$request->set_body_params( array( 'quantity' => '87', 'unit' => 'unit', 'reason' => 'Count', 'idempotency_key' => 'anonymous-' . $this->pool_id ) );
+		$this->assertSame( 401, rest_get_server()->dispatch( $request )->get_status() );
+	}
 }
