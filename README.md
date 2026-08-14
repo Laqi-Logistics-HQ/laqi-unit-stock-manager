@@ -123,6 +123,14 @@ whole event commits or rolls back together, and stable event IDs make safe retri
 return the original movement results. External clients never write balances or
 ledger rows directly.
 
+Stock & Pricing Automation and other rule engines can discover read-only field
+definitions through `laqi_lusm_read_only_rule_field_catalog` and resolve values
+for a product/variation through `laqi_lusm_read_only_rule_field_values`. The
+provider exposes mapped state, limiting saleable quantity, minimum valid days of
+cover, and an aligned collection of pool balance, filtered availability,
+consumption, and forecast data. The contract contains no write callback and does
+not expose the stock mutation service.
+
 Custom units use soft retirement. The repository prevents retirement while a pool
 uses the key as its base/display unit or another active custom unit references it;
 retired records remain stored so a historical key is never redefined accidentally.
