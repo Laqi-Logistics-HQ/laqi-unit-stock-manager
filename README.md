@@ -95,6 +95,14 @@ so a stale form cannot silently overwrite a newer administrator change.
 Current product links use the shared pagination renderer in 25-row pages, so the
 Setup tab can manage every active mapping without a fixed listing ceiling.
 
+The Pro grouped-product adapter supports WooCommerce Product Bundles and
+Composite Products without reconstructing their configurations. Their container
+cart/order lines are excluded from pooled demand, while their normal
+quantity-synchronized child lines continue through cart validation, immutable
+order snapshots, reservations, reductions, restorations, and order edits exactly
+once. The adapter prefers each extension's public cart helper and retains the
+documented relationship fields as a compatibility fallback.
+
 Custom units use soft retirement. The repository prevents retirement while a pool
 uses the key as its base/display unit or another active custom unit references it;
 retired records remain stored so a historical key is never redefined accidentally.
