@@ -103,4 +103,14 @@ class Test_Plugin extends WP_UnitTestCase {
 		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Admin\StockLossController' ) );
 		$this->assertFalse( has_action( 'admin_post_laqi_lusm_record_loss' ) );
 	}
+
+	/**
+	 * Optional grouped-product integration belongs only to the Pro add-on.
+	 */
+	public function test_grouped_product_adapter_is_not_bundled(): void {
+		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Integrations\GroupedProductAdapter' ) );
+		$this->assertFalse( has_filter( 'laqi_lusm_include_cart_item_stock_demand' ) );
+		$this->assertFalse( has_filter( 'laqi_lusm_include_checkout_item_stock_demand' ) );
+		$this->assertFalse( has_filter( 'laqi_lusm_include_order_item_stock_demand' ) );
+	}
 }

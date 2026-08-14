@@ -75,7 +75,6 @@ require_once __DIR__ . '/Premium__premium_only/Admin/SupplyStateController.php';
 require_once __DIR__ . '/Premium__premium_only/Recipes/RecipeCalculator.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/RecipeSection.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/RecipeController.php';
-require_once __DIR__ . '/Premium__premium_only/Integrations/GroupedProductAdapter.php';
 require_once __DIR__ . '/Premium__premium_only/Integrations/SubscriptionRenewalAdapter.php';
 require_once __DIR__ . '/Premium__premium_only/Integrations/MobileOrderAdapter.php';
 require_once __DIR__ . '/Premium__premium_only/Integrations/MobileStockLookupController.php';
@@ -178,7 +177,6 @@ add_action(
 		( new Premium\Admin\CsvExchangeController( $csv_exchange ) )->register();
 		( new Premium\Admin\SupplyStateController( $stock_hold_service, $container->pool_repository(), $container->unit_registry(), $safety_stock ) )->register();
 		( new Premium\Admin\RecipeController( $container->mapping_repository(), $container->pool_repository(), $container->unit_registry(), new WooCommerce\PurchasableResolver() ) )->register();
-		( new Premium\Integrations\GroupedProductAdapter() )->register();
 		$renewal_snapshots = new WooCommerce\OrderItemSnapshotter( $container->mapping_repository(), $container->calculator_registry() );
 		( new Premium\Integrations\SubscriptionRenewalAdapter( $renewal_snapshots, $reservation_service ) )->register();
 		$mobile_snapshots = new WooCommerce\OrderItemSnapshotter( $container->mapping_repository(), $container->calculator_registry() );
