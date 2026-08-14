@@ -20,8 +20,6 @@ require_once __DIR__ . '/Premium__premium_only/Admin/LowStockAlertController.php
 require_once __DIR__ . '/Premium__premium_only/Admin/LowStockAlertsSection.php';
 require_once __DIR__ . '/Premium__premium_only/Forecasting/ForecastPolicyRepository.php';
 require_once __DIR__ . '/Premium__premium_only/Forecasting/StockForecastService.php';
-require_once __DIR__ . '/Premium__premium_only/Admin/ForecastController.php';
-require_once __DIR__ . '/Premium__premium_only/Admin/ForecastSection.php';
 require_once __DIR__ . '/Premium__premium_only/Reports/StockReportSettings.php';
 require_once __DIR__ . '/Premium__premium_only/Reports/StockReportBuilder.php';
 require_once __DIR__ . '/Premium__premium_only/Reports/StockReportScheduler.php';
@@ -130,14 +128,12 @@ add_action(
 		$container->movement_registry()->register( new Inventory\MovementType( 'batch_transfer_out', __( 'Batch transfer out', 'laqi-unit-stock-manager' ) ) );
 		$container->movement_registry()->register( new Inventory\MovementType( 'batch_transfer_in', __( 'Batch transfer in', 'laqi-unit-stock-manager' ) ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\LowStockAlertsSection( $alert_policies, $container->pool_repository(), $container->quantity_formatter(), $alert_deliveries ) );
-		$container->screen_section_catalog()->register( new Premium\Admin\ForecastSection( $container->pool_repository(), $forecast_policies, $forecast_service, $container->quantity_formatter(), new Admin\PaginationRenderer() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\StockReportSection( $report_settings ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ReceivingSection( $suppliers, $container->pool_repository(), $container->quantity_formatter(), $batches, $batch_allocations, $batch_expiry ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ReorderSection( $container->pool_repository(), $suppliers, $reorder_policies, $reorder_suggestions, $container->quantity_formatter() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\MaterialCostsSection( $material_economics, $container->mapping_repository() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ReservationsSection( $stock_holds, $container->pool_repository(), $container->quantity_formatter(), $safety_stock, $supply_projections ) );
 		( new Premium\Admin\LowStockAlertController( $alert_policies, $container->pool_repository(), $container->unit_registry() ) )->register();
-		( new Premium\Admin\ForecastController( $forecast_policies, $container->pool_repository() ) )->register();
 		( new Premium\Admin\StockReportController( $report_settings, $report_scheduler ) )->register();
 		( new Premium\Admin\ReceivingController( $suppliers, $container->pool_repository(), $container->unit_registry(), $receiving ) )->register();
 		( new Premium\Admin\BatchOperationsController( $batch_operations, $batches, $container->unit_registry(), $batch_transfers ) )->register();

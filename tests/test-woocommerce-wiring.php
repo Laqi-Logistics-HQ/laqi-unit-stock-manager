@@ -33,7 +33,7 @@ class Test_WooCommerce_Wiring extends WP_UnitTestCase {
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_update_pool' ) );
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_create_unit' ) );
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_save_low_stock_alert' ) );
-		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_save_forecast' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_save_forecast' ) );
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_save_stock_report' ) );
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_send_stock_report' ) );
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_create_supplier' ) );
