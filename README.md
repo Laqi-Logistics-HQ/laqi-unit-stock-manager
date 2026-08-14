@@ -110,6 +110,12 @@ moment. The exact renewal demand is reserved while pending; the normal Woo order
 hooks convert it on reduction, release it on failure/cancellation, and restore
 the immutable renewal snapshot when stock is restored.
 
+Woo Mobile and other WooCommerce REST clients use the same immutable snapshot,
+reservation, reduction, restoration, and order-edit lifecycle as browser orders.
+Authorized inventory clients can resolve a scanned product SKU or WooCommerce
+GTIN/UPC/EAN/ISBN through `GET /wp-json/laqi-lusm/v1/scan?code=...` and receive
+its exact per-sale pool demand, available pool balances, and saleable quantity.
+
 Custom units use soft retirement. The repository prevents retirement while a pool
 uses the key as its base/display unit or another active custom unit references it;
 retired records remain stored so a historical key is never redefined accidentally.
