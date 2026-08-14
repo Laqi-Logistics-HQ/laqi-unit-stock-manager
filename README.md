@@ -161,6 +161,11 @@ context and the Free-owned `laqi_lusm_adjustment_authorized` and
 `laqi_lusm_adjustment_reason_templates` hooks; no paid implementation ships in
 this repository for that capability.
 
+Typed physical-loss workflows likewise live in the separate Pro add-on. Pro
+registers stable `loss_*` movement labels, its templated admin section, and its
+controller through the extension context while Free remains the only service
+that validates and applies the resulting stock change.
+
 Custom units use soft retirement. The repository prevents retirement while a pool
 uses the key as its base/display unit or another active custom unit references it;
 retired records remain stored so a historical key is never redefined accidentally.
