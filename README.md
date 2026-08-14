@@ -102,13 +102,11 @@ so a stale form cannot silently overwrite a newer administrator change.
 Current product links use the shared pagination renderer in 25-row pages, so the
 Setup tab can manage every active mapping without a fixed listing ceiling.
 
-The Pro grouped-product adapter supports WooCommerce Product Bundles and
-Composite Products without reconstructing their configurations. Their container
-cart/order lines are excluded from pooled demand, while their normal
-quantity-synchronized child lines continue through cart validation, immutable
-order snapshots, reservations, reductions, restorations, and order edits exactly
-once. The adapter prefers each extension's public cart helper and retains the
-documented relationship fields as a compatibility fallback.
+The separately distributed Pro add-on supports WooCommerce Product Bundles and
+Composite Products through Free's documented demand-inclusion filters. Their
+container cart/order lines are excluded from pooled demand, while their normal
+quantity-synchronized child lines continue through Free's cart validation,
+immutable snapshots, reductions, restorations, and order edits exactly once.
 
 The Pro WooCommerce Subscriptions adapter prepares each renewal as its own stock
 event. Because Subscriptions copies line-item metadata forward, inherited pooled
