@@ -145,13 +145,11 @@ cover, and an aligned collection of pool balance, filtered availability,
 consumption, and forecast data. The contract contains no write callback and does
 not expose the stock mutation service.
 
-The Pro Anomalies tab performs a read-only review of the latest 500 ledger rows
-and all active mappings. It highlights large manual, count, or external changes;
-repeated negative balances; order consumption without an order source;
-restorations that exceed the matching recent reductions; and mapping conflicts.
-The default large-change threshold is 50% of the preceding balance and can be
-adjusted with `laqi_lusm_large_adjustment_ratio`. Consumers may add or rank
-findings with `laqi_lusm_stock_anomalies`; detection never changes stock.
+The separately distributed Pro add-on owns the Anomalies tab and consumes Free's
+public movement-history, mapping, and mapping-diagnostics services. It performs
+a read-only review without duplicating Free's inventory rules or receiving the
+internal container. Pro-owned filters can adjust its large-change threshold or
+extend its findings without adding paid implementation code to this repository.
 
 The separately distributed Pro add-on owns reusable adjustment reasons and
 sensitive-change approval policies. It attaches through the versioned extension

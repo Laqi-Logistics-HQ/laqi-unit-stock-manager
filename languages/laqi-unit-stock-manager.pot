@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-14T14:29:30+00:00\n"
+"POT-Creation-Date: 2026-08-14T14:48:57+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -57,7 +57,6 @@ msgstr ""
 #: src/Admin/ActivitySection.php:78
 #: src/Premium__premium_only/Admin/LowStockAlertsSection.php:105
 #: src/Premium__premium_only/Admin/MovementLedgerSection.php:81
-#: src/Premium__premium_only/Admin/StockAnomaliesSection.php:60
 #: src/Privacy.php:108
 msgid "Date"
 msgstr ""
@@ -79,7 +78,6 @@ msgstr ""
 #: src/Premium__premium_only/Admin/RecipeSection.php:56
 #: src/Premium__premium_only/Admin/ReorderSection.php:66
 #: src/Premium__premium_only/Admin/ReservationsSection.php:40
-#: src/Premium__premium_only/Admin/StockAnomaliesSection.php:60
 #: src/Premium__premium_only/Admin/StockScenarioSection.php:53
 #: src/Premium__premium_only/Reports/StockReportBuilder.php:62
 msgid "Inventory pool"
@@ -107,7 +105,6 @@ msgstr ""
 
 #: src/Admin/ActivitySection.php:83
 #: src/Premium__premium_only/Admin/MovementLedgerSection.php:81
-#: src/Premium__premium_only/Admin/StockAnomaliesSection.php:60
 msgid "Source"
 msgstr ""
 
@@ -299,7 +296,7 @@ msgid "Stock unit"
 msgstr ""
 
 #: src/Admin/SetupSection.php:111
-#: src/Container.php:169
+#: src/Container.php:180
 msgid "Opening balance"
 msgstr ""
 
@@ -549,35 +546,35 @@ msgstr ""
 msgid "The stocktaking request could not be completed."
 msgstr ""
 
-#: src/Container.php:170
+#: src/Container.php:181
 msgid "Order reduction"
 msgstr ""
 
-#: src/Container.php:171
+#: src/Container.php:182
 msgid "Order restoration"
 msgstr ""
 
-#: src/Container.php:172
+#: src/Container.php:183
 msgid "Refund restoration"
 msgstr ""
 
-#: src/Container.php:173
+#: src/Container.php:184
 msgid "Manual stock count"
 msgstr ""
 
-#: src/Container.php:174
+#: src/Container.php:185
 msgid "Manual addition"
 msgstr ""
 
-#: src/Container.php:175
+#: src/Container.php:186
 msgid "Manual subtraction"
 msgstr ""
 
-#: src/Container.php:176
+#: src/Container.php:187
 msgid "Existing stock migration"
 msgstr ""
 
-#: src/Container.php:177
+#: src/Container.php:188
 msgid "Order quantity edit"
 msgstr ""
 
@@ -597,23 +594,23 @@ msgstr ""
 msgid "Laqi Unit Stock Manager for WooCommerce requires WooCommerce to be installed and active."
 msgstr ""
 
-#: src/premium-bootstrap__premium_only.php:151
+#: src/premium-bootstrap__premium_only.php:149
 msgid "Supplier receipt"
 msgstr ""
 
-#: src/premium-bootstrap__premium_only.php:152
+#: src/premium-bootstrap__premium_only.php:150
 msgid "Batch transfer out"
 msgstr ""
 
-#: src/premium-bootstrap__premium_only.php:153
+#: src/premium-bootstrap__premium_only.php:151
 msgid "Batch transfer in"
 msgstr ""
 
-#: src/premium-bootstrap__premium_only.php:154
+#: src/premium-bootstrap__premium_only.php:152
 msgid "External stock addition"
 msgstr ""
 
-#: src/premium-bootstrap__premium_only.php:155
+#: src/premium-bootstrap__premium_only.php:153
 msgid "External stock subtraction"
 msgstr ""
 
@@ -1677,26 +1674,6 @@ msgstr ""
 msgid "Write off permanently"
 msgstr ""
 
-#: src/Premium__premium_only/Admin/StockAnomaliesSection.php:48
-msgid "Anomalies"
-msgstr ""
-
-#: src/Premium__premium_only/Admin/StockAnomaliesSection.php:59
-msgid "Review suspicious recent movements and mapping conflicts. Findings are read-only and never change stock automatically."
-msgstr ""
-
-#: src/Premium__premium_only/Admin/StockAnomaliesSection.php:60
-msgid "Severity"
-msgstr ""
-
-#: src/Premium__premium_only/Admin/StockAnomaliesSection.php:60
-msgid "Finding"
-msgstr ""
-
-#: src/Premium__premium_only/Admin/StockAnomaliesSection.php:67
-msgid "No stock anomalies detected in the inspected activity."
-msgstr ""
-
 #: src/Premium__premium_only/Admin/StockReportController.php:76
 msgid "You are not allowed to manage stock reports."
 msgstr ""
@@ -1875,44 +1852,6 @@ msgstr ""
 #: src/Premium__premium_only/Alerts/LowStockAlertEvaluator.php:140
 #, php-format
 msgid "%1$s is at %2$s stock with a current balance of %3$s."
-msgstr ""
-
-#. translators: %d: configured percentage of the preceding balance.
-#: src/Premium__premium_only/Anomalies/StockAnomalyDetector.php:105
-#, php-format
-msgid "This adjustment changed at least %d%% of the preceding pool balance."
-msgstr ""
-
-#: src/Premium__premium_only/Anomalies/StockAnomalyDetector.php:106
-msgid "Large stock adjustment"
-msgstr ""
-
-#: src/Premium__premium_only/Anomalies/StockAnomalyDetector.php:116
-msgid "Unexpected order consumption"
-msgstr ""
-
-#: src/Premium__premium_only/Anomalies/StockAnomalyDetector.php:116
-msgid "An order consumption movement is missing its order source."
-msgstr ""
-
-#: src/Premium__premium_only/Anomalies/StockAnomalyDetector.php:141
-msgid "Repeated negative balance"
-msgstr ""
-
-#: src/Premium__premium_only/Anomalies/StockAnomalyDetector.php:141
-msgid "At least three recent ledger entries for this pool ended below zero."
-msgstr ""
-
-#: src/Premium__premium_only/Anomalies/StockAnomalyDetector.php:147
-msgid "Possible duplicate restoration"
-msgstr ""
-
-#: src/Premium__premium_only/Anomalies/StockAnomalyDetector.php:147
-msgid "Recent restorations for this order and pool exceed its recorded reductions."
-msgstr ""
-
-#: src/Premium__premium_only/Anomalies/StockAnomalyDetector.php:169
-msgid "Invalid or conflicting mapping"
 msgstr ""
 
 #. translators: %s: supplier lot or batch ID.
