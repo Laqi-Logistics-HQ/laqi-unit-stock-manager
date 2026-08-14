@@ -76,8 +76,6 @@ require_once __DIR__ . '/Premium__premium_only/Integrations/MobileOrderAdapter.p
 require_once __DIR__ . '/Premium__premium_only/Integrations/MobileStockLookupController.php';
 require_once __DIR__ . '/Premium__premium_only/Integrations/MobileStocktakeController.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/MobileStocktakeSection.php';
-require_once __DIR__ . '/Premium__premium_only/Integrations/ExternalMovementService.php';
-require_once __DIR__ . '/Premium__premium_only/Integrations/ExternalMovementController.php';
 require_once __DIR__ . '/Premium__premium_only/Integrations/StockPricingRuleFieldProvider.php';
 
 add_action(
@@ -147,8 +145,6 @@ add_action(
 		$container->movement_registry()->register( new Inventory\MovementType( 'supplier_receipt', __( 'Supplier receipt', 'laqi-unit-stock-manager' ) ) );
 		$container->movement_registry()->register( new Inventory\MovementType( 'batch_transfer_out', __( 'Batch transfer out', 'laqi-unit-stock-manager' ) ) );
 		$container->movement_registry()->register( new Inventory\MovementType( 'batch_transfer_in', __( 'Batch transfer in', 'laqi-unit-stock-manager' ) ) );
-		$container->movement_registry()->register( new Inventory\MovementType( 'external_add', __( 'External stock addition', 'laqi-unit-stock-manager' ) ) );
-		$container->movement_registry()->register( new Inventory\MovementType( 'external_subtract', __( 'External stock subtraction', 'laqi-unit-stock-manager' ) ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\LowStockAlertsSection( $alert_policies, $container->pool_repository(), $container->quantity_formatter(), $alert_deliveries ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ForecastSection( $container->pool_repository(), $forecast_policies, $forecast_service, $container->quantity_formatter(), new Admin\PaginationRenderer() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\StockReportSection( $report_settings ) );
@@ -175,8 +171,6 @@ add_action(
 		( new Premium\Integrations\MobileOrderAdapter( $mobile_snapshots, $reservation_service ) )->register();
 		( new Premium\Integrations\MobileStockLookupController( $container->mapping_repository(), $container->pool_repository(), $container->pool_presenter(), $container->availability_service(), $container->calculator_registry() ) )->register();
 		( new Premium\Integrations\MobileStocktakeController( $container->stock_adjustment_service(), $container->pool_repository(), $container->pool_presenter() ) )->register();
-		$external_movements = new Premium\Integrations\ExternalMovementService( $container->pool_repository(), $container->unit_registry(), $container->stock_mutation_service() );
-		( new Premium\Integrations\ExternalMovementController( $external_movements ) )->register();
 		( new Premium\Integrations\StockPricingRuleFieldProvider( $container->mapping_repository(), $container->pool_repository(), $container->calculator_registry(), $container->availability_service(), $forecast_policies, $forecast_service ) )->register();
 		$report_scheduler->register();
 		$alert_evaluator = new Premium\Alerts\LowStockAlertEvaluator( $alert_policies, $container->pool_repository(), $container->quantity_formatter(), $alert_channels, $alert_deliveries );
