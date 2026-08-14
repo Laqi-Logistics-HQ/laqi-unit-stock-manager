@@ -6,6 +6,8 @@
  * Version:           0.1.0
  * Author:            Laqi Logistics
  * Author URI:        https://laqi-logistics.com
+ * Developer:         Laqi Logistics
+ * Developer URI:     https://laqi-logistics.com
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       laqi-unit-stock-manager
@@ -14,7 +16,7 @@
  * Requires at least: 6.8
  * Requires Plugins:  woocommerce
  * WC requires at least: 7.1
- * WC tested up to:   10.9
+ * WC tested up to:   11.0
  *
  * @package LaqiUnitStockManager
  */
@@ -70,9 +72,6 @@ spl_autoload_register(
 register_activation_hook( __FILE__, array( '\LaqiUnitStockManager\Plugin', 'on_activate' ) );
 register_deactivation_hook( __FILE__, array( '\LaqiUnitStockManager\Plugin', 'on_deactivate' ) );
 
-add_action(
-	'plugins_loaded',
-	static function () {
-		\LaqiUnitStockManager\Plugin::instance()->boot();
-	}
-);
+$laqi_lusm_plugin = \LaqiUnitStockManager\Plugin::instance();
+$laqi_lusm_plugin->register_early_hooks();
+add_action( 'init', array( $laqi_lusm_plugin, 'boot' ) );

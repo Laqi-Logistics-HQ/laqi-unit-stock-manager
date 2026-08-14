@@ -56,5 +56,5 @@ class Test_Operations_Csv_Exchange extends WP_UnitTestCase {
 	private function service( Laqi_Lusm_Test_Csv_Mapper $mapper ): OperationsCsvService { $registry = new CsvRowMapperRegistry(); $registry->register( $mapper ); return new OperationsCsvService( $registry ); }
 
 	/** Write a portable CSV fixture. @param array<int,string> $headers Headers. @param array<int,array<string,string>> $rows Rows. */
-	private function csv_file( array $headers, array $rows ): string { $file = wp_tempnam( 'laqi-lusm-csv' ); $handle = fopen( $file, 'w' ); fputcsv( $handle, $headers ); foreach ( $rows as $row ) { fputcsv( $handle, array_values( $row ) ); } fclose( $handle ); return $file; }
+	private function csv_file( array $headers, array $rows ): string { $file = wp_tempnam( 'laqi-lusm-csv' ); $handle = fopen( $file, 'w' ); fputcsv( $handle, $headers, ',', '"', '' ); foreach ( $rows as $row ) { fputcsv( $handle, array_values( $row ), ',', '"', '' ); } fclose( $handle ); return $file; }
 }

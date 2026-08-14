@@ -95,10 +95,10 @@ final class StockReportScheduler {
 			return false;
 		}
 		fwrite( $handle, "\xEF\xBB\xBF" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite
-		fputcsv( $handle, $this->builder->headers() );
+		fputcsv( $handle, $this->builder->headers(), ',', '"', '' );
 		$rows = $this->builder->rows();
 		foreach ( $rows as $row ) {
-			fputcsv( $handle, $row );
+			fputcsv( $handle, $row, ',', '"', '' );
 		}
 		fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 		$sent = wp_mail( $settings['recipients'], __( 'Unit stock report', 'laqi-unit-stock-manager' ), __( 'Your scheduled unit stock snapshot is attached.', 'laqi-unit-stock-manager' ), array(), array( $file ) );

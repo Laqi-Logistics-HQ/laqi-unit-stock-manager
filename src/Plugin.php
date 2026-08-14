@@ -37,16 +37,21 @@ final class Plugin {
 	}
 
 	/**
-	 * Wire up WordPress hooks. Called once on plugins_loaded.
+	 * Register hooks that WooCommerce requires before WordPress init.
+	 *
+	 * @return void
+	 */
+	public function register_early_hooks(): void {
+		add_action( 'before_woocommerce_init', array( $this, 'declare_woocommerce_compatibility' ) );
+	}
+
+	/**
+	 * Wire up runtime hooks. Called once on init so translations are safe.
 	 *
 	 * @return void
 	 */
 	public function boot(): void {
 		$this->load_premium_features();
-
-		// HPOS / Cart-Checkout-Blocks compatibility must be declared even when
-		// WooCommerce is loading; declare it before bailing on a missing WC.
-		add_action( 'before_woocommerce_init', array( $this, 'declare_woocommerce_compatibility' ) );
 
 		// Translations load themselves. WordPress reads the Text Domain and Domain
 		// Path headers and loads the .mo file when a string is first translated,

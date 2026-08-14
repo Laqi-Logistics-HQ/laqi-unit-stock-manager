@@ -8,7 +8,7 @@ Stable tag: 0.1.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 7.1
-WC tested up to: 10.9
+WC tested up to: 11.0
 
 Manage one bulk stock quantity shared by simple products and variations sold in different package sizes.
 

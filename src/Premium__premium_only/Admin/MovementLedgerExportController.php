@@ -63,13 +63,13 @@ final class MovementLedgerExportController {
 		}
 
 		fwrite( $output, "\xEF\xBB\xBF" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite -- Streaming a download, not writing a file.
-		fputcsv( $output, $this->headers() );
+		fputcsv( $output, $this->headers(), ',', '"', '' );
 		$offset    = 0;
 		$row_count = 0;
 		do {
 			$rows = $this->movements->search( $term, self::BATCH_SIZE, $offset );
 			foreach ( $rows as $row ) {
-				fputcsv( $output, $this->csv_row( $this->presenter->present( $row ) ) );
+				fputcsv( $output, $this->csv_row( $this->presenter->present( $row ) ), ',', '"', '' );
 			}
 			$row_count = count( $rows );
 			$offset   += $row_count;
