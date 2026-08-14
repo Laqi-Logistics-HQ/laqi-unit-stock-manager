@@ -27,7 +27,9 @@ add_action( 'laqi_lusm_extensions_ready', $callback );
 Use `laqi_lusm_register_calculators` only for calculators, because the container
 builds that registry lazily. `laqi_lusm_extensions_ready` receives an
 `ExtensionContextInterface`, which is the supported, versioned add-on API. Check
-`LAQI_LUSM_API_VERSION` before booting an add-on. The concrete `Container`,
+compatibility with `ApiCompatibility::supports( $minimum, $before_exclusive )`
+before booting an add-on. The upper bound is exclusive, so an add-on supporting
+API 1.x should check `supports( '1.0', '2.0' )`. The concrete `Container`,
 `laqi_lusm_booted`, and `laqi_lusm_premium_ready` are transitional internals for
 the current in-tree paid edition and must not be used by new extensions.
 

@@ -39,6 +39,34 @@ class Test_Plugin extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Public services retain identity for the complete request.
+	 */
+	public function test_extension_context_returns_shared_services(): void {
+		$context = new \LaqiUnitStockManager\Extension\ExtensionContext( new \LaqiUnitStockManager\Container() );
+
+		$this->assertSame( $context->pools(), $context->pools() );
+		$this->assertSame( $context->mappings(), $context->mappings() );
+		$this->assertSame( $context->movement_history(), $context->movement_history() );
+		$this->assertSame( $context->stock_mutations(), $context->stock_mutations() );
+		$this->assertSame( $context->stock_adjustments(), $context->stock_adjustments() );
+		$this->assertSame( $context->availability(), $context->availability() );
+		$this->assertSame( $context->quantities(), $context->quantities() );
+		$this->assertSame( $context->pool_presenter(), $context->pool_presenter() );
+		$this->assertSame( $context->movement_presenter(), $context->movement_presenter() );
+	}
+
+	/**
+	 * Add-ons can check an explicit supported API range before registering.
+	 */
+	public function test_extension_api_compatibility_range(): void {
+		$compatibility = \LaqiUnitStockManager\Extension\ApiCompatibility::class;
+
+		$this->assertTrue( $compatibility::supports( '1.0', '2.0' ) );
+		$this->assertFalse( $compatibility::supports( '1.1', '2.0' ) );
+		$this->assertFalse( $compatibility::supports( '0.1', '1.0' ) );
+	}
+
+	/**
 	 * WooCommerce is loaded by the test bootstrap, so the dependency guard should
 	 * report it active and the plugin should register its feature-compatibility
 	 * declaration on the proper hook (calling it directly is flagged by WC as
