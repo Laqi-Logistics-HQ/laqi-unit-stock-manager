@@ -136,4 +136,13 @@ class Test_Plugin extends WP_UnitTestCase {
 		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Admin\MovementLedgerExportController' ) );
 		$this->assertFalse( has_action( 'admin_post_laqi_lusm_export_ledger' ) );
 	}
+
+	/**
+	 * Forecast administration belongs only to the Pro add-on.
+	 */
+	public function test_forecast_admin_implementation_is_not_bundled(): void {
+		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Admin\ForecastSection' ) );
+		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Admin\ForecastController' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_save_forecast' ) );
+	}
 }
