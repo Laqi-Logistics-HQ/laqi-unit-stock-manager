@@ -39,9 +39,9 @@ src/Privacy.php       # exporter, eraser, and privacy-policy integration points
 src/Assets.php        # scopes Unit Stock admin styles
 assets/css/           # admin.css (Unit Stock screen only, version-busted)
 languages/            # .pot / .po / .mo / .json — see languages/README.md
-bin/build.sh          # build distributable zip per channel (woocommerce|freemius|wordpressorg)
+bin/build.sh          # build the complete WordPress.org Free zip
 bin/install-wp-tests.sh # provision pinned WordPress test suites for CI
-.github/workflows/    # quality.yml + gated three-channel release.yml
+.github/workflows/    # quality.yml + gated Free release.yml
 tests/                # PHPUnit (WordPress test suite)
 phpcs.xml.dist        # WordPress standards + PHP 7.4 compatibility
 composer.json         # PSR-4 autoload + dev tooling
@@ -50,15 +50,10 @@ composer.json         # PSR-4 autoload + dev tooling
 ## Releasing
 
 This plugin is its own git repo. To ship a version, publish a **GitHub Release**;
-`.github/workflows/release.yml` then builds and attaches the distributable zips:
-
-- `laqi-unit-stock-manager-<version>-woocommerce.zip` — the active channel (WooCommerce.com
-  handles updates/licensing; the Freemius SDK is stripped).
-- `laqi-unit-stock-manager-<version>-freemius.zip` — a channel package only; do not
-  distribute it until the Freemius product and SDK are configured and the package
-  contains the SDK bootstrap.
-- `laqi-unit-stock-manager-<version>-wordpressorg.zip` — complete Free edition with
-  every `__premium_only` file physically removed.
+`.github/workflows/release.yml` then builds and attaches
+`laqi-unit-stock-manager-<version>-wordpressorg.zip`, the complete Free plugin.
+Paid implementations are released separately from `laqi-unit-stock-manager-pro`;
+this repository never generates a paid edition or strips Free source into one.
 
 The workflow is **OFF until** you set the repo variable
 `RELEASE_BUILDS_ENABLED=true` (`gh variable set RELEASE_BUILDS_ENABLED --body true`).
@@ -66,7 +61,7 @@ The merge-gated `quality.yml` workflow runs on pushes to `main`, manual dispatch
 and release workflow calls; it intentionally does not run on pull requests.
 Before merging a PR, run the relevant checks locally. The hosted gate covers
 coding standards, PHP syntax, PHPUnit across the supported PHP/WordPress matrix,
-all three channel archives, and an authenticated Playwright + axe admin-quality
+the WordPress.org archive, and an authenticated Playwright + axe admin-quality
 test in a real WordPress/WooCommerce environment.
 Complete the manual screen-reader, keyboard, zoom, contrast, and performance
 checks in `docs/release-quality-checklist.md` before a Marketplace upload.
@@ -78,12 +73,11 @@ composer install --no-dev --optimize-autoloader
 # Only when package-lock.json is committed:
 npm ci
 npm run build
-bash bin/build.sh --channel woocommerce
 bash bin/build.sh --channel wordpressorg
 ```
 
-The WooCommerce build excludes the complete Composer runtime and uses the
-fallback PSR-4 loader. If a lockfile marks a real asset build, packaging fails
+The archive excludes the complete Composer runtime and uses the fallback PSR-4
+loader. If a lockfile marks a real asset build, packaging fails
 unless its generated runtime exists.
 
 ## Assets

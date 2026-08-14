@@ -1,22 +1,18 @@
 #!/usr/bin/env bash
-# Build a distributable zip of Laqi Unit Stock Manager for WooCommerce for one sales channel.
+# Build the complete WordPress.org Free archive.
 #
-# Usage: bin/build.sh --channel <woocommerce|freemius|wordpressorg> [--version X.Y.Z]
+# Usage: bin/build.sh --channel wordpressorg [--version X.Y.Z]
 #
 # Run AFTER `composer install --no-dev --optimize-autoloader`. If package-lock.json
 # is committed, also run `npm ci && npm run build`. Output:
 # dist/<slug>-<version>-<channel>.zip with one top-level <slug>/ directory.
 #
-# Channels differ by which licensing SDK ships and which paid files survive: the
-# WooCommerce.com build must NOT bundle the SDK (Woo's marketplace handles
-# updates/licensing) but keeps paid features; the Freemius build keeps both; the
-# WordPress.org build keeps neither. The SDK is embedded via Composer when
-# Freemius is configured.
+# This repository is the complete Free plugin. Paid implementations are packaged
+# separately by laqi-unit-stock-manager-pro; this build never strips or rewrites
+# source to create an edition.
 set -euo pipefail
 
 SLUG="laqi-unit-stock-manager"
-FREE_PLUGIN_NAME="Laqi Unit Stock Manager for WooCommerce"
-PRO_PLUGIN_NAME="Laqi Unit Stock Manager Pro for WooCommerce"
 CHANNEL=""
 VERSION=""
 
@@ -29,8 +25,8 @@ while [ $# -gt 0 ]; do
 done
 
 case "$CHANNEL" in
-  woocommerce|freemius|wordpressorg) ;;
-  *) echo "usage: bin/build.sh --channel <woocommerce|freemius|wordpressorg> [--version X.Y.Z]" >&2; exit 1 ;;
+  wordpressorg) ;;
+  *) echo "usage: bin/build.sh --channel wordpressorg [--version X.Y.Z]" >&2; exit 1 ;;
 esac
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -61,17 +57,8 @@ STAGE="$(mktemp -d)"
 DEST="$STAGE/$SLUG"
 mkdir -p "$DEST" dist
 
-# The WooCommerce build uses the fallback PSR-4 loader. Exclude the complete
-# Composer runtime because its generated files may require a stripped SDK.
-RSYNC_CHANNEL_ARGS=()
-if [ "$CHANNEL" = "woocommerce" ]; then
-  RSYNC_CHANNEL_ARGS+=(--exclude 'vendor')
-fi
-
-# Copy the plugin, excluding dev-only and build tooling. The Freemius channel
-# includes vendor/ after Composer removes development dependencies.
+# Copy the complete Free plugin, excluding dependencies and development tooling.
 rsync -a --no-owner --no-group --delete \
-  "${RSYNC_CHANNEL_ARGS[@]}" \
   --exclude '.git' \
   --exclude '.github' \
   --exclude 'node_modules' \
@@ -90,29 +77,15 @@ rsync -a --no-owner --no-group --delete \
   --exclude '.phpunit.result.cache' \
   --exclude '.phpcs-cache' \
   --exclude 'phpcs.xml.dist' \
-  --exclude 'phpunit.xml.dist' \
+  --exclude 'phpunit*.xml*' \
   --exclude 'composer.json' \
   --exclude 'composer.lock' \
   --exclude 'package.json' \
   --exclude 'package-lock.json' \
+  --exclude 'README.md' \
+  --exclude 'vendor' \
+  --exclude 'freemius' \
   ./ "$DEST/"
-
-# Update ownership differs by release channel. Shared source intentionally has
-# no Update URI header so the WordPress.org archive receives directory updates.
-# WooCommerce.com owns updates for its paid build. Freemius injects its own
-# update integration when that channel is configured.
-if [ "$CHANNEL" = "woocommerce" ]; then
-  sed -i.bak \
-    "/^[[:space:]]*\*[[:space:]]*Plugin URI:/a\\ * Update URI:        false" \
-    "$DEST/$SLUG.php"
-  rm -f "$DEST/$SLUG.php.bak"
-fi
-
-if [ "$CHANNEL" = "woocommerce" ] && ! grep -q '^[[:space:]]*\*[[:space:]]*Update URI:[[:space:]]*false$' "$DEST/$SLUG.php"; then
-  echo "refusing to package: WooCommerce archive is missing its protected update header" >&2
-  rm -rf "$STAGE"
-  exit 1
-fi
 
 if [ "$CHANNEL" = "wordpressorg" ] && grep -q '^[[:space:]]*\*[[:space:]]*Update URI:' "$DEST/$SLUG.php"; then
   echo "refusing to package: WordPress.org archive must use directory updates" >&2
@@ -129,104 +102,22 @@ if [ -n "$FORBIDDEN_ARTIFACT" ] || [ -d "$DEST/test-results" ]; then
   exit 1
 fi
 
-# Both editions can be installed during an upgrade. Give paid archives a clear
-# Plugins-screen name without changing their shared runtime identifiers or data.
-if [ "$CHANNEL" = "wordpressorg" ]; then
-  EXPECTED_PLUGIN_NAME="$FREE_PLUGIN_NAME"
-else
-  EXPECTED_PLUGIN_NAME="$PRO_PLUGIN_NAME"
-  sed -i.bak \
-    "s|^ \* Plugin Name:       $FREE_PLUGIN_NAME$| * Plugin Name:       $PRO_PLUGIN_NAME|" \
-    "$DEST/$SLUG.php"
-  rm -f "$DEST/$SLUG.php.bak"
-fi
-
-if ! grep -qFx " * Plugin Name:       $EXPECTED_PLUGIN_NAME" "$DEST/$SLUG.php"; then
-  echo "failed to set the $CHANNEL plugin name to: $EXPECTED_PLUGIN_NAME" >&2
+if ! grep -qFx ' * Plugin Name:       Laqi Unit Stock Manager for WooCommerce' "$DEST/$SLUG.php"; then
+  echo "refusing to package: archive is missing the Free plugin name" >&2
   rm -rf "$STAGE"
   exit 1
 fi
 
-# Channel divergence: the WooCommerce.com build must not ship Composer's runtime
-# tree. Freemius registers start.php as an autoload file, so removing only its
-# package directory leaves vendor/autoload.php requiring a missing file. The
-# plugin's fallback loader handles src/, and the scaffold has no other runtime
-# package. This removal also protects builds after Freemius is configured.
-if [ "$CHANNEL" != "freemius" ]; then
-  rm -rf "$DEST/vendor" "$DEST/freemius"
+# Free is authored as Free source. Reject cross-edition leakage instead of
+# deleting or rewriting it during packaging.
+PREMIUM_RESIDUE="$(grep -rniE 'freemius|fs_dynamic_init|fs_premium_only|__premium_only|LaqiUnitStockManagerPro|laqi_lusmp_' \
+  --include='*.php' --include='*.js' --include='*.json' "$DEST" || true)"
+if [ -n "$PREMIUM_RESIDUE" ]; then
+  echo "$PREMIUM_RESIDUE" >&2
+  echo "refusing to package: Premium implementation or SDK references reached the Free archive" >&2
+  rm -rf "$STAGE"
+  exit 1
 fi
-
-# Exercise the exact Composer tree copied into the Freemius artifact. A stale or
-# SDK-owned autoloader that cannot resolve the plugin root would otherwise build
-# successfully and fail only when WordPress next loads the activated plugin.
-if [ "$CHANNEL" = "freemius" ] && [ -f "$DEST/vendor/autoload.php" ]; then
-  if ! php -r 'require $argv[1]; exit(class_exists("LaqiUnitStockManager\\Plugin") ? 0 : 1);' "$DEST/vendor/autoload.php"; then
-    echo "refusing to package: Freemius autoloader cannot load LaqiUnitStockManager\\Plugin" >&2
-    rm -rf "$STAGE"
-    exit 1
-  fi
-fi
-
-# Free is generated from the same source tree as both paid channels. Freemius
-# uses this suffix for its own free-package split; apply the identical physical
-# boundary to the WordPress.org archive built directly by this repository.
-if [ "$CHANNEL" = "wordpressorg" ]; then
-  find "$DEST" -type f -name '*__premium_only.*' -delete
-  find "$DEST" -depth -type d -name '*__premium_only' -exec rm -rf {} +
-fi
-# Strip the licensing-SDK bootstrap from every channel but `freemius`.
-#
-# Removing vendor/ is not enough. The bootstrap and the paid-file manifest live
-# in the main plugin file, so without this they ship as dead code that still
-# names a licensing platform, carries its product id and public key, and — worst
-# — lists every paid file the package deliberately excludes. WordPress.org reads
-# that inventory as functionality "restricted or locked, only to be made
-# available by payment" (Guideline 5), and WooCommerce.com owns licensing on its
-# own channel, so a rival SDK has no business in that archive either. This cost
-# a WordPress.org review round on order-status-automation.
-#
-# Wrap the bootstrap in the main plugin file with these markers:
-#
-#   /* laqi-unit-stock-manager-paid-sdk-start */
-#   if ( ! function_exists( '<prefix>_fs' ) ) { ... }
-#   /* laqi-unit-stock-manager-paid-sdk-end */
-#
-# Order matters if a wordpressorg block above consumes the paid-file manifest to
-# delete paid files: this strip has to run after it.
-if [ "$CHANNEL" != "freemius" ]; then
-  sed -i.bak \
-    -e "/laqi-unit-stock-manager-paid-sdk-start/,/laqi-unit-stock-manager-paid-sdk-end/d" \
-    -e '/^[[:space:]]*\*[[:space:]]*Paid-only code\./d' \
-    -e '/^[[:space:]]*\*[[:space:]]*@fs_premium_only[[:space:]]/d' \
-    "$DEST/$SLUG.php"
-  rm -f "$DEST/$SLUG.php.bak"
-
-  # Collapse the runs of bare ` *` and blank lines those deletions leave, so the
-  # shipped file reads as written rather than excised. A reviewer opens it first.
-  awk '
-    /^[[:space:]]*\*$/ { if (bare) next; bare = 1; blank = 0; print; next }
-    /^[[:space:]]*$/    { if (blank) next; blank = 1; bare = 0; print; next }
-                        { bare = 0; blank = 0; print }
-  ' "$DEST/$SLUG.php" > "$DEST/$SLUG.php.tmp"
-  mv "$DEST/$SLUG.php.tmp" "$DEST/$SLUG.php"
-
-  # A gate, not a comment: one surviving reference means the archive ships it.
-  # Scoped to executable code on purpose — readme.txt may legitimately state that
-  # this edition carries no licensing SDK, which is what a reviewer wants to read.
-  RESIDUE="$(grep -rniE 'freemius|fs_dynamic_init|fs_premium_only' \
-    --include='*.php' --include='*.js' --include='*.json' "$DEST" || true)"
-  if [ -n "$RESIDUE" ]; then
-    echo "$RESIDUE" >&2
-    echo "refusing to package: licensing-SDK references survived the $CHANNEL strip" >&2
-    exit 1
-  fi
-fi
-#
-# Adding a free tier later? Freemius generates the free build from __premium_only
-# markers, and inline is__premium_only() guards fatal THIS channel (the *_fs()
-# accessor returns null once vendor/ is stripped). Split premium code out by file
-# instead. See docs/freemius-free-paid-split.md in the wordpress_ai_dev meta-repo;
-# release.yml fails the build if a marker reaches the WooCommerce archive.
 
 OUT="$ROOT/dist/$SLUG-$VERSION-$CHANNEL.zip"
 rm -f "$OUT"
