@@ -81,10 +81,12 @@ final class StockAdjustmentService {
 			'reason'      => $reason,
 		);
 		if ( 'set' === $mode ) {
+			$this->assert_authorized( $pool_id, $quantity->amount() - $pool->quantity()->amount(), 'manual_set', $actor_id, $reason );
 			return $this->mutations->set_balance( $pool_id, $quantity->amount(), 'manual_set', $idempotency_key, $context );
 		}
 		if ( 'add' === $mode || 'subtract' === $mode ) {
 			$direction = 'add' === $mode ? 1 : -1;
+			$this->assert_authorized( $pool_id, $direction * $quantity->amount(), 'manual_' . $mode, $actor_id, $reason );
 			return $this->mutations->apply( $pool_id, $direction * $quantity->amount(), 'manual_' . $mode, $idempotency_key, $context );
 		}
 		throw new InvalidArgumentException( 'Unknown stock adjustment type.' );
@@ -114,6 +116,7 @@ final class StockAdjustmentService {
 		if ( '' === trim( $reason ) ) {
 			throw new InvalidArgumentException( 'A stocktake reason is required.' );
 		}
+		$this->assert_authorized( $pool_id, $quantity->amount() - $pool->quantity()->amount(), 'mobile_stocktake', $actor_id, $reason );
 
 		return $this->mutations->set_balance(
 			$pool_id,
@@ -154,6 +157,7 @@ final class StockAdjustmentService {
 		if ( $quantity->family() !== $pool->quantity()->family() || $unit !== $pool->display_unit() ) {
 			throw new InvalidArgumentException( 'The adjustment unit does not match the inventory pool.' );
 		}
+		$this->assert_authorized( $pool_id, $direction * $quantity->amount(), $movement_type, $actor_id, $reason );
 		return $this->mutations->apply(
 			$pool_id,
 			$direction * $quantity->amount(),
@@ -165,5 +169,33 @@ final class StockAdjustmentService {
 				'reason'      => $reason,
 			)
 		);
+	}
+
+	/**
+	 * Let registered policy modules authorize a prepared exact change.
+	 *
+	 * @param int    $pool_id  Pool ID.
+	 * @param int    $delta    Signed normalized change.
+	 * @param string $type     Movement or source type.
+	 * @param int    $actor_id WordPress user ID.
+	 * @param string $reason   Audit reason.
+	 * @return void
+	 * @throws InvalidArgumentException When a registered policy denies the change.
+	 */
+	private function assert_authorized( int $pool_id, int $delta, string $type, int $actor_id, string $reason ): void {
+		/**
+		 * Filters whether a prepared stock adjustment may be applied.
+		 *
+		 * @param bool   $authorized Whether the adjustment is authorized so far.
+		 * @param int    $pool_id   Pool ID.
+		 * @param int    $delta     Signed normalized change.
+		 * @param string $type      Movement or source type.
+		 * @param int    $actor_id  WordPress user ID.
+		 * @param string $reason    Audit reason.
+		 */
+		$authorized = (bool) apply_filters( 'laqi_lusm_adjustment_authorized', true, $pool_id, $delta, $type, $actor_id, $reason );
+		if ( ! $authorized ) {
+			throw new InvalidArgumentException( 'This sensitive stock adjustment requires approval from an authorized user.' );
+		}
 	}
 }

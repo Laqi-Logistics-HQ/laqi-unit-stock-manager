@@ -60,8 +60,9 @@ final class StockLossSection implements ScreenSectionInterface {
 
 	/** Render the pool picker and loss form. @return void */
 	public function render(): void {
-		$pool_id = isset( $_GET['pool_id'] ) ? absint( $_GET['pool_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$pool    = $pool_id > 0 ? $this->pools->find( $pool_id ) : null;
+		$pool_id          = isset( $_GET['pool_id'] ) ? absint( $_GET['pool_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$pool             = $pool_id > 0 ? $this->pools->find( $pool_id ) : null;
+		$reason_templates = apply_filters( 'laqi_lusm_adjustment_reason_templates', array(), 'loss' );
 		$this->notice();
 		?>
 		<section class="card laqi-lusm-loss-card">
@@ -78,7 +79,15 @@ final class StockLossSection implements ScreenSectionInterface {
 				<?php
 				foreach ( $this->types->all() as $key => $label ) :
 					?>
-					<option value="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $label ); ?></option><?php endforeach; ?></select><label for="laqi-lusm-loss-quantity"><?php echo esc_html( sprintf( /* translators: %s: unit symbol. */ __( 'Quantity lost (%s)', 'laqi-unit-stock-manager' ), $pool->display_unit() ) ); ?></label><input id="laqi-lusm-loss-quantity" name="quantity" inputmode="decimal" required /><label for="laqi-lusm-loss-reason"><?php esc_html_e( 'Notes', 'laqi-unit-stock-manager' ); ?></label><input id="laqi-lusm-loss-reason" name="reason" maxlength="255" /><?php submit_button( __( 'Record stock loss', 'laqi-unit-stock-manager' ) ); ?></form>
+					<option value="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $label ); ?></option><?php endforeach; ?></select><label for="laqi-lusm-loss-quantity"><?php echo esc_html( sprintf( /* translators: %s: unit symbol. */ __( 'Quantity lost (%s)', 'laqi-unit-stock-manager' ), $pool->display_unit() ) ); ?></label><input id="laqi-lusm-loss-quantity" name="quantity" inputmode="decimal" required /><label for="laqi-lusm-loss-reason"><?php esc_html_e( 'Notes', 'laqi-unit-stock-manager' ); ?></label><input id="laqi-lusm-loss-reason" name="reason" maxlength="255" <?php echo ! empty( $reason_templates ) ? 'list="laqi-lusm-loss-reasons"' : ''; ?> />
+					<?php
+					if ( ! empty( $reason_templates ) ) :
+						?>
+						<datalist id="laqi-lusm-loss-reasons">
+						<?php
+						foreach ( $reason_templates as $template ) :
+							?>
+						<option value="<?php echo esc_attr( $template ); ?>"></option><?php endforeach; ?></datalist><?php endif; ?><?php submit_button( __( 'Record stock loss', 'laqi-unit-stock-manager' ) ); ?></form>
 			<?php endif; ?>
 		</section>
 		<?php
