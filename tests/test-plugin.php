@@ -84,4 +84,13 @@ class Test_Plugin extends WP_UnitTestCase {
 	public function test_optional_paid_bootstrap_registers_composition_hook(): void {
 		$this->assertNotFalse( has_action( 'laqi_lusm_booted' ) );
 	}
+
+	/**
+	 * Extracted adjustment policies leave only Free's extension hooks behind.
+	 */
+	public function test_adjustment_policy_implementation_is_not_bundled(): void {
+		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Approvals\AdjustmentPolicy' ) );
+		$this->assertTrue( apply_filters( 'laqi_lusm_adjustment_authorized', true, 1, 1, 'manual_add', 1, 'Count' ) );
+		$this->assertSame( array(), apply_filters( 'laqi_lusm_adjustment_reason_templates', array(), 'manual' ) );
+	}
 }
