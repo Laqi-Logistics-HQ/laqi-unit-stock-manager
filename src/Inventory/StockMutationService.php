@@ -258,7 +258,6 @@ final class StockMutationService {
 			$table,
 			array(
 				'pool_id'         => $pool_id,
-				'batch_id'        => isset( $context['batch_id'] ) ? (int) $context['batch_id'] : 0,
 				'type'            => $type,
 				'delta_base'      => $delta,
 				'balance_base'    => $balance,
@@ -270,7 +269,7 @@ final class StockMutationService {
 				'metadata_json'   => isset( $context['metadata'] ) ? wp_json_encode( $context['metadata'] ) : null,
 				'created_at'      => current_time( 'mysql', true ),
 			),
-			array( '%d', '%d', '%s', '%d', '%d', '%s', '%d', '%s', '%d', '%s', '%s', '%s' )
+			array( '%d', '%s', '%d', '%d', '%s', '%d', '%s', '%d', '%s', '%s', '%s' )
 		);
 
 		if ( false === $inserted ) {

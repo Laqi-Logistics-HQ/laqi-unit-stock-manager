@@ -83,10 +83,11 @@ class Test_Plugin extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Paid modules receive the shared container through the removable bootstrap.
+	 * The transitional internal-container hook is gone after extraction.
 	 */
-	public function test_optional_paid_bootstrap_registers_composition_hook(): void {
-		$this->assertNotFalse( has_action( 'laqi_lusm_booted' ) );
+	public function test_transitional_paid_bootstrap_is_removed(): void {
+		$this->assertFalse( has_action( 'laqi_lusm_booted' ) );
+		$this->assertFileDoesNotExist( LAQI_LUSM_PATH . 'src/premium-bootstrap__premium_only.php' );
 	}
 
 	/**
