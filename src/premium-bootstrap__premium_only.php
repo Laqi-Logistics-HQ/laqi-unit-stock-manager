@@ -9,8 +9,6 @@ namespace LaqiUnitStockManager;
 
 defined( 'ABSPATH' ) || exit;
 
-require_once __DIR__ . '/Premium__premium_only/Admin/MovementLedgerSection.php';
-require_once __DIR__ . '/Premium__premium_only/Admin/MovementLedgerExportController.php';
 require_once __DIR__ . '/Premium__premium_only/Alerts/LowStockPolicyRepository.php';
 require_once __DIR__ . '/Premium__premium_only/Alerts/LowStockAlertEvaluator.php';
 require_once __DIR__ . '/Premium__premium_only/Alerts/AlertChannelInterface.php';
@@ -151,7 +149,6 @@ add_action(
 		$container->movement_registry()->register( new Inventory\MovementType( 'batch_transfer_in', __( 'Batch transfer in', 'laqi-unit-stock-manager' ) ) );
 		$container->movement_registry()->register( new Inventory\MovementType( 'external_add', __( 'External stock addition', 'laqi-unit-stock-manager' ) ) );
 		$container->movement_registry()->register( new Inventory\MovementType( 'external_subtract', __( 'External stock subtraction', 'laqi-unit-stock-manager' ) ) );
-		$container->screen_section_catalog()->register( new Premium\Admin\MovementLedgerSection( $container->movement_repository(), $container->movement_presenter(), new Admin\PaginationRenderer() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\LowStockAlertsSection( $alert_policies, $container->pool_repository(), $container->quantity_formatter(), $alert_deliveries ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ForecastSection( $container->pool_repository(), $forecast_policies, $forecast_service, $container->quantity_formatter(), new Admin\PaginationRenderer() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\StockReportSection( $report_settings ) );
@@ -162,7 +159,6 @@ add_action(
 		$container->screen_section_catalog()->register( new Premium\Admin\ReservationsSection( $stock_holds, $container->pool_repository(), $container->quantity_formatter(), $safety_stock, $supply_projections ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\RecipeSection( $container->unit_registry() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\MobileStocktakeSection() );
-		( new Premium\Admin\MovementLedgerExportController( $container->movement_repository(), $container->movement_presenter() ) )->register();
 		( new Premium\Admin\LowStockAlertController( $alert_policies, $container->pool_repository(), $container->unit_registry() ) )->register();
 		( new Premium\Admin\ForecastController( $forecast_policies, $container->pool_repository() ) )->register();
 		( new Premium\Admin\StockReportController( $report_settings, $report_scheduler ) )->register();

@@ -125,4 +125,13 @@ class Test_Plugin extends WP_UnitTestCase {
 		$this->assertFalse( has_filter( 'laqi_lusm_large_adjustment_ratio' ) );
 		$this->assertFalse( has_filter( 'laqi_lusm_stock_anomalies' ) );
 	}
+
+	/**
+	 * Searchable ledger presentation and export belong only to the Pro add-on.
+	 */
+	public function test_movement_ledger_implementation_is_not_bundled(): void {
+		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Admin\MovementLedgerSection' ) );
+		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Admin\MovementLedgerExportController' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_export_ledger' ) );
+	}
 }
