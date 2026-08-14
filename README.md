@@ -103,6 +103,13 @@ order snapshots, reservations, reductions, restorations, and order edits exactly
 once. The adapter prefers each extension's public cart helper and retains the
 documented relationship fields as a compatibility fallback.
 
+The Pro WooCommerce Subscriptions adapter prepares each renewal as its own stock
+event. Because Subscriptions copies line-item metadata forward, inherited pooled
+snapshots are replaced once at renewal creation using the mapping active at that
+moment. The exact renewal demand is reserved while pending; the normal Woo order
+hooks convert it on reduction, release it on failure/cancellation, and restore
+the immutable renewal snapshot when stock is restored.
+
 Custom units use soft retirement. The repository prevents retirement while a pool
 uses the key as its base/display unit or another active custom unit references it;
 retired records remain stored so a historical key is never redefined accidentally.
