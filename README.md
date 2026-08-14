@@ -116,6 +116,15 @@ Authorized inventory clients can resolve a scanned product SKU or WooCommerce
 GTIN/UPC/EAN/ISBN through `GET /wp-json/laqi-lusm/v1/scan?code=...` and receive
 its exact per-sale pool demand, available pool balances, and saleable quantity.
 
+The Pro Mobile count tab turns that lookup into a touch-friendly stocktaking
+workflow. Staff may type a code or, where the browser supports Barcode Detector
+and camera access, scan it directly; multi-component products expose every
+affected pool for an explicit choice. Exact physical counts are submitted to
+`POST /wp-json/laqi-lusm/v1/pools/<id>/stocktake` with a required reason and
+stable request key. Counts use the shared adjustment service, create an audited
+`manual_set` movement sourced as `mobile_stocktake`, and safely reuse retry keys.
+The plugin resolves existing WooCommerce codes but does not generate barcodes.
+
 ERP and WMS clients can submit up to 100 relative pool changes as one authenticated
 event through `POST /wp-json/laqi-lusm/v1/external-movements`. Pool SKUs must be
 unambiguous, quantities are normalized through the registered unit system, the

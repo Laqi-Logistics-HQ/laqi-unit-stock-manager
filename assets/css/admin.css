@@ -137,7 +137,67 @@
 	display: block;
 }
 
+.laqi-lusm-mobile-stocktake {
+	box-sizing: border-box;
+	max-width: 42rem;
+	margin-top: 1rem;
+}
+
+.laqi-lusm-mobile-stocktake form,
+.laqi-lusm-mobile-stocktake label {
+	display: grid;
+	gap: 0.5rem;
+}
+
+.laqi-lusm-mobile-stocktake form {
+	margin-top: 1rem;
+}
+
+.laqi-lusm-mobile-actions,
+.laqi-lusm-mobile-quantity {
+	display: flex;
+	gap: 0.5rem;
+	align-items: center;
+}
+
+.laqi-lusm-mobile-actions input,
+.laqi-lusm-mobile-quantity input,
+.laqi-lusm-mobile-stocktake select,
+.laqi-lusm-mobile-stocktake > form > input {
+	min-height: 44px;
+	font-size: 16px;
+}
+
+.laqi-lusm-mobile-actions input,
+.laqi-lusm-mobile-quantity input {
+	flex: 1;
+}
+
+.laqi-lusm-camera-preview {
+	width: 100%;
+	max-height: 22rem;
+	margin-top: 1rem;
+	background: #1d2327;
+}
+
+.laqi-lusm-mobile-status.notice-error {
+	color: #b32d2e;
+}
+
 @media screen and (max-width: 782px) {
+	.laqi-lusm-mobile-stocktake {
+		max-width: none;
+		margin-right: 10px;
+	}
+
+	.laqi-lusm-mobile-actions {
+		align-items: stretch;
+		flex-direction: column;
+	}
+
+	.laqi-lusm-mobile-stocktake .button {
+		min-height: 44px;
+	}
 
 	.laqi-lusm-stock-table thead,
 	.laqi-lusm-mapping-table thead {
