@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-13T22:25:08+00:00\n"
+"POT-Creation-Date: 2026-08-14T08:35:31+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -61,8 +61,8 @@ msgstr ""
 
 #: src/Admin/ActivitySection.php:79
 #: src/Admin/PoolStockSection.php:129
-#: src/Admin/SetupSection.php:187
-#: src/Admin/SetupSection.php:271
+#: src/Admin/SetupSection.php:193
+#: src/Admin/SetupSection.php:278
 msgid "Inventory pool"
 msgstr ""
 
@@ -125,8 +125,8 @@ msgid "Stock"
 msgstr ""
 
 #: src/Admin/PoolStockSection.php:123
-#: src/Admin/SetupSection.php:188
-#: src/Admin/SetupSection.php:272
+#: src/Admin/SetupSection.php:194
+#: src/Admin/SetupSection.php:279
 msgid "Search inventory pools"
 msgstr ""
 
@@ -253,7 +253,7 @@ msgid "Stock unit"
 msgstr ""
 
 #: src/Admin/SetupSection.php:111
-#: src/Container.php:129
+#: src/Container.php:136
 msgid "Opening balance"
 msgstr ""
 
@@ -311,7 +311,7 @@ msgid "No products or variations are linked yet."
 msgstr ""
 
 #: src/Admin/SetupSection.php:159
-#: src/Admin/SetupSection.php:269
+#: src/Admin/SetupSection.php:276
 msgid "Product or variation"
 msgstr ""
 
@@ -329,81 +329,87 @@ msgstr ""
 msgid "Unavailable product #%d"
 msgstr ""
 
-#: src/Admin/SetupSection.php:193
-#: src/Admin/SetupSection.php:273
+#. translators: 1: mapping calculator type, 2: component count.
+#: src/Admin/SetupSection.php:185
+#, php-format
+msgid "%1$s mapping with %2$d components. Use its dedicated section to edit it."
+msgstr ""
+
+#: src/Admin/SetupSection.php:199
+#: src/Admin/SetupSection.php:280
 msgid "Consumption per sold item"
 msgstr ""
 
-#: src/Admin/SetupSection.php:195
-#: src/Admin/SetupSection.php:274
+#: src/Admin/SetupSection.php:201
+#: src/Admin/SetupSection.php:281
 msgid "Consumption unit"
 msgstr ""
 
-#: src/Admin/SetupSection.php:201
+#: src/Admin/SetupSection.php:207
 msgid "Save changes"
 msgstr ""
 
-#: src/Admin/SetupSection.php:209
+#: src/Admin/SetupSection.php:216
 msgid "Unlink"
 msgstr ""
 
 #. translators: 1: first visible mapping number, 2: last visible mapping number, 3: total active mappings.
-#: src/Admin/SetupSection.php:218
+#: src/Admin/SetupSection.php:225
 #, php-format
 msgid "Showing %1$d-%2$d of %3$d product links."
 msgstr ""
 
-#: src/Admin/SetupSection.php:221
+#: src/Admin/SetupSection.php:228
 msgid "Product link pages"
 msgstr ""
 
-#: src/Admin/SetupSection.php:240
+#: src/Admin/SetupSection.php:247
 msgid "Custom units"
 msgstr ""
 
-#: src/Admin/SetupSection.php:241
+#: src/Admin/SetupSection.php:248
 msgid "Unused units can be retired. Units used by an inventory pool or another active custom unit are protected."
 msgstr ""
 
 #. translators: 1: unit label, 2: unit key, 3: equivalent quantity, 4: reference unit.
-#: src/Admin/SetupSection.php:245
+#: src/Admin/SetupSection.php:252
 #, php-format
 msgid "%1$s (%2$s) = %3$s %4$s"
 msgstr ""
 
-#: src/Admin/SetupSection.php:251
+#: src/Admin/SetupSection.php:258
 msgid "Retire"
 msgstr ""
 
-#: src/Admin/SetupSection.php:262
+#: src/Admin/SetupSection.php:269
 msgid "Create an inventory pool before linking products."
 msgstr ""
 
-#: src/Admin/SetupSection.php:270
+#: src/Admin/SetupSection.php:277
 msgid "Search for a product or variation"
 msgstr ""
 
-#: src/Admin/SetupSection.php:275
+#: src/Admin/SetupSection.php:282
 msgid "Existing WooCommerce stock"
 msgstr ""
 
-#: src/Admin/SetupSection.php:277
+#: src/Admin/SetupSection.php:284
 msgid "Disable native quantity management"
 msgstr ""
 
-#: src/Admin/SetupSection.php:278
+#: src/Admin/SetupSection.php:285
 msgid "Add native item count to this pool, then disable it"
 msgstr ""
 
-#: src/Admin/SetupSection.php:279
+#: src/Admin/SetupSection.php:286
 msgid "Keep native quantity management unchanged"
 msgstr ""
 
-#: src/Admin/SetupSection.php:281
+#: src/Admin/SetupSection.php:288
 msgid "Transferring multiplies the current native item count by the consumption per item and adds that exact quantity to the pool once."
 msgstr ""
 
-#: src/Admin/SetupSection.php:282
+#: src/Admin/SetupSection.php:289
 msgid "Save mapping"
 msgstr ""
 
@@ -469,35 +475,35 @@ msgstr ""
 msgid "Inventory stock could not be updated. Check the quantity and try again."
 msgstr ""
 
-#: src/Container.php:130
+#: src/Container.php:137
 msgid "Order reduction"
 msgstr ""
 
-#: src/Container.php:131
+#: src/Container.php:138
 msgid "Order restoration"
 msgstr ""
 
-#: src/Container.php:132
+#: src/Container.php:139
 msgid "Refund restoration"
 msgstr ""
 
-#: src/Container.php:133
+#: src/Container.php:140
 msgid "Manual stock count"
 msgstr ""
 
-#: src/Container.php:134
+#: src/Container.php:141
 msgid "Manual addition"
 msgstr ""
 
-#: src/Container.php:135
+#: src/Container.php:142
 msgid "Manual subtraction"
 msgstr ""
 
-#: src/Container.php:136
+#: src/Container.php:143
 msgid "Existing stock migration"
 msgstr ""
 
-#: src/Container.php:137
+#: src/Container.php:144
 msgid "Order quantity edit"
 msgstr ""
 

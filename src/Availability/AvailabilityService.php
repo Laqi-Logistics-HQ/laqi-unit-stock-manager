@@ -117,12 +117,12 @@ final class AvailabilityService {
 				return 0;
 			}
 			if ( $pool->allows_backorders() ) {
-				return null;
+				continue;
 			}
 			$available = (int) apply_filters( 'laqi_lusm_pool_available_quantity', $pool->quantity()->amount(), $pool_id );
 			$max       = min( $max, intdiv( max( 0, $available ), $consumption ) );
 		}
 
-		return $max;
+		return PHP_INT_MAX === $max ? null : $max;
 	}
 }

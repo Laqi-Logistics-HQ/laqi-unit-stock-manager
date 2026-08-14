@@ -179,6 +179,12 @@ final class SetupSection implements ScreenSectionInterface {
 					?>
 					</th>
 					<td>
+						<?php if ( 'single_pool' !== $mapping->calculator_type() ) : ?>
+							<?php
+							/* translators: 1: mapping calculator type, 2: component count. */
+							echo esc_html( sprintf( __( '%1$s mapping with %2$d components. Use its dedicated section to edit it.', 'laqi-unit-stock-manager' ), $mapping->calculator_type(), count( $mapping->components() ) ) );
+							?>
+						<?php else : ?>
 						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="laqi-lusm-mapping-edit">
 							<input type="hidden" name="action" value="laqi_lusm_update_mapping" />
 							<input type="hidden" name="mapping_id" value="<?php echo esc_attr( $mapping->id() ); ?>" />
@@ -200,6 +206,7 @@ final class SetupSection implements ScreenSectionInterface {
 							</select>
 							<?php submit_button( __( 'Save changes', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?>
 						</form>
+						<?php endif; ?>
 					</td>
 					<td>
 						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">

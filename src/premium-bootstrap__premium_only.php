@@ -73,6 +73,16 @@ require_once __DIR__ . '/Premium__premium_only/Supply/SafetyStockPolicyRepositor
 require_once __DIR__ . '/Premium__premium_only/Supply/SafetyStockAvailability.php';
 require_once __DIR__ . '/Premium__premium_only/Supply/SupplyProjectionService.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/SupplyStateController.php';
+require_once __DIR__ . '/Premium__premium_only/Recipes/RecipeCalculator.php';
+require_once __DIR__ . '/Premium__premium_only/Admin/RecipeSection.php';
+require_once __DIR__ . '/Premium__premium_only/Admin/RecipeController.php';
+
+add_action(
+	'laqi_lusm_register_calculators',
+	static function ( Consumption\CalculatorRegistry $calculators ): void {
+		$calculators->register( new Premium\Recipes\RecipeCalculator() );
+	}
+);
 
 /**
  * Give physically separate paid modules the completed shared composition root.
@@ -146,6 +156,7 @@ add_action(
 		$container->screen_section_catalog()->register( new Premium\Admin\ReorderSection( $container->pool_repository(), $suppliers, $reorder_policies, $reorder_suggestions, $container->quantity_formatter() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\MaterialCostsSection( $material_economics, $container->mapping_repository() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ReservationsSection( $stock_holds, $container->pool_repository(), $container->quantity_formatter(), $safety_stock, $supply_projections ) );
+		$container->screen_section_catalog()->register( new Premium\Admin\RecipeSection( $container->unit_registry() ) );
 		( new Premium\Admin\MovementLedgerExportController( $container->movement_repository(), $container->movement_presenter() ) )->register();
 		( new Premium\Admin\StockLossController( $container->stock_adjustment_service(), $loss_types ) )->register();
 		( new Premium\Admin\LowStockAlertController( $alert_policies, $container->pool_repository(), $container->unit_registry() ) )->register();
@@ -157,6 +168,7 @@ add_action(
 		( new Premium\Admin\ReorderController( $reorder_policies, $container->pool_repository(), $suppliers, $container->unit_registry() ) )->register();
 		( new Premium\Admin\CsvExchangeController( $csv_exchange ) )->register();
 		( new Premium\Admin\SupplyStateController( $stock_hold_service, $container->pool_repository(), $container->unit_registry(), $safety_stock ) )->register();
+		( new Premium\Admin\RecipeController( $container->mapping_repository(), $container->pool_repository(), $container->unit_registry(), new WooCommerce\PurchasableResolver() ) )->register();
 		$report_scheduler->register();
 		$alert_evaluator = new Premium\Alerts\LowStockAlertEvaluator( $alert_policies, $container->pool_repository(), $container->quantity_formatter(), $alert_channels, $alert_deliveries );
 		$alert_evaluator->register();
