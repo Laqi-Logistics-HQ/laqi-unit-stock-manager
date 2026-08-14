@@ -74,11 +74,20 @@ composer install --no-dev --optimize-autoloader
 npm ci
 npm run build
 bash bin/build.sh --channel wordpressorg
+
+# After building the separately distributed Pro WooCommerce archive:
+bash bin/verify-edition-archives.sh \
+  dist/laqi-unit-stock-manager-<version>-wordpressorg.zip \
+  ../laqi-unit-stock-manager-pro/dist/laqi-unit-stock-manager-pro-<version>-woocommerce.zip
 ```
 
 The archive excludes the complete Composer runtime and uses the fallback PSR-4
 loader. If a lockfile marks a real asset build, packaging fails
 unless its generated runtime exists.
+
+The edition-boundary verifier checks the exact ZIPs for Pro/SDK residue in Free,
+Free namespace implementations in Pro, the declared Pro dependency on Free, and
+byte-identical PHP files that would indicate a copied runtime.
 
 ## Assets
 
