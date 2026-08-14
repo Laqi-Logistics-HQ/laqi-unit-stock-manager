@@ -2,7 +2,7 @@
 
 ## 0.1.0 submission review — 2026-08-14
 
-The release package is ready for its final merge-gated quality run. Review was
+The release package passed its final merge-gated quality run. Review was
 performed against the current official WordPress.org plugin guidelines and Woo
 Marketplace submission requirements. The source and generated channel boundaries,
 licensing, dependency declaration, update ownership, readme metadata, HPOS and
@@ -20,11 +20,16 @@ Hosted run `31796518257` established the pre-fix baseline on WordPress 6.9.5 and
 - browser login was blocked because Pro labels triggered just-in-time translation
   loading before `init`.
 
-The final hardening change fixes both failures, tests WooCommerce 10.9.4 and
+The final hardening change fixed both failures, tests WooCommerce 10.9.4 and
 11.0.0 across the four PHPUnit lanes, declares WooCommerce 11.0 compatibility,
-and updates Node-based actions away from the deprecated Node 20 runtime. The
-merge-triggered `quality` run is the acceptance gate: do not submit either archive
-unless every job passes on the merge commit.
+and updates Node-based actions away from the deprecated Node 20 runtime.
+
+Merge-triggered quality run
+[`31798352233`](https://github.com/Laqi-Logistics-HQ/laqi-unit-stock-manager/actions/runs/31798352233)
+passed on commit `2b3b23a`: official Plugin Check, browser/axe coverage, PHP
+7.4–8.5 compatibility, coding standards, all channel archives, and the four
+WordPress/PHP/WooCommerce 10.9.4/11.0.0 PHPUnit lanes are green. This completes
+the repository release sign-off for 0.1.0.
 
 Woo's submission-only QIT API, E2E, activation, security, PHPCompatibility,
 malware, and validation checks still run in the vendor submission flow. Passing
