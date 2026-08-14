@@ -151,6 +151,10 @@ a read-only review without duplicating Free's inventory rules or receiving the
 internal container. Pro-owned filters can adjust its large-change threshold or
 extend its findings without adding paid implementation code to this repository.
 
+Pro also owns searchable, paginated ledger presentation and spreadsheet-safe CSV
+export. It consumes Free's public read-only movement history and presenter while
+Free remains the sole owner of immutable ledger storage and stock mutations.
+
 The separately distributed Pro add-on owns reusable adjustment reasons and
 sensitive-change approval policies. It attaches through the versioned extension
 context and the Free-owned `laqi_lusm_adjustment_authorized` and

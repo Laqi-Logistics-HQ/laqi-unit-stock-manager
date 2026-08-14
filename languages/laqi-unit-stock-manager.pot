@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-14T14:48:57+00:00\n"
+"POT-Creation-Date: 2026-08-14T15:14:55+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -56,7 +56,6 @@ msgstr ""
 
 #: src/Admin/ActivitySection.php:78
 #: src/Premium__premium_only/Admin/LowStockAlertsSection.php:105
-#: src/Premium__premium_only/Admin/MovementLedgerSection.php:81
 #: src/Privacy.php:108
 msgid "Date"
 msgstr ""
@@ -72,8 +71,6 @@ msgstr ""
 #: src/Premium__premium_only/Admin/LowStockAlertsSection.php:86
 #: src/Premium__premium_only/Admin/LowStockAlertsSection.php:105
 #: src/Premium__premium_only/Admin/MobileStocktakeSection.php:41
-#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:86
-#: src/Premium__premium_only/Admin/MovementLedgerSection.php:81
 #: src/Premium__premium_only/Admin/ReceivingSection.php:88
 #: src/Premium__premium_only/Admin/RecipeSection.php:56
 #: src/Premium__premium_only/Admin/ReorderSection.php:66
@@ -84,35 +81,26 @@ msgid "Inventory pool"
 msgstr ""
 
 #: src/Admin/ActivitySection.php:80
-#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:87
-#: src/Premium__premium_only/Admin/MovementLedgerSection.php:81
 msgid "Movement"
 msgstr ""
 
 #: src/Admin/ActivitySection.php:81
-#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:88
-#: src/Premium__premium_only/Admin/MovementLedgerSection.php:81
 msgid "Change"
 msgstr ""
 
 #. translators: %s: unit symbol.
 #: src/Admin/ActivitySection.php:82
 #: src/Premium__premium_only/Admin/LowStockAlertsSection.php:86
-#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:89
-#: src/Premium__premium_only/Admin/MovementLedgerSection.php:81
 msgid "Balance"
 msgstr ""
 
 #: src/Admin/ActivitySection.php:83
-#: src/Premium__premium_only/Admin/MovementLedgerSection.php:81
 msgid "Source"
 msgstr ""
 
 #. translators: %s: unit.
 #: src/Admin/ActivitySection.php:84
 #: src/Admin/PoolStockSection.php:263
-#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:94
-#: src/Premium__premium_only/Admin/MovementLedgerSection.php:81
 #: src/Premium__premium_only/Admin/ReservationsSection.php:48
 #: src/Privacy.php:128
 msgid "Reason"
@@ -170,7 +158,6 @@ msgstr ""
 
 #: src/Admin/PoolStockSection.php:125
 #: src/Premium__premium_only/Admin/ForecastSection.php:82
-#: src/Premium__premium_only/Admin/MovementLedgerSection.php:79
 msgid "Search"
 msgstr ""
 
@@ -594,23 +581,23 @@ msgstr ""
 msgid "Laqi Unit Stock Manager for WooCommerce requires WooCommerce to be installed and active."
 msgstr ""
 
-#: src/premium-bootstrap__premium_only.php:149
+#: src/premium-bootstrap__premium_only.php:147
 msgid "Supplier receipt"
 msgstr ""
 
-#: src/premium-bootstrap__premium_only.php:150
+#: src/premium-bootstrap__premium_only.php:148
 msgid "Batch transfer out"
 msgstr ""
 
-#: src/premium-bootstrap__premium_only.php:151
+#: src/premium-bootstrap__premium_only.php:149
 msgid "Batch transfer in"
 msgstr ""
 
-#: src/premium-bootstrap__premium_only.php:152
+#: src/premium-bootstrap__premium_only.php:150
 msgid "External stock addition"
 msgstr ""
 
-#: src/premium-bootstrap__premium_only.php:153
+#: src/premium-bootstrap__premium_only.php:151
 msgid "External stock subtraction"
 msgstr ""
 
@@ -919,74 +906,6 @@ msgstr ""
 
 #: src/Premium__premium_only/Admin/MobileStocktakeSection.php:53
 msgid "Save physical count"
-msgstr ""
-
-#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:51
-msgid "You are not allowed to export the stock ledger."
-msgstr ""
-
-#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:62
-msgid "The stock ledger export could not be created."
-msgstr ""
-
-#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:84
-msgid "Movement ID"
-msgstr ""
-
-#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:85
-msgid "Date (UTC)"
-msgstr ""
-
-#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:90
-msgid "Source type"
-msgstr ""
-
-#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:91
-msgid "Source ID"
-msgstr ""
-
-#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:92
-msgid "Actor ID"
-msgstr ""
-
-#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:93
-#: src/Premium__premium_only/Admin/MovementLedgerSection.php:81
-msgid "Actor"
-msgstr ""
-
-#: src/Premium__premium_only/Admin/MovementLedgerExportController.php:114
-#: src/Premium__premium_only/Admin/MovementLedgerSection.php:127
-msgid "System or deleted user"
-msgstr ""
-
-#: src/Premium__premium_only/Admin/MovementLedgerSection.php:57
-msgid "Ledger"
-msgstr ""
-
-#: src/Premium__premium_only/Admin/MovementLedgerSection.php:79
-msgid "Search stock movements"
-msgstr ""
-
-#: src/Premium__premium_only/Admin/MovementLedgerSection.php:79
-msgid "Search pools, movements, sources, actors, or reasons"
-msgstr ""
-
-#: src/Premium__premium_only/Admin/MovementLedgerSection.php:79
-msgid "Export CSV"
-msgstr ""
-
-#: src/Premium__premium_only/Admin/MovementLedgerSection.php:87
-msgid "No matching movements found."
-msgstr ""
-
-#. translators: 1: first row, 2: last row, 3: total matching movements.
-#: src/Premium__premium_only/Admin/MovementLedgerSection.php:94
-#, php-format
-msgid "Showing %1$d-%2$d of %3$d matching movements."
-msgstr ""
-
-#: src/Premium__premium_only/Admin/MovementLedgerSection.php:97
-msgid "Ledger pages"
 msgstr ""
 
 #: src/Premium__premium_only/Admin/ReceivingController.php:150
