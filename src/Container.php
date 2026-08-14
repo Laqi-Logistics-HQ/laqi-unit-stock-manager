@@ -20,6 +20,7 @@ use LaqiUnitStockManager\Storage\MovementRepository;
 use LaqiUnitStockManager\Consumption\CalculatorRegistry;
 use LaqiUnitStockManager\Availability\AvailabilityService;
 use LaqiUnitStockManager\Admin\ScreenSectionCatalog;
+use LaqiUnitStockManager\Diagnostics\MappingDiagnostics;
 use LaqiUnitStockManager\Presentation\PoolPresenter;
 use LaqiUnitStockManager\Presentation\QuantityFormatter;
 use LaqiUnitStockManager\Presentation\MovementPresenter;
@@ -147,6 +148,16 @@ final class Container {
 			static function () {
 				global $wpdb;
 				return new MappingRepository( $wpdb );
+			}
+		);
+	}
+
+	/** Product-mapping diagnostics. @return MappingDiagnostics */
+	public function mapping_diagnostics(): MappingDiagnostics {
+		return $this->remember(
+			'mapping_diagnostics',
+			static function () {
+				return new MappingDiagnostics();
 			}
 		);
 	}

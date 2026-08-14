@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 use LaqiUnitStockManager\Admin\ScreenSectionCatalog;
 use LaqiUnitStockManager\Availability\AvailabilityService;
 use LaqiUnitStockManager\Consumption\CalculatorRegistry;
+use LaqiUnitStockManager\Diagnostics\MappingDiagnostics;
 use LaqiUnitStockManager\Inventory\MovementRegistry;
 use LaqiUnitStockManager\Inventory\StockAdjustmentService;
 use LaqiUnitStockManager\Inventory\StockMutationService;
@@ -50,6 +51,9 @@ interface ExtensionContextInterface {
 
 	/** Product-mapping persistence. @return MappingRepository */
 	public function mappings(): MappingRepository;
+
+	/** Read-only product-mapping diagnostics. @return MappingDiagnostics */
+	public function mapping_diagnostics(): MappingDiagnostics;
 
 	/** Movement-ledger reads. @return MovementRepository */
 	public function movement_history(): MovementRepository;
