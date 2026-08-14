@@ -156,6 +156,17 @@ if [ "$CHANNEL" != "freemius" ]; then
   rm -rf "$DEST/vendor" "$DEST/freemius"
 fi
 
+# Exercise the exact Composer tree copied into the Freemius artifact. A stale or
+# SDK-owned autoloader that cannot resolve the plugin root would otherwise build
+# successfully and fail only when WordPress next loads the activated plugin.
+if [ "$CHANNEL" = "freemius" ] && [ -f "$DEST/vendor/autoload.php" ]; then
+  if ! php -r 'require $argv[1]; exit(class_exists("LaqiUnitStockManager\\Plugin") ? 0 : 1);' "$DEST/vendor/autoload.php"; then
+    echo "refusing to package: Freemius autoloader cannot load LaqiUnitStockManager\\Plugin" >&2
+    rm -rf "$STAGE"
+    exit 1
+  fi
+fi
+
 # Free is generated from the same source tree as both paid channels. Freemius
 # uses this suffix for its own free-package split; apply the identical physical
 # boundary to the WordPress.org archive built directly by this repository.

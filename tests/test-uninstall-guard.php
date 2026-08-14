@@ -50,4 +50,34 @@ class Test_Uninstall_Guard extends WP_UnitTestCase {
 		$this->assertSame( $table, $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) );
 		$this->assertSame( Schema::VERSION, (int) get_option( Schema::VERSION_OPTION ) );
 	}
+
+	/** A final-edition uninstall removes policy state and every recurring job. */
+	public function test_final_edition_uninstall_cleans_options_and_schedules(): void {
+		if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+			define( 'WP_UNINSTALL_PLUGIN', true );
+		}
+		unlink( $this->sibling_dir . '/laqi-unit-stock-manager.php' );
+		rmdir( $this->sibling_dir );
+
+		update_option( 'laqi_lusm_adjustment_policy', array( 'require_reason' => true ) );
+		$hooks = array(
+			'laqi_lusm_evaluate_stock_alerts',
+			'laqi_lusm_send_stock_report',
+			'laqi_lusm_expire_reservations',
+			'laqi_lusm_evaluate_batch_expiry',
+		);
+		foreach ( $hooks as $hook ) {
+			wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', $hook );
+		}
+
+		include dirname( __DIR__ ) . '/uninstall.php';
+
+		$this->assertFalse( get_option( 'laqi_lusm_adjustment_policy', false ) );
+		foreach ( $hooks as $hook ) {
+			$this->assertFalse( wp_next_scheduled( $hook ), $hook . ' remains scheduled.' );
+		}
+
+		// Restore the base schema for tests that run after this destructive check.
+		Schema::install();
+	}
 }
