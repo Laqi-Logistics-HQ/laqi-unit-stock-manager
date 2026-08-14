@@ -32,7 +32,7 @@ class Test_WooCommerce_Wiring extends WP_UnitTestCase {
 		$this->assertNotFalse( has_action( 'wp_ajax_laqi_lusm_search_pools' ) );
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_update_pool' ) );
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_create_unit' ) );
-		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_save_low_stock_alert' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_save_low_stock_alert' ) );
 		$this->assertFalse( has_action( 'admin_post_laqi_lusm_save_forecast' ) );
 		$this->assertFalse( has_action( 'admin_post_laqi_lusm_save_stock_report' ) );
 		$this->assertFalse( has_action( 'admin_post_laqi_lusm_send_stock_report' ) );
@@ -61,7 +61,6 @@ class Test_WooCommerce_Wiring extends WP_UnitTestCase {
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_batch_expiry_write_off' ) );
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_save_batch_expiry' ) );
 		$this->assertNotFalse( has_action( \LaqiUnitStockManager\Premium\Batches\BatchExpiryEvaluator::CRON_HOOK ) );
-		$this->assertNotFalse( has_action( \LaqiUnitStockManager\Premium\Alerts\LowStockAlertEvaluator::CRON_HOOK ) );
 		$this->assertNotFalse( has_action( 'laqi_lusm_mapping_changed' ) );
 		$this->assertNotFalse( has_action( 'rest_api_init' ) );
 		$this->assertSame( '_laqi_lusm_stock_snapshot', OrderItemSnapshotter::META_KEY );

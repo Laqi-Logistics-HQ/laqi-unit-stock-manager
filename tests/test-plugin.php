@@ -161,4 +161,13 @@ class Test_Plugin extends WP_UnitTestCase {
 		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Admin\StockReportSection' ) );
 		$this->assertFalse( has_action( 'laqi_lusm_send_stock_report' ) );
 	}
+
+	/** Low-stock alert policy, evaluator, and UI belong only to Pro. */
+	public function test_low_stock_alert_implementation_is_not_bundled(): void {
+		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Alerts\LowStockPolicyRepository' ) );
+		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Alerts\LowStockAlertEvaluator' ) );
+		$this->assertFalse( class_exists( '\LaqiUnitStockManager\Premium\Admin\LowStockAlertsSection' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_save_low_stock_alert' ) );
+		$this->assertFalse( has_action( 'laqi_lusm_evaluate_stock_alerts' ) );
+	}
 }
