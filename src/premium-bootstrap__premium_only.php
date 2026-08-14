@@ -73,9 +73,6 @@ require_once __DIR__ . '/Premium__premium_only/Admin/RecipeSection.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/RecipeController.php';
 require_once __DIR__ . '/Premium__premium_only/Integrations/SubscriptionRenewalAdapter.php';
 require_once __DIR__ . '/Premium__premium_only/Integrations/MobileOrderAdapter.php';
-require_once __DIR__ . '/Premium__premium_only/Integrations/MobileStockLookupController.php';
-require_once __DIR__ . '/Premium__premium_only/Integrations/MobileStocktakeController.php';
-require_once __DIR__ . '/Premium__premium_only/Admin/MobileStocktakeSection.php';
 require_once __DIR__ . '/Premium__premium_only/Integrations/StockPricingRuleFieldProvider.php';
 
 add_action(
@@ -154,7 +151,6 @@ add_action(
 		$container->screen_section_catalog()->register( new Premium\Admin\MaterialCostsSection( $material_economics, $container->mapping_repository() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ReservationsSection( $stock_holds, $container->pool_repository(), $container->quantity_formatter(), $safety_stock, $supply_projections ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\RecipeSection( $container->unit_registry() ) );
-		$container->screen_section_catalog()->register( new Premium\Admin\MobileStocktakeSection() );
 		( new Premium\Admin\LowStockAlertController( $alert_policies, $container->pool_repository(), $container->unit_registry() ) )->register();
 		( new Premium\Admin\ForecastController( $forecast_policies, $container->pool_repository() ) )->register();
 		( new Premium\Admin\StockReportController( $report_settings, $report_scheduler ) )->register();
@@ -169,8 +165,6 @@ add_action(
 		( new Premium\Integrations\SubscriptionRenewalAdapter( $renewal_snapshots, $reservation_service ) )->register();
 		$mobile_snapshots = new WooCommerce\OrderItemSnapshotter( $container->mapping_repository(), $container->calculator_registry() );
 		( new Premium\Integrations\MobileOrderAdapter( $mobile_snapshots, $reservation_service ) )->register();
-		( new Premium\Integrations\MobileStockLookupController( $container->mapping_repository(), $container->pool_repository(), $container->pool_presenter(), $container->availability_service(), $container->calculator_registry() ) )->register();
-		( new Premium\Integrations\MobileStocktakeController( $container->stock_adjustment_service(), $container->pool_repository(), $container->pool_presenter() ) )->register();
 		( new Premium\Integrations\StockPricingRuleFieldProvider( $container->mapping_repository(), $container->pool_repository(), $container->calculator_registry(), $container->availability_service(), $forecast_policies, $forecast_service ) )->register();
 		$report_scheduler->register();
 		$alert_evaluator = new Premium\Alerts\LowStockAlertEvaluator( $alert_policies, $container->pool_repository(), $container->quantity_formatter(), $alert_channels, $alert_deliveries );
