@@ -155,16 +155,11 @@ The default large-change threshold is 50% of the preceding balance and can be
 adjusted with `laqi_lusm_large_adjustment_ratio`. Consumers may add or rank
 findings with `laqi_lusm_stock_anomalies`; detection never changes stock.
 
-The Pro Reasons & approvals tab stores up to 20 reusable audit-reason
-suggestions and a site-wide sensitive-change threshold. By default, a prepared
-manual adjustment, stocktake, or typed loss that changes at least 25% of the
-current absolute pool balance requires an administrator; ordinary WooCommerce
-stock managers may still make smaller changes. Administrators can delegate that
-approval permission to WooCommerce stock managers or set the threshold to zero
-to disable the additional check. Enforcement occurs through
-`laqi_lusm_adjustment_authorized` inside the shared adjustment service, while
-`laqi_lusm_adjustment_reason_templates` lets registered modules and extensions
-compose suggestions. Reasons remain editable audit text rather than opaque IDs.
+The separately distributed Pro add-on owns reusable adjustment reasons and
+sensitive-change approval policies. It attaches through the versioned extension
+context and the Free-owned `laqi_lusm_adjustment_authorized` and
+`laqi_lusm_adjustment_reason_templates` hooks; no paid implementation ships in
+this repository for that capability.
 
 Custom units use soft retirement. The repository prevents retirement while a pool
 uses the key as its base/display unit or another active custom unit references it;

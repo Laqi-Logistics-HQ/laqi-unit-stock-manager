@@ -51,7 +51,7 @@ class Test_Uninstall_Guard extends WP_UnitTestCase {
 		$this->assertSame( Schema::VERSION, (int) get_option( Schema::VERSION_OPTION ) );
 	}
 
-	/** A final-edition uninstall removes policy state and every recurring job. */
+	/** A final-edition uninstall removes Free-owned state and recurring jobs. */
 	public function test_final_edition_uninstall_cleans_options_and_schedules(): void {
 		if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 			define( 'WP_UNINSTALL_PLUGIN', true );
@@ -59,7 +59,6 @@ class Test_Uninstall_Guard extends WP_UnitTestCase {
 		unlink( $this->sibling_dir . '/laqi-unit-stock-manager.php' );
 		rmdir( $this->sibling_dir );
 
-		update_option( 'laqi_lusm_adjustment_policy', array( 'require_reason' => true ) );
 		$hooks = array(
 			'laqi_lusm_evaluate_stock_alerts',
 			'laqi_lusm_send_stock_report',
@@ -72,7 +71,6 @@ class Test_Uninstall_Guard extends WP_UnitTestCase {
 
 		include dirname( __DIR__ ) . '/uninstall.php';
 
-		$this->assertFalse( get_option( 'laqi_lusm_adjustment_policy', false ) );
 		foreach ( $hooks as $hook ) {
 			$this->assertFalse( wp_next_scheduled( $hook ), $hook . ' remains scheduled.' );
 		}

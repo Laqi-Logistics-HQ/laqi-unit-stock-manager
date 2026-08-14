@@ -13,10 +13,6 @@ require_once __DIR__ . '/Premium__premium_only/Admin/MovementLedgerSection.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/MovementLedgerExportController.php';
 require_once __DIR__ . '/Premium__premium_only/Anomalies/StockAnomalyDetector.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/StockAnomaliesSection.php';
-require_once __DIR__ . '/Premium__premium_only/Approvals/AdjustmentPolicyRepository.php';
-require_once __DIR__ . '/Premium__premium_only/Approvals/AdjustmentPolicy.php';
-require_once __DIR__ . '/Premium__premium_only/Admin/AdjustmentPolicyController.php';
-require_once __DIR__ . '/Premium__premium_only/Admin/AdjustmentPolicySection.php';
 require_once __DIR__ . '/Premium__premium_only/Inventory/StockLossTypeCatalog.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/StockLossController.php';
 require_once __DIR__ . '/Premium__premium_only/Admin/StockLossSection.php';
@@ -110,8 +106,6 @@ add_action(
 	static function ( Container $container ): void {
 		$loss_types = new Premium\Inventory\StockLossTypeCatalog();
 		global $wpdb;
-		$adjustment_policies = new Premium\Approvals\AdjustmentPolicyRepository();
-		( new Premium\Approvals\AdjustmentPolicy( $adjustment_policies, $container->pool_repository() ) )->register();
 		$alert_policies   = new Premium\Alerts\LowStockPolicyRepository( $wpdb );
 		$alert_deliveries = new Premium\Alerts\AlertDeliveryRepository( $wpdb );
 		$alert_deliveries->install();
@@ -168,7 +162,6 @@ add_action(
 		$container->screen_section_catalog()->register( new Premium\Admin\MovementLedgerSection( $container->movement_repository(), $container->movement_presenter(), new Admin\PaginationRenderer() ) );
 		$anomaly_detector = new Premium\Anomalies\StockAnomalyDetector( $container->movement_repository(), $container->mapping_repository(), new Diagnostics\MappingDiagnostics() );
 		$container->screen_section_catalog()->register( new Premium\Admin\StockAnomaliesSection( $anomaly_detector ) );
-		$container->screen_section_catalog()->register( new Premium\Admin\AdjustmentPolicySection( $adjustment_policies ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\StockLossSection( $container->pool_repository(), $container->quantity_formatter(), $loss_types ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\LowStockAlertsSection( $alert_policies, $container->pool_repository(), $container->quantity_formatter(), $alert_deliveries ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\ForecastSection( $container->pool_repository(), $forecast_policies, $forecast_service, $container->quantity_formatter(), new Admin\PaginationRenderer() ) );
@@ -181,7 +174,6 @@ add_action(
 		$container->screen_section_catalog()->register( new Premium\Admin\RecipeSection( $container->unit_registry() ) );
 		$container->screen_section_catalog()->register( new Premium\Admin\MobileStocktakeSection() );
 		( new Premium\Admin\MovementLedgerExportController( $container->movement_repository(), $container->movement_presenter() ) )->register();
-		( new Premium\Admin\AdjustmentPolicyController( $adjustment_policies ) )->register();
 		( new Premium\Admin\StockLossController( $container->stock_adjustment_service(), $loss_types ) )->register();
 		( new Premium\Admin\LowStockAlertController( $alert_policies, $container->pool_repository(), $container->unit_registry() ) )->register();
 		( new Premium\Admin\ForecastController( $forecast_policies, $container->pool_repository() ) )->register();
