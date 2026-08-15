@@ -35,6 +35,19 @@ class Test_Admin_Foundation extends WP_UnitTestCase {
 		$this->assertSame( array( 'value' => '1000', 'unit' => 'mg' ), $formatter->editable( new Quantity( 'mass', 1000000000 ), 'triple_gram' ) );
 	}
 
+	/** Unit definitions expose readable labels without changing stable keys. */
+	public function test_unit_definitions_have_merchant_facing_labels(): void {
+		$registry = new UnitRegistry();
+
+		$this->assertSame( 'us_fl_oz', $registry->get( 'us_fl_oz' )->key() );
+		$this->assertSame( 'US fluid ounce', $registry->get( 'us_fl_oz' )->label() );
+		$this->assertSame( 'US fl oz', $registry->get( 'us_fl_oz' )->symbol() );
+
+		$custom = $registry->register_custom( 'sack', '25', 'kg', 'Flour sack', 'sack' );
+		$this->assertSame( 'Flour sack', $custom->label() );
+		$this->assertSame( 'sack', $custom->symbol() );
+	}
+
 	/**
 	 * The shared presenter publishes the version-one row shape.
 	 */

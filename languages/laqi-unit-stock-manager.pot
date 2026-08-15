@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-14T18:47:21+00:00\n"
+"POT-Creation-Date: 2026-08-15T18:19:28+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -54,55 +54,63 @@ msgstr ""
 msgid "The latest pooled-stock changes are shown below. These records are append-only."
 msgstr ""
 
-#: src/Admin/ActivitySection.php:78
+#: src/Admin/ActivitySection.php:79
+#: src/Admin/ActivitySection.php:93
 #: src/Privacy.php:108
 msgid "Date"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:79
+#: src/Admin/ActivitySection.php:80
+#: src/Admin/ActivitySection.php:94
 #: src/Admin/PoolStockSection.php:129
+#: src/Admin/PoolStockSection.php:140
 #: src/Admin/SetupSection.php:193
 #: src/Admin/SetupSection.php:278
 msgid "Inventory pool"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:80
+#: src/Admin/ActivitySection.php:81
+#: src/Admin/ActivitySection.php:95
 msgid "Movement"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:81
+#: src/Admin/ActivitySection.php:82
+#: src/Admin/ActivitySection.php:96
 msgid "Change"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:82
+#: src/Admin/ActivitySection.php:83
+#: src/Admin/ActivitySection.php:97
 msgid "Balance"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:83
+#: src/Admin/ActivitySection.php:84
+#: src/Admin/ActivitySection.php:98
 msgid "Source"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:84
+#: src/Admin/ActivitySection.php:85
+#: src/Admin/ActivitySection.php:99
 #: src/Admin/PoolStockSection.php:263
 #: src/Privacy.php:128
 msgid "Reason"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:88
+#: src/Admin/ActivitySection.php:89
 msgid "No stock movements recorded yet."
 msgstr ""
 
 #. translators: 1: first visible movement number, 2: last visible movement number, 3: total movements.
-#: src/Admin/ActivitySection.php:106
+#: src/Admin/ActivitySection.php:108
 #, php-format
 msgid "Showing %1$d-%2$d of %3$d stock movements."
 msgstr ""
 
-#: src/Admin/ActivitySection.php:109
+#: src/Admin/ActivitySection.php:111
 msgid "Stock movement pages"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:137
+#: src/Admin/ActivitySection.php:139
 msgid "System"
 msgstr ""
 
@@ -139,14 +147,17 @@ msgid "Search"
 msgstr ""
 
 #: src/Admin/PoolStockSection.php:130
+#: src/Admin/PoolStockSection.php:141
 msgid "On hand"
 msgstr ""
 
 #: src/Admin/PoolStockSection.php:131
+#: src/Admin/PoolStockSection.php:142
 msgid "Linked products"
 msgstr ""
 
 #: src/Admin/PoolStockSection.php:132
+#: src/Admin/PoolStockSection.php:143
 msgid "Adjustment"
 msgstr ""
 
@@ -413,6 +424,26 @@ msgstr ""
 msgid "Save mapping"
 msgstr ""
 
+#: src/Admin/SetupSection.php:332
+msgid "Metric"
+msgstr ""
+
+#: src/Admin/SetupSection.php:333
+msgid "Imperial"
+msgstr ""
+
+#: src/Admin/SetupSection.php:334
+msgid "US customary"
+msgstr ""
+
+#: src/Admin/SetupSection.php:335
+msgid "Count"
+msgstr ""
+
+#: src/Admin/SetupSection.php:336
+msgid "Custom"
+msgstr ""
+
 #: src/Admin/StockAdjustmentController.php:49
 msgid "You are not allowed to adjust unit stock."
 msgstr ""
@@ -553,6 +584,70 @@ msgstr ""
 
 #: src/Privacy.php:167
 msgid "The plugin does not copy customer names, email addresses, payment details, or shipping addresses into its own tables. It does not send inventory or personal data to Laqi Logistics or another external service. Movement and temporary order-reservation records are retained for inventory correctness until their normal lifecycle completes or the plugin is deleted. A WordPress personal-data erasure request removes the user association from movements while retaining the stock ledger required for inventory correctness."
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:32
+msgid "Milligram"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:33
+msgid "Gram"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:34
+msgid "Kilogram"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:35
+msgid "Ounce"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:36
+msgid "Pound"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:40
+msgid "Millilitre"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:41
+msgid "Litre"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:42
+msgid "US fluid ounce"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:43
+msgid "US pint"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:44
+msgid "US quart"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:45
+msgid "US gallon"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:46
+msgid "Imperial fluid ounce"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:47
+msgid "Imperial pint"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:48
+msgid "Imperial gallon"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:50
+msgid "Unit"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:50
+msgid "units"
 msgstr ""
 
 #: src/WooCommerce/CartValidator.php:105

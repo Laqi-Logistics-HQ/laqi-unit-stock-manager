@@ -48,7 +48,7 @@ final class CustomUnitRepository {
 	 * @throws RuntimeException When persistence fails.
 	 */
 	public function create( UnitRegistry $registry, string $key, string $label, string $symbol, string $reference_value, string $reference_unit ): UnitDefinition {
-		$definition = $registry->register_custom( $key, $reference_value, $reference_unit );
+		$definition = $registry->register_custom( $key, $reference_value, $reference_unit, $label, $symbol );
 		$now        = current_time( 'mysql', true );
 		$inserted   = $this->db->insert(
 			Schema::table( 'units' ),
@@ -82,7 +82,7 @@ final class CustomUnitRepository {
 	 */
 	public function register_all( UnitRegistry $registry ): void {
 		$rows = $this->db->get_results(
-			'SELECT unit_key, family, base_factor FROM ' . Schema::table( 'units' ) . ' WHERE active = 1 ORDER BY id ASC', // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			'SELECT unit_key, label, symbol, family, base_factor FROM ' . Schema::table( 'units' ) . ' WHERE active = 1 ORDER BY id ASC', // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 			ARRAY_A
 		); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 
@@ -92,7 +92,9 @@ final class CustomUnitRepository {
 					(string) $row['unit_key'],
 					(string) $row['family'],
 					(int) $row['base_factor'],
-					'custom'
+					'custom',
+					(string) $row['label'],
+					(string) $row['symbol']
 				)
 			);
 		}
