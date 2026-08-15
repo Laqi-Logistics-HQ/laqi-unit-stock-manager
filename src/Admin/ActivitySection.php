@@ -73,6 +73,7 @@ final class ActivitySection implements ScreenSectionInterface {
 		$rows        = array_map( array( $this->presenter, 'present' ), $this->movements->recent( self::PER_PAGE, $offset ) );
 		?>
 		<p><?php esc_html_e( 'The latest pooled-stock changes are shown below. These records are append-only.', 'laqi-unit-stock-manager' ); ?></p>
+		<div class="laqi-lusm-table-scroll">
 		<table class="widefat striped laqi-lusm-activity-table">
 			<thead><tr>
 				<th scope="col"><?php esc_html_e( 'Date', 'laqi-unit-stock-manager' ); ?></th>
@@ -89,17 +90,18 @@ final class ActivitySection implements ScreenSectionInterface {
 			<?php endif; ?>
 			<?php foreach ( $rows as $row ) : ?>
 				<tr>
-					<td><?php echo esc_html( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $row['created_at'] . ' UTC' ) ) ); ?></td>
-					<th scope="row"><?php echo esc_html( $row['pool_name'] ); ?></th>
-					<td><?php echo esc_html( $row['type_label'] ); ?></td>
-					<td><?php echo esc_html( $row['delta_display'] ); ?></td>
-					<td><?php echo esc_html( $row['balance_display'] ); ?></td>
-					<td><?php echo esc_html( $this->source_label( $row ) ); ?></td>
-					<td><?php echo esc_html( $row['reason'] ); ?></td>
+					<td data-label="<?php esc_attr_e( 'Date', 'laqi-unit-stock-manager' ); ?>"><?php echo esc_html( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $row['created_at'] . ' UTC' ) ) ); ?></td>
+					<th scope="row" data-label="<?php esc_attr_e( 'Inventory pool', 'laqi-unit-stock-manager' ); ?>"><?php echo esc_html( $row['pool_name'] ); ?></th>
+					<td data-label="<?php esc_attr_e( 'Movement', 'laqi-unit-stock-manager' ); ?>"><?php echo esc_html( $row['type_label'] ); ?></td>
+					<td data-label="<?php esc_attr_e( 'Change', 'laqi-unit-stock-manager' ); ?>"><?php echo esc_html( $row['delta_display'] ); ?></td>
+					<td data-label="<?php esc_attr_e( 'Balance', 'laqi-unit-stock-manager' ); ?>"><?php echo esc_html( $row['balance_display'] ); ?></td>
+					<td data-label="<?php esc_attr_e( 'Source', 'laqi-unit-stock-manager' ); ?>"><?php echo esc_html( $this->source_label( $row ) ); ?></td>
+					<td data-label="<?php esc_attr_e( 'Reason', 'laqi-unit-stock-manager' ); ?>"><?php echo esc_html( $row['reason'] ); ?></td>
 				</tr>
 			<?php endforeach; ?>
 			</tbody>
 		</table>
+		</div>
 		<?php
 		if ( $total > 0 ) {
 			/* translators: 1: first visible movement number, 2: last visible movement number, 3: total movements. */

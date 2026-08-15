@@ -43,18 +43,36 @@ final class UnitDefinition {
 	private $system;
 
 	/**
+	 * Merchant-facing unit label.
+	 *
+	 * @var string
+	 */
+	private $label;
+
+	/**
+	 * Merchant-facing unit symbol.
+	 *
+	 * @var string
+	 */
+	private $symbol;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param string $key         Unit key.
 	 * @param string $family      Measurement family.
 	 * @param int    $base_factor Number of base units.
 	 * @param string $system      Unit system or custom.
+	 * @param string $label       Merchant-facing label.
+	 * @param string $symbol      Merchant-facing symbol.
 	 */
-	public function __construct( string $key, string $family, int $base_factor, string $system = 'custom' ) {
+	public function __construct( string $key, string $family, int $base_factor, string $system = 'custom', string $label = '', string $symbol = '' ) {
 		$this->key         = $key;
 		$this->family      = $family;
 		$this->base_factor = $base_factor;
 		$this->system      = $system;
+		$this->label       = '' !== $label ? $label : $key;
+		$this->symbol      = '' !== $symbol ? $symbol : $key;
 	}
 
 	/**
@@ -91,5 +109,15 @@ final class UnitDefinition {
 	 */
 	public function system(): string {
 		return $this->system;
+	}
+
+	/** Merchant-facing label. @return string */
+	public function label(): string {
+		return $this->label;
+	}
+
+	/** Merchant-facing symbol. @return string */
+	public function symbol(): string {
+		return $this->symbol;
 	}
 }

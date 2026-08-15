@@ -29,25 +29,25 @@ final class UnitRegistry {
 	 */
 	public function __construct() {
 		// Mass base: nanogram. Common metric and imperial definitions are exact.
-		$this->register( new UnitDefinition( 'mg', 'mass', 1000000, 'metric' ) );
-		$this->register( new UnitDefinition( 'g', 'mass', 1000000000, 'metric' ) );
-		$this->register( new UnitDefinition( 'kg', 'mass', 1000000000000, 'metric' ) );
-		$this->register( new UnitDefinition( 'oz', 'mass', 28349523125, 'imperial' ) );
-		$this->register( new UnitDefinition( 'lb', 'mass', 453592370000, 'imperial' ) );
+		$this->register( new UnitDefinition( 'mg', 'mass', 1000000, 'metric', __( 'Milligram', 'laqi-unit-stock-manager' ), 'mg' ) );
+		$this->register( new UnitDefinition( 'g', 'mass', 1000000000, 'metric', __( 'Gram', 'laqi-unit-stock-manager' ), 'g' ) );
+		$this->register( new UnitDefinition( 'kg', 'mass', 1000000000000, 'metric', __( 'Kilogram', 'laqi-unit-stock-manager' ), 'kg' ) );
+		$this->register( new UnitDefinition( 'oz', 'mass', 28349523125, 'imperial', __( 'Ounce', 'laqi-unit-stock-manager' ), 'oz' ) );
+		$this->register( new UnitDefinition( 'lb', 'mass', 453592370000, 'imperial', __( 'Pound', 'laqi-unit-stock-manager' ), 'lb' ) );
 
 		// Volume base: one sixteenth of a nanolitre. This keeps common US and
 		// imperial definitions exact while retaining practical BIGINT capacity.
-		$this->register( new UnitDefinition( 'ml', 'volume', 16000000, 'metric' ) );
-		$this->register( new UnitDefinition( 'l', 'volume', 16000000000, 'metric' ) );
-		$this->register( new UnitDefinition( 'us_fl_oz', 'volume', 473176473, 'us_customary' ) );
-		$this->register( new UnitDefinition( 'us_pt', 'volume', 7570823568, 'us_customary' ) );
-		$this->register( new UnitDefinition( 'us_qt', 'volume', 15141647136, 'us_customary' ) );
-		$this->register( new UnitDefinition( 'us_gal', 'volume', 60566588544, 'us_customary' ) );
-		$this->register( new UnitDefinition( 'imp_fl_oz', 'volume', 454609000, 'imperial' ) );
-		$this->register( new UnitDefinition( 'imp_pt', 'volume', 9092180000, 'imperial' ) );
-		$this->register( new UnitDefinition( 'imp_gal', 'volume', 72737440000, 'imperial' ) );
+		$this->register( new UnitDefinition( 'ml', 'volume', 16000000, 'metric', __( 'Millilitre', 'laqi-unit-stock-manager' ), 'ml' ) );
+		$this->register( new UnitDefinition( 'l', 'volume', 16000000000, 'metric', __( 'Litre', 'laqi-unit-stock-manager' ), 'l' ) );
+		$this->register( new UnitDefinition( 'us_fl_oz', 'volume', 473176473, 'us_customary', __( 'US fluid ounce', 'laqi-unit-stock-manager' ), 'US fl oz' ) );
+		$this->register( new UnitDefinition( 'us_pt', 'volume', 7570823568, 'us_customary', __( 'US pint', 'laqi-unit-stock-manager' ), 'US pt' ) );
+		$this->register( new UnitDefinition( 'us_qt', 'volume', 15141647136, 'us_customary', __( 'US quart', 'laqi-unit-stock-manager' ), 'US qt' ) );
+		$this->register( new UnitDefinition( 'us_gal', 'volume', 60566588544, 'us_customary', __( 'US gallon', 'laqi-unit-stock-manager' ), 'US gal' ) );
+		$this->register( new UnitDefinition( 'imp_fl_oz', 'volume', 454609000, 'imperial', __( 'Imperial fluid ounce', 'laqi-unit-stock-manager' ), 'imp fl oz' ) );
+		$this->register( new UnitDefinition( 'imp_pt', 'volume', 9092180000, 'imperial', __( 'Imperial pint', 'laqi-unit-stock-manager' ), 'imp pt' ) );
+		$this->register( new UnitDefinition( 'imp_gal', 'volume', 72737440000, 'imperial', __( 'Imperial gallon', 'laqi-unit-stock-manager' ), 'imp gal' ) );
 
-		$this->register( new UnitDefinition( 'unit', 'count', 1, 'count' ) );
+		$this->register( new UnitDefinition( 'unit', 'count', 1, 'count', __( 'Unit', 'laqi-unit-stock-manager' ), __( 'units', 'laqi-unit-stock-manager' ) ) );
 	}
 
 	/**
@@ -140,16 +140,18 @@ final class UnitRegistry {
 	 * @param string $key        Custom unit key.
 	 * @param string $equivalent Decimal quantity of the reference unit.
 	 * @param string $unit       Reference unit key.
+	 * @param string $label      Merchant-facing label.
+	 * @param string $symbol     Merchant-facing symbol.
 	 * @return UnitDefinition
 	 * @throws InvalidArgumentException When the custom definition is invalid.
 	 */
-	public function register_custom( string $key, string $equivalent, string $unit ): UnitDefinition {
+	public function register_custom( string $key, string $equivalent, string $unit, string $label = '', string $symbol = '' ): UnitDefinition {
 		if ( ! preg_match( '/^[a-z][a-z0-9_]{1,49}$/', $key ) || isset( $this->definitions[ $key ] ) ) {
 			throw new InvalidArgumentException( 'Custom unit key is invalid or already registered.' );
 		}
 
 		$quantity   = $this->normalize( $equivalent, $unit );
-		$definition = new UnitDefinition( $key, $quantity->family(), $quantity->amount(), 'custom' );
+		$definition = new UnitDefinition( $key, $quantity->family(), $quantity->amount(), 'custom', $label, $symbol );
 		$this->register( $definition );
 
 		return $definition;

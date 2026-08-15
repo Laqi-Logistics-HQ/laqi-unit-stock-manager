@@ -137,10 +137,10 @@ final class PoolStockSection implements ScreenSectionInterface {
 			<?php endif; ?>
 			<?php foreach ( $rows as $row ) : ?>
 				<tr>
-					<th scope="row"><?php $this->render_details_form( $row ); ?></th>
-					<td><strong><?php echo esc_html( $row['quantity_display'] ); ?></strong></td>
-					<td><?php $this->render_links( (int) $row['id'] ); ?></td>
-					<td><?php $this->render_adjustment_form( $row ); ?></td>
+					<th scope="row" data-label="<?php esc_attr_e( 'Inventory pool', 'laqi-unit-stock-manager' ); ?>"><?php $this->render_details_form( $row ); ?></th>
+					<td data-label="<?php esc_attr_e( 'On hand', 'laqi-unit-stock-manager' ); ?>"><strong><?php echo esc_html( $row['quantity_display'] ); ?></strong></td>
+					<td data-label="<?php esc_attr_e( 'Linked products', 'laqi-unit-stock-manager' ); ?>"><?php $this->render_links( (int) $row['id'] ); ?></td>
+					<td data-label="<?php esc_attr_e( 'Adjustment', 'laqi-unit-stock-manager' ); ?>"><?php $this->render_adjustment_form( $row ); ?></td>
 				</tr>
 			<?php endforeach; ?>
 			</tbody>
@@ -186,7 +186,7 @@ final class PoolStockSection implements ScreenSectionInterface {
 			<select id="laqi-lusm-pool-unit-<?php echo esc_attr( $row['id'] ); ?>" name="display_unit">
 			<?php foreach ( $this->units->all() as $unit ) : ?>
 				<?php if ( $unit->family() === $row['family'] ) : ?>
-					<option value="<?php echo esc_attr( $unit->key() ); ?>" <?php selected( $unit->key(), $row['display_unit'] ); ?>><?php echo esc_html( $unit->key() ); ?></option>
+					<option value="<?php echo esc_attr( $unit->key() ); ?>" <?php selected( $unit->key(), $row['display_unit'] ); ?>><?php echo esc_html( $unit->label() . ' (' . $unit->symbol() . ')' ); ?></option>
 				<?php endif; ?>
 			<?php endforeach; ?>
 			</select>
@@ -221,7 +221,7 @@ final class PoolStockSection implements ScreenSectionInterface {
 					}
 				)
 			);
-			echo '<li><strong>' . esc_html( $product->get_formatted_name() ) . '</strong><br />';
+			echo '<li><strong>' . esc_html( wp_strip_all_tags( $product->get_formatted_name() ) ) . '</strong><br />';
 			if ( $component && $pool ) {
 				/* translators: %s: exact pool quantity consumed by one sold item. */
 				echo esc_html( sprintf( __( 'Uses %s per item.', 'laqi-unit-stock-manager' ), $this->formatter->format( new Quantity( $pool->quantity()->family(), $component->consumption() ), $pool->display_unit() ) ) ) . ' ';

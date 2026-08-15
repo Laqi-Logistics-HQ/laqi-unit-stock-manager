@@ -175,7 +175,7 @@ final class SetupSection implements ScreenSectionInterface {
 					<th scope="row">
 					<?php
 					/* translators: %d: unavailable WooCommerce product or variation ID. */
-					echo esc_html( $product ? $product->get_formatted_name() : sprintf( __( 'Unavailable product #%d', 'laqi-unit-stock-manager' ), $mapping->variation_id() > 0 ? $mapping->variation_id() : $mapping->product_id() ) );
+					echo esc_html( $product ? wp_strip_all_tags( $product->get_formatted_name() ) : sprintf( __( 'Unavailable product #%d', 'laqi-unit-stock-manager' ), $mapping->variation_id() > 0 ? $mapping->variation_id() : $mapping->product_id() ) );
 					?>
 					</th>
 					<td>
@@ -316,8 +316,26 @@ final class SetupSection implements ScreenSectionInterface {
 		echo '<label for="laqi-lusm-' . esc_attr( $name ) . '">' . esc_html( $label ) . '</label>';
 		echo '<select id="laqi-lusm-' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '" required>';
 		foreach ( $this->units->all() as $unit ) {
-			echo '<option value="' . esc_attr( $unit->key() ) . '">' . esc_html( $unit->key() . ' (' . $unit->system() . ')' ) . '</option>';
+			echo '<option value="' . esc_attr( $unit->key() ) . '">' . esc_html( $unit->label() . ' (' . $unit->symbol() . ') — ' . $this->system_label( $unit->system() ) ) . '</option>';
 		}
 		echo '</select>';
+	}
+
+	/**
+	 * Human-readable unit system.
+	 *
+	 * @param string $system Stored system key.
+	 * @return string
+	 */
+	private function system_label( string $system ): string {
+		$labels = array(
+			'metric'       => __( 'Metric', 'laqi-unit-stock-manager' ),
+			'imperial'     => __( 'Imperial', 'laqi-unit-stock-manager' ),
+			'us_customary' => __( 'US customary', 'laqi-unit-stock-manager' ),
+			'count'        => __( 'Count', 'laqi-unit-stock-manager' ),
+			'custom'       => __( 'Custom', 'laqi-unit-stock-manager' ),
+		);
+
+		return isset( $labels[ $system ] ) ? $labels[ $system ] : $system;
 	}
 }
