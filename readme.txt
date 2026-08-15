@@ -22,7 +22,7 @@ For example, keep 10 kg of an ingredient in one inventory pool and link 0.1 g, 0
 
 WooCommerce > Unit Stock contains all plugin workflows as tabs under one menu item:
 
-* Stock: search pools by pool name, internal SKU, linked product name, product or variation SKU, or variation attribute. See current balance, linked packages, per-item consumption, saleable quantity, diagnostics, and inline adjustments.
+* Stock: search pools by pool name, internal SKU, linked product name, product or variation SKU, or variation attribute. See current balance, linked packages, per-item consumption, sellable quantity, diagnostics, and inline adjustments.
 * Setup: create pools, link simple products or individual variations, edit or unlink active consumption rules, decide what to do with existing WooCommerce stock, and define custom merchant units.
 * Activity: browse the complete append-only correctness ledger created by orders, refunds, restorations, migrations, edits, and manual adjustments.
 
@@ -51,7 +51,7 @@ The plugin does not copy customer contact, address, or payment data into its own
 5. Link a simple product or an individual variation to the pool and enter the exact quantity consumed by one sold item.
 6. Choose whether to disable, transfer, or keep the product's existing WooCommerce quantity management.
 7. Repeat the mapping step for every package drawing from that pool.
-8. Use the Stock tab to confirm linked products, saleable quantities, and current stock.
+8. Use the Stock tab to confirm linked products, sellable quantities, and current stock.
 
 Back up the database before transferring established WooCommerce stock. The transfer option multiplies the current native item count by the configured consumption and adds that exact amount to the pool once.
 

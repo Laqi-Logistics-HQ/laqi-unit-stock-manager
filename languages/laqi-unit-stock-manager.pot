@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-15T18:19:28+00:00\n"
+"POT-Creation-Date: 2026-08-15T19:03:46+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -91,7 +91,7 @@ msgstr ""
 
 #: src/Admin/ActivitySection.php:85
 #: src/Admin/ActivitySection.php:99
-#: src/Admin/PoolStockSection.php:263
+#: src/Admin/PoolStockSection.php:278
 #: src/Privacy.php:128
 msgid "Reason"
 msgstr ""
@@ -175,71 +175,75 @@ msgstr ""
 msgid "Inventory pool pages"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:181
+#: src/Admin/PoolStockSection.php:182
+msgid "Edit details"
+msgstr ""
+
+#: src/Admin/PoolStockSection.php:188
 #: src/Admin/SetupSection.php:108
 msgid "Pool name"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:183
-#: src/Admin/PoolStockSection.php:184
+#: src/Admin/PoolStockSection.php:190
+#: src/Admin/PoolStockSection.php:191
 #: src/Admin/SetupSection.php:109
 msgid "Internal SKU"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:185
+#: src/Admin/PoolStockSection.php:192
 msgid "Display unit"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:193
+#: src/Admin/PoolStockSection.php:200
 msgid "Save details"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:206
+#: src/Admin/PoolStockSection.php:214
 msgid "No products linked"
 msgstr ""
 
 #. translators: %s: exact pool quantity consumed by one sold item.
-#: src/Admin/PoolStockSection.php:227
+#: src/Admin/PoolStockSection.php:235
 #, php-format
 msgid "Uses %s per item."
 msgstr ""
 
-#. translators: %s: number of saleable items or Unlimited.
-#: src/Admin/PoolStockSection.php:230
+#. translators: %s: number of sellable items or Unlimited.
+#: src/Admin/PoolStockSection.php:238
 #, php-format
-msgid "Saleable: %s"
+msgid "Sellable: %s"
 msgstr ""
 
-#. translators: %s: number of saleable items or Unlimited.
-#: src/Admin/PoolStockSection.php:230
+#. translators: %s: number of sellable items or Unlimited.
+#: src/Admin/PoolStockSection.php:238
 msgid "Unlimited"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:254
-msgid "Adjustment type"
+#: src/Admin/PoolStockSection.php:263
+msgid "Type"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:256
+#: src/Admin/PoolStockSection.php:265
 msgid "Set to"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:257
+#: src/Admin/PoolStockSection.php:266
 msgid "Add"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:258
+#: src/Admin/PoolStockSection.php:267
 msgid "Subtract"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:260
+#: src/Admin/PoolStockSection.php:271
 msgid "Quantity"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:264
+#: src/Admin/PoolStockSection.php:279
 msgid "Reason (optional)"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:273
+#: src/Admin/PoolStockSection.php:289
 msgid "Apply"
 msgstr ""
 

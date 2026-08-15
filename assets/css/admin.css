@@ -14,13 +14,20 @@
 
 .laqi-lusm-stock-table th,
 .laqi-lusm-stock-table td {
-	vertical-align: middle;
+	padding: 1rem;
+	vertical-align: top;
 }
 
-.laqi-lusm-stock-table > thead > tr > :nth-child(1) { width: 16%; }
-.laqi-lusm-stock-table > thead > tr > :nth-child(2) { width: 9%; white-space: nowrap; }
-.laqi-lusm-stock-table > thead > tr > :nth-child(3) { width: 34%; }
-.laqi-lusm-stock-table > thead > tr > :nth-child(4) { width: 41%; }
+.laqi-lusm-stock-table > thead > tr > :nth-child(1) { width: 20%; }
+.laqi-lusm-stock-table > thead > tr > :nth-child(2) { width: 10%; white-space: nowrap; }
+.laqi-lusm-stock-table > thead > tr > :nth-child(3) { width: 30%; }
+.laqi-lusm-stock-table > thead > tr > :nth-child(4) { width: 40%; }
+
+.laqi-lusm-on-hand {
+	display: inline-block;
+	font-size: 1.1rem;
+	line-height: 1.4;
+}
 
 .laqi-lusm-pagination {
 	display: flex;
@@ -67,8 +74,33 @@
 }
 
 .laqi-lusm-adjustment {
-	display: flex;
-	flex-wrap: wrap;
+	display: grid;
+	grid-template-columns: minmax(6.5rem, 0.7fr) minmax(7rem, 0.8fr) minmax(11rem, 1.5fr) auto;
+	gap: 0.75rem;
+	align-items: end;
+}
+
+.laqi-lusm-control {
+	display: grid;
+	gap: 0.35rem;
+	font-weight: 400;
+}
+
+.laqi-lusm-control > span:first-child {
+	color: #50575e;
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+}
+
+.laqi-lusm-control input,
+.laqi-lusm-control select {
+	width: 100%;
+}
+
+.laqi-lusm-quantity-control {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
 	gap: 0.4rem;
 	align-items: center;
 }
@@ -81,6 +113,7 @@
 .laqi-lusm-pool-details {
 	display: grid;
 	gap: 0.35rem;
+	margin-top: 0.75rem;
 }
 
 .laqi-lusm-pool-details input,
@@ -91,6 +124,31 @@
 .laqi-lusm-pool-details .submit {
 	margin: 0;
 	padding: 0;
+}
+
+.laqi-lusm-pool-summary {
+	display: grid;
+	gap: 0.25rem;
+}
+
+.laqi-lusm-pool-summary > strong {
+	font-size: 1rem;
+}
+
+.laqi-lusm-pool-summary > span {
+	color: #50575e;
+	font-weight: 400;
+}
+
+.laqi-lusm-pool-editor {
+	margin-top: 0.75rem;
+	font-weight: 400;
+}
+
+.laqi-lusm-pool-editor > summary {
+	color: #2271b1;
+	cursor: pointer;
+	font-weight: 600;
 }
 
 .laqi-lusm-setup-grid {
@@ -231,5 +289,9 @@
 	.laqi-lusm-stock-table tr > [data-label] {
 		padding-top: 0.8rem;
 		padding-bottom: 0.8rem;
+	}
+
+	.laqi-lusm-adjustment {
+		grid-template-columns: 1fr;
 	}
 }
