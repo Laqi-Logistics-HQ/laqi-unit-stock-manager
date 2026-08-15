@@ -138,7 +138,7 @@ final class PoolStockSection implements ScreenSectionInterface {
 			<?php foreach ( $rows as $row ) : ?>
 				<tr>
 					<th scope="row" data-label="<?php esc_attr_e( 'Inventory pool', 'laqi-unit-stock-manager' ); ?>"><?php $this->render_details_form( $row ); ?></th>
-					<td data-label="<?php esc_attr_e( 'On hand', 'laqi-unit-stock-manager' ); ?>"><strong><?php echo esc_html( $row['quantity_display'] ); ?></strong></td>
+					<td data-label="<?php esc_attr_e( 'On hand', 'laqi-unit-stock-manager' ); ?>"><strong class="laqi-lusm-on-hand"><?php echo esc_html( $row['quantity_display'] ); ?></strong></td>
 					<td data-label="<?php esc_attr_e( 'Linked products', 'laqi-unit-stock-manager' ); ?>"><?php $this->render_links( (int) $row['id'] ); ?></td>
 					<td data-label="<?php esc_attr_e( 'Adjustment', 'laqi-unit-stock-manager' ); ?>"><?php $this->render_adjustment_form( $row ); ?></td>
 				</tr>
@@ -173,6 +173,13 @@ final class PoolStockSection implements ScreenSectionInterface {
 	 */
 	private function render_details_form( array $row ): void {
 		?>
+		<div class="laqi-lusm-pool-summary">
+			<strong><?php echo esc_html( $row['name'] ); ?></strong>
+			<span><?php echo esc_html( $row['internal_sku'] ); ?></span>
+			<span><?php echo esc_html( $this->units->get( $row['display_unit'] )->label() . ' (' . $this->units->get( $row['display_unit'] )->symbol() . ')' ); ?></span>
+		</div>
+		<details class="laqi-lusm-pool-editor">
+			<summary><?php esc_html_e( 'Edit details', 'laqi-unit-stock-manager' ); ?></summary>
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="laqi-lusm-pool-details">
 			<input type="hidden" name="action" value="laqi_lusm_update_pool" />
 			<input type="hidden" name="pool_id" value="<?php echo esc_attr( $row['id'] ); ?>" />
@@ -192,6 +199,7 @@ final class PoolStockSection implements ScreenSectionInterface {
 			</select>
 			<?php submit_button( __( 'Save details', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?>
 		</form>
+		</details>
 		<?php
 	}
 
@@ -226,8 +234,8 @@ final class PoolStockSection implements ScreenSectionInterface {
 				/* translators: %s: exact pool quantity consumed by one sold item. */
 				echo esc_html( sprintf( __( 'Uses %s per item.', 'laqi-unit-stock-manager' ), $this->formatter->format( new Quantity( $pool->quantity()->family(), $component->consumption() ), $pool->display_unit() ) ) ) . ' ';
 			}
-			/* translators: %s: number of saleable items or Unlimited. */
-			echo esc_html( sprintf( __( 'Saleable: %s', 'laqi-unit-stock-manager' ), null === $saleable ? __( 'Unlimited', 'laqi-unit-stock-manager' ) : number_format_i18n( $saleable ) ) );
+			/* translators: %s: number of sellable items or Unlimited. */
+			echo esc_html( sprintf( __( 'Sellable: %s', 'laqi-unit-stock-manager' ), null === $saleable ? __( 'Unlimited', 'laqi-unit-stock-manager' ) : number_format_i18n( $saleable ) ) );
 			foreach ( $this->diagnostics->inspect( $mapping ) as $warning ) {
 				echo '<span class="laqi-lusm-warning">' . esc_html( $warning ) . '</span>';
 			}
@@ -251,17 +259,25 @@ final class PoolStockSection implements ScreenSectionInterface {
 			<input type="hidden" name="pool_id" value="<?php echo esc_attr( $row['id'] ); ?>" />
 			<input type="hidden" name="unit" value="<?php echo esc_attr( $row['display_unit'] ); ?>" />
 			<?php wp_nonce_field( 'laqi_lusm_adjust_stock_' . $row['id'] ); ?>
-			<label class="screen-reader-text" for="laqi-lusm-mode-<?php echo esc_attr( $row['id'] ); ?>"><?php esc_html_e( 'Adjustment type', 'laqi-unit-stock-manager' ); ?></label>
+			<label class="laqi-lusm-control" for="laqi-lusm-mode-<?php echo esc_attr( $row['id'] ); ?>">
+				<span><?php esc_html_e( 'Type', 'laqi-unit-stock-manager' ); ?></span>
 			<select id="laqi-lusm-mode-<?php echo esc_attr( $row['id'] ); ?>" name="mode">
 				<option value="set"><?php esc_html_e( 'Set to', 'laqi-unit-stock-manager' ); ?></option>
 				<option value="add"><?php esc_html_e( 'Add', 'laqi-unit-stock-manager' ); ?></option>
 				<option value="subtract"><?php esc_html_e( 'Subtract', 'laqi-unit-stock-manager' ); ?></option>
 			</select>
-			<label class="screen-reader-text" for="laqi-lusm-quantity-<?php echo esc_attr( $row['id'] ); ?>"><?php esc_html_e( 'Quantity', 'laqi-unit-stock-manager' ); ?></label>
-			<input id="laqi-lusm-quantity-<?php echo esc_attr( $row['id'] ); ?>" name="quantity" type="text" inputmode="decimal" required size="10" />
-			<span><?php echo esc_html( $row['display_unit'] ); ?></span>
-			<label class="screen-reader-text" for="laqi-lusm-reason-<?php echo esc_attr( $row['id'] ); ?>"><?php esc_html_e( 'Reason', 'laqi-unit-stock-manager' ); ?></label>
+			</label>
+			<label class="laqi-lusm-control" for="laqi-lusm-quantity-<?php echo esc_attr( $row['id'] ); ?>">
+				<span><?php esc_html_e( 'Quantity', 'laqi-unit-stock-manager' ); ?></span>
+				<span class="laqi-lusm-quantity-control">
+					<input id="laqi-lusm-quantity-<?php echo esc_attr( $row['id'] ); ?>" name="quantity" type="text" inputmode="decimal" required />
+					<span><?php echo esc_html( $row['display_unit'] ); ?></span>
+				</span>
+			</label>
+			<label class="laqi-lusm-control" for="laqi-lusm-reason-<?php echo esc_attr( $row['id'] ); ?>">
+				<span><?php esc_html_e( 'Reason', 'laqi-unit-stock-manager' ); ?></span>
 			<input id="laqi-lusm-reason-<?php echo esc_attr( $row['id'] ); ?>" name="reason" type="text" placeholder="<?php esc_attr_e( 'Reason (optional)', 'laqi-unit-stock-manager' ); ?>" <?php echo ! empty( $reason_templates ) ? 'list="' . esc_attr( $list_id ) . '"' : ''; ?> />
+			</label>
 			<?php
 			if ( ! empty( $reason_templates ) ) :
 				?>
@@ -270,7 +286,7 @@ final class PoolStockSection implements ScreenSectionInterface {
 				foreach ( $reason_templates as $template ) :
 					?>
 				<option value="<?php echo esc_attr( $template ); ?>"></option><?php endforeach; ?></datalist><?php endif; ?>
-			<?php submit_button( __( 'Apply', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?>
+			<?php submit_button( __( 'Apply', 'laqi-unit-stock-manager' ), 'secondary', '', false ); ?>
 		</form>
 		<?php
 	}

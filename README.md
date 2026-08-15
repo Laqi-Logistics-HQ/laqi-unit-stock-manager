@@ -122,7 +122,7 @@ Woo Mobile and other WooCommerce REST clients use the same immutable snapshot,
 reservation, reduction, restoration, and order-edit lifecycle as browser orders.
 Authorized inventory clients can resolve a scanned product SKU or WooCommerce
 GTIN/UPC/EAN/ISBN through `GET /wp-json/laqi-lusm/v1/scan?code=...` and receive
-its exact per-sale pool demand, available pool balances, and saleable quantity.
+its exact per-sale pool demand, available pool balances, and sellable quantity.
 
 The Pro Mobile count tab turns that lookup into a touch-friendly stocktaking
 workflow. Staff may type a code or, where the browser supports Barcode Detector
@@ -143,7 +143,7 @@ ledger rows directly.
 Stock & Pricing Automation and other rule engines can discover read-only field
 definitions through `laqi_lusm_read_only_rule_field_catalog` and resolve values
 for a product/variation through `laqi_lusm_read_only_rule_field_values`. The
-provider exposes mapped state, limiting saleable quantity, minimum valid days of
+provider exposes mapped state, limiting sellable quantity, minimum valid days of
 cover, and an aligned collection of pool balance, filtered availability,
 consumption, and forecast data. The contract contains no write callback and does
 not expose the stock mutation service.
@@ -200,7 +200,7 @@ erasure request anonymizes that association while retaining the stock ledger.
 Premium supply-state modules may reduce on-hand stock to an available-to-sell
 quantity through `laqi_lusm_pool_available_quantity`. The filter receives the
 current normalized on-hand integer and pool ID; implementations must return a
-normalized integer and must not mutate stock. Order reservations, non-saleable
+normalized integer and must not mutate stock. Order reservations, non-sellable
 holds, and merchant-defined safety stock compose through this contract, while
 the reusable projection service reports current and post-incoming availability.
 The Free availability and mutation services remain edition-neutral.
