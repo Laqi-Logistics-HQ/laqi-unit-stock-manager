@@ -26,8 +26,8 @@ final class PaginationRenderer {
 	 * @return void
 	 */
 	public function render( string $summary, string $aria_label, string $page_arg, array $query_args, int $current, int $total_pages ): void {
-		$previous_url = $current > 1 ? add_query_arg( array_merge( $query_args, array( $page_arg => $current - 1 ) ), admin_url( 'admin.php' ) ) : '';
-		$next_url     = $current < $total_pages ? add_query_arg( array_merge( $query_args, array( $page_arg => $current + 1 ) ), admin_url( 'admin.php' ) ) : '';
+		$previous_url = $current > 1 ? add_query_arg( array_merge( $query_args, array( $page_arg => $current - 1 ) ), admin_url( 'edit.php?post_type=product' ) ) : '';
+		$next_url     = $current < $total_pages ? add_query_arg( array_merge( $query_args, array( $page_arg => $current + 1 ) ), admin_url( 'edit.php?post_type=product' ) ) : '';
 		?>
 		<div class="laqi-lusm-pagination">
 			<p><?php echo esc_html( $summary ); ?></p>
@@ -36,7 +36,8 @@ final class PaginationRenderer {
 					<?php if ( '' !== $previous_url ) : ?>
 						<a class="button" href="<?php echo esc_url( $previous_url ); ?>"><?php esc_html_e( 'Previous', 'laqi-unit-stock-manager' ); ?></a>
 					<?php endif; ?>
-					<form method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>" class="laqi-lusm-page-picker">
+					<form method="get" action="<?php echo esc_url( admin_url( 'edit.php' ) ); ?>" class="laqi-lusm-page-picker">
+						<input type="hidden" name="post_type" value="product" />
 						<?php foreach ( $query_args as $key => $value ) : ?>
 							<input type="hidden" name="<?php echo esc_attr( (string) $key ); ?>" value="<?php echo esc_attr( (string) $value ); ?>" />
 						<?php endforeach; ?>

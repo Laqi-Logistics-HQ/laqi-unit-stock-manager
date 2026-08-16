@@ -35,7 +35,10 @@ final class Assets {
 	 * @return void
 	 */
 	public function enqueue_admin( string $hook_suffix ): void {
-		if ( 'woocommerce_page_laqi-unit-stock-manager' !== $hook_suffix ) {
+		$is_workspace = 'product_page_laqi-unit-stock-manager' === $hook_suffix;
+		$screen       = get_current_screen();
+		$is_product   = in_array( $hook_suffix, array( 'post.php', 'post-new.php' ), true ) && $screen && 'product' === $screen->post_type;
+		if ( ! $is_workspace && ! $is_product ) {
 			return;
 		}
 

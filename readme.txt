@@ -20,7 +20,7 @@ For example, keep 10 kg of an ingredient in one inventory pool and link 0.1 g, 0
 
 = One stock screen =
 
-WooCommerce > Unit Stock contains all plugin workflows as tabs under one menu item:
+Products > Unit Stock contains all inventory workflows as tabs under one menu item. A Unit Stock panel is also available in each simple or variable product's Product data box, so product-specific mappings can be managed while editing that product:
 
 * Stock: search pools by pool name, internal SKU, linked product name, product or variation SKU, or variation attribute. See current balance, linked packages, per-item consumption, sellable quantity, diagnostics, and inline adjustments.
 * Setup: create pools, link simple products or individual variations, edit or unlink active consumption rules, decide what to do with existing WooCommerce stock, and define custom merchant units.
@@ -46,7 +46,7 @@ The plugin does not copy customer contact, address, or payment data into its own
 
 1. Install and activate WooCommerce.
 2. Install and activate Laqi Unit Stock Manager for WooCommerce.
-3. Go to WooCommerce > Unit Stock > Setup.
+3. Go to Products > Unit Stock > Setup, or open the Unit Stock panel while editing a product.
 4. Create an inventory pool with its stock unit and opening balance.
 5. Link a simple product or an individual variation to the pool and enter the exact quantity consumed by one sold item.
 6. Choose whether to disable, transfer, or keep the product's existing WooCommerce quantity management.

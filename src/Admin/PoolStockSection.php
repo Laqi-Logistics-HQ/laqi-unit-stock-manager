@@ -203,7 +203,7 @@ final class PoolStockSection implements ScreenSectionInterface {
 				<?php endif; ?>
 			<?php endforeach; ?>
 			</select>
-			<?php submit_button( __( 'Save details', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?>
+			<p class="submit"><?php submit_button( __( 'Save details', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?></p>
 		</form>
 			</div>
 		</div>

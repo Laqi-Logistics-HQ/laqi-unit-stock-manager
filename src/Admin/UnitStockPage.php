@@ -37,10 +37,10 @@ final class UnitStockPage {
 		add_action( 'admin_menu', array( $this, 'add_menu' ) );
 	}
 
-	/** Add the WooCommerce submenu. @return void */
+	/** Add the Products submenu. @return void */
 	public function add_menu(): void {
 		add_submenu_page(
-			'woocommerce',
+			'edit.php?post_type=product',
 			__( 'Unit Stock', 'laqi-unit-stock-manager' ),
 			__( 'Unit Stock', 'laqi-unit-stock-manager' ),
 			'manage_woocommerce',
@@ -184,7 +184,7 @@ final class UnitStockPage {
 				'page'    => self::SLUG,
 				'section' => $section,
 			),
-			admin_url( 'admin.php' )
+			admin_url( 'edit.php?post_type=product' )
 		);
 	}
 

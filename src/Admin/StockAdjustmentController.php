@@ -78,7 +78,7 @@ final class StockAdjustmentController {
 				'page'             => UnitStockPage::SLUG,
 				'laqi_lusm_result' => $result,
 			),
-			admin_url( 'admin.php' )
+			admin_url( 'edit.php?post_type=product' )
 		);
 		wp_safe_redirect( $url );
 		exit;
