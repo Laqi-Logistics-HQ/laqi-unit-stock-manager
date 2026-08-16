@@ -16,10 +16,16 @@
 
 .laqi-lusm-wrap input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="hidden"]):not([type="file"]),
 .laqi-lusm-wrap select,
-.laqi-lusm-wrap textarea,
 .laqi-lusm-wrap .select2-selection {
 	box-sizing: border-box;
-	min-height: 40px;
+	height: 40px;
+	line-height: 1.4;
+}
+
+.laqi-lusm-wrap textarea {
+	box-sizing: border-box;
+	min-height: 80px;
+	line-height: 1.4;
 }
 
 .laqi-lusm-stock-table th,
@@ -242,13 +248,30 @@
 }
 
 .laqi-lusm-modal .laqi-lusm-pool-details {
-	gap: 0.5rem;
+	grid-template-columns: 8rem minmax(0, 1fr);
+	gap: 0.75rem 1rem;
+	align-items: center;
 	margin: 0;
 }
 
 .laqi-lusm-modal .laqi-lusm-pool-details label {
-	margin-top: 0.35rem;
 	font-weight: 600;
+}
+
+.laqi-lusm-modal .laqi-lusm-pool-details .submit {
+	grid-column: 2;
+	justify-self: end;
+}
+
+@media screen and (max-width: 600px) {
+
+	.laqi-lusm-modal .laqi-lusm-pool-details {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.laqi-lusm-modal .laqi-lusm-pool-details .submit {
+		grid-column: 1;
+	}
 }
 
 .laqi-lusm-setup-grid {

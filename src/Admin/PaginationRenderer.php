@@ -36,7 +36,7 @@ final class PaginationRenderer {
 					<?php if ( '' !== $previous_url ) : ?>
 						<a class="button" href="<?php echo esc_url( $previous_url ); ?>"><?php esc_html_e( 'Previous', 'laqi-unit-stock-manager' ); ?></a>
 					<?php endif; ?>
-					<form method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>">
+					<form method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>" class="laqi-lusm-page-picker">
 						<?php foreach ( $query_args as $key => $value ) : ?>
 							<input type="hidden" name="<?php echo esc_attr( (string) $key ); ?>" value="<?php echo esc_attr( (string) $value ); ?>" />
 						<?php endforeach; ?>
@@ -47,7 +47,7 @@ final class PaginationRenderer {
 							<?php endfor; ?>
 						</select>
 						<span><?php echo esc_html( sprintf( /* translators: %d: total page count. */ __( 'of %d', 'laqi-unit-stock-manager' ), $total_pages ) ); ?></span>
-						<button type="submit" class="button"><?php esc_html_e( 'Go', 'laqi-unit-stock-manager' ); ?></button>
+						<noscript><button type="submit" class="button"><?php esc_html_e( 'Go', 'laqi-unit-stock-manager' ); ?></button></noscript>
 					</form>
 					<?php if ( '' !== $next_url ) : ?>
 						<a class="button" href="<?php echo esc_url( $next_url ); ?>"><?php esc_html_e( 'Next', 'laqi-unit-stock-manager' ); ?></a>

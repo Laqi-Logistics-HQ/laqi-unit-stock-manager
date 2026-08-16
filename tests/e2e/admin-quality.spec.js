@@ -127,9 +127,12 @@ test( 'activity pagination uses the compact page picker', async ( { page } ) => 
 	const pagination = page.locator( '.laqi-lusm-pagination' );
 	await expect( pagination ).toBeVisible();
 	if ( ( await pagination.getByRole( 'navigation' ).count() ) > 0 ) {
-		await expect( pagination.getByLabel( 'Page', { exact: true } ) ).toBeVisible();
-		await expect( pagination.getByRole( 'button', { name: 'Go' } ) ).toBeVisible();
+		const pagePicker = pagination.getByLabel( 'Page', { exact: true } );
+		await expect( pagePicker ).toBeVisible();
+		await expect( pagination.getByRole( 'button', { name: 'Go' } ) ).toHaveCount( 0 );
 		await expect( pagination.locator( '.page-numbers' ) ).toHaveCount( 0 );
+		await pagePicker.selectOption( '2' );
+		await expect( page ).toHaveURL( /activity_page=2/ );
 	}
 } );
 

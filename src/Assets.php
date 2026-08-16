@@ -12,8 +12,8 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Enqueues the plugin's stylesheet only where its admin UI is rendered.
  *
- * Handles are prefixed with the plugin slug to avoid collisions. Versions use
- * the plugin version constant so a release busts the browser cache.
+ * Handles are prefixed with the plugin slug to avoid collisions. File
+ * modification times invalidate cached assets as soon as their contents change.
  */
 final class Assets {
 
@@ -39,11 +39,14 @@ final class Assets {
 			return;
 		}
 
+		$style_version  = (string) filemtime( LAQI_LUSM_PATH . 'assets/css/admin.css' );
+		$script_version = (string) filemtime( LAQI_LUSM_PATH . 'assets/js/admin.js' );
+
 		wp_enqueue_style(
 			'laqi-unit-stock-manager-admin',
 			LAQI_LUSM_URL . 'assets/css/admin.css',
 			array(),
-			LAQI_LUSM_VERSION
+			$style_version
 		);
 
 		wp_enqueue_script( 'wc-enhanced-select' );
@@ -51,7 +54,7 @@ final class Assets {
 			'laqi-unit-stock-manager-admin',
 			LAQI_LUSM_URL . 'assets/js/admin.js',
 			array( 'jquery', 'wc-enhanced-select' ),
-			LAQI_LUSM_VERSION,
+			$script_version,
 			true
 		);
 		wp_localize_script(
