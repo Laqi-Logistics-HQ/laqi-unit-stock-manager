@@ -96,6 +96,51 @@ final class MappingReadRepository {
 		return array_map( array( $this, 'hydrate' ), $rows );
 	}
 
+	/**
+	 * Build one bulk product-list projection for the requested parent products.
+	 *
+	 * @param int[] $product_ids WooCommerce parent/simple product IDs.
+	 * @return array<int, array<string, mixed>> Summaries keyed by product ID.
+	 */
+	public function summaries_for_products( array $product_ids ): array {
+		$product_ids = array_values( array_unique( array_filter( array_map( 'absint', $product_ids ) ) ) );
+		if ( array() === $product_ids ) {
+			return array();
+		}
+
+		$placeholders = implode( ', ', array_fill( 0, count( $product_ids ), '%d' ) );
+		$sql          = 'SELECT m.product_id,
+			COUNT(DISTINCT m.id) AS mapping_count,
+			COUNT(DISTINCT CASE WHEN m.variation_id > 0 THEN m.id END) AS variation_mapping_count,
+			COUNT(DISTINCT CASE WHEN m.calculator_type = "recipe" THEN m.id END) AS recipe_count,
+			COUNT(DISTINCT CASE WHEN m.calculator_type = "recipe" THEN c.id END) AS recipe_component_count,
+			COUNT(DISTINCT CASE WHEN linked.ID IS NULL OR c.id IS NULL OR p.id IS NULL OR stock.meta_value = "yes" THEN m.id END) AS warning_count,
+			GROUP_CONCAT(DISTINCT CASE WHEN m.calculator_type = "single_pool" THEN p.name END ORDER BY p.name SEPARATOR "||") AS pool_names,
+			(SELECT COUNT(*) FROM ' . $this->db->posts . ' v WHERE v.post_parent = m.product_id AND v.post_type = "product_variation" AND v.post_status NOT IN ("trash", "auto-draft")) AS variation_count
+		FROM ' . Schema::table( 'mappings' ) . ' m
+		LEFT JOIN ' . Schema::table( 'mapping_components' ) . ' c ON c.mapping_id = m.id
+		LEFT JOIN ' . Schema::table( 'pools' ) . ' p ON p.id = c.pool_id
+		LEFT JOIN ' . $this->db->posts . ' linked ON linked.ID = CASE WHEN m.variation_id > 0 THEN m.variation_id ELSE m.product_id END AND linked.post_status NOT IN ("trash", "auto-draft")
+		LEFT JOIN ' . $this->db->postmeta . ' stock ON stock.post_id = CASE WHEN m.variation_id > 0 THEN m.variation_id ELSE m.product_id END AND stock.meta_key = "_manage_stock"
+		WHERE m.active = 1 AND m.product_id IN (' . $placeholders . ')
+		GROUP BY m.product_id';
+		$rows         = $this->db->get_results( $this->db->prepare( $sql, ...$product_ids ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Dynamic placeholders are generated from validated integer IDs.
+		$summaries    = array();
+		foreach ( $rows as $row ) {
+			$product_id               = (int) $row['product_id'];
+			$summaries[ $product_id ] = array(
+				'mapping_count'           => (int) $row['mapping_count'],
+				'variation_mapping_count' => (int) $row['variation_mapping_count'],
+				'variation_count'         => (int) $row['variation_count'],
+				'recipe_count'            => (int) $row['recipe_count'],
+				'recipe_component_count'  => (int) $row['recipe_component_count'],
+				'warning_count'           => (int) $row['warning_count'],
+				'pool_names'              => '' === (string) $row['pool_names'] ? array() : explode( '||', (string) $row['pool_names'] ),
+			);
+		}
+		return $summaries;
+	}
+
 	/** Turn one mapping row into its aggregate.
 	 *
 	 * @param array<string,mixed> $mapping Mapping row.

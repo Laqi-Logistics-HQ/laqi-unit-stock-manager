@@ -204,8 +204,7 @@ final class SetupSection implements ScreenSectionInterface {
 					'value' => '',
 					'unit'  => '',
 				);
-				$edit_id   = $mapping->variation_id() > 0 ? $mapping->product_id() : ( $product ? $product->get_id() : $mapping->product_id() );
-				$edit_url  = get_edit_post_link( $edit_id, '' );
+				$edit_url  = $this->product_edit_url( $mapping->product_id(), $mapping->variation_id() );
 				?>
 				<tr>
 					<th scope="row">
@@ -238,7 +237,7 @@ final class SetupSection implements ScreenSectionInterface {
 					</td>
 					<td>
 						<?php if ( $edit_url ) : ?>
-							<a class="button button-secondary button-small" href="<?php echo esc_url( $edit_url ); ?>"><?php esc_html_e( 'Edit product', 'laqi-unit-stock-manager' ); ?></a>
+							<a class="button button-secondary button-small" href="<?php echo esc_url( $edit_url ); ?>"><?php echo esc_html( $mapping->variation_id() > 0 ? __( 'Edit variation', 'laqi-unit-stock-manager' ) : __( 'Edit product', 'laqi-unit-stock-manager' ) ); ?></a>
 						<?php endif; ?>
 						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 							<input type="hidden" name="action" value="laqi_lusm_unlink_mapping" />
@@ -269,6 +268,43 @@ final class SetupSection implements ScreenSectionInterface {
 		);
 		?>
 		<?php
+	}
+
+	/** Build a product-owned mapping editor URL.
+	 *
+	 * @param int $product_id Parent/simple product ID.
+	 * @param int $variation_id Variation ID or zero.
+	 * @return string
+	 */
+	private function product_edit_url( int $product_id, int $variation_id ): string {
+		$url = get_edit_post_link( $product_id, '' );
+		if ( ! $url ) {
+			return '';
+		}
+		$args = array( 'laqi_lusm_open' => 'unit-stock' );
+		if ( $variation_id > 0 ) {
+			global $wpdb;
+			$variation = get_post( $variation_id );
+			$per_page  = max( 1, absint( apply_filters( 'woocommerce_admin_meta_boxes_variations_per_page', 15 ) ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WooCommerce's documented variation pagination filter.
+			$position  = $variation ? (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Mirrors WooCommerce's uncached variation pagination query for an admin navigation URL.
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM ' . $wpdb->posts . ' WHERE post_parent = %d AND post_type = "product_variation" AND post_status IN ("publish", "private") AND (menu_order < %d OR (menu_order = %d AND ID > %d))',
+					$product_id,
+					$variation->menu_order,
+					$variation->menu_order,
+					$variation_id
+				)
+			) : 0;
+			$args      = array(
+				'laqi_lusm_open'           => 'variation',
+				'laqi_lusm_variation'      => $variation_id,
+				'laqi_lusm_variation_page' => (int) floor( $position / $per_page ) + 1,
+			);
+		}
+		return add_query_arg(
+			$args,
+			$url
+		);
 	}
 
 	/** Render existing custom definitions. @return void */
