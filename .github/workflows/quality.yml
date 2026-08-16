@@ -128,6 +128,8 @@ jobs:
       - run: npm run build --if-present
       - run: npx playwright install --with-deps chromium
       - run: npm run wp-env start
+      - name: Seed admin quality records
+        run: npx wp-env run cli wp eval-file wp-content/plugins/laqi-unit-stock-manager/tests/e2e/seed-admin-quality.php
       - run: npm run test:admin-quality
       - name: Show WordPress logs after a failure
         if: failure()
