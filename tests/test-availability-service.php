@@ -7,6 +7,7 @@
 
 use LaqiUnitStockManager\Availability\AvailabilityService;
 use LaqiUnitStockManager\Consumption\CalculatorRegistry;
+use LaqiUnitStockManager\Domain\MappingComponent;
 use LaqiUnitStockManager\Domain\Quantity;
 use LaqiUnitStockManager\Storage\MappingRepository;
 use LaqiUnitStockManager\Storage\PoolRepository;
@@ -109,6 +110,24 @@ class Test_Availability_Service extends WP_UnitTestCase {
 		$this->assertSame( 40, $this->service->saleable_quantity( 100, 101 ) );
 		$this->assertSame( 5, $this->service->saleable_quantity( 100, 102 ) );
 		$this->assertNull( $this->service->saleable_quantity( 999, 0 ) );
+	}
+
+	/** Persisted add-on mappings fall back safely while their calculator is unavailable. */
+	public function test_unavailable_extension_calculator_does_not_break_free_availability(): void {
+		global $wpdb;
+
+		$maps = new MappingRepository( $wpdb );
+		$maps->save_components( 100, 101, 'recipe', array( new MappingComponent( $this->pool_id, 250000000, 'component' ) ) );
+
+		$result = $this->service->check(
+			array(
+				array( 'product_id' => 100, 'variation_id' => 101, 'quantity' => 1 ),
+			)
+		);
+
+		$this->assertTrue( $result->is_available() );
+		$this->assertSame( array(), $result->demand() );
+		$this->assertNull( $this->service->saleable_quantity( 100, 101 ) );
 	}
 
 	/** Public pool reads apply the same availability adjustments as saleability. */

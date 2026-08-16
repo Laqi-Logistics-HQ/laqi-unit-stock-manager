@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 use LaqiUnitStockManager\Consumption\CalculatorRegistry;
 use LaqiUnitStockManager\Storage\MappingRepository;
 use LaqiUnitStockManager\Storage\PoolRepository;
+use InvalidArgumentException;
 
 /**
  * Aggregates every cart/order line before checking shared pool balances.
@@ -74,7 +75,13 @@ final class AvailabilityService {
 				continue;
 			}
 
-			$line_demand = $this->calculators->get( $mapping->calculator_type() )->calculate( $mapping, $quantity );
+			try {
+				$calculator = $this->calculators->get( $mapping->calculator_type() );
+			} catch ( InvalidArgumentException $error ) {
+				// An inactive add-on may own the persisted calculator definition.
+				continue;
+			}
+			$line_demand = $calculator->calculate( $mapping, $quantity );
 			foreach ( $line_demand as $pool_id => $amount ) {
 				$demand[ $pool_id ] = ( $demand[ $pool_id ] ?? 0 ) + $amount;
 			}
@@ -109,7 +116,13 @@ final class AvailabilityService {
 			return null;
 		}
 
-		$one = $this->calculators->get( $mapping->calculator_type() )->calculate( $mapping, 1 );
+		try {
+			$calculator = $this->calculators->get( $mapping->calculator_type() );
+		} catch ( InvalidArgumentException $error ) {
+			// Fall back to WooCommerce stock handling while the add-on is inactive.
+			return null;
+		}
+		$one = $calculator->calculate( $mapping, 1 );
 		$max = PHP_INT_MAX;
 		foreach ( $one as $pool_id => $consumption ) {
 			$pool = $this->pools->find( $pool_id );
