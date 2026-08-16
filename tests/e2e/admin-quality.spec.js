@@ -104,6 +104,35 @@ test( 'setup pool picker performs an authorized paginated search', async ( {
 	expect( typeof payload.data.pagination.more ).toBe( 'boolean' );
 } );
 
+test( 'stock details open in a keyboard-accessible modal', async ( { page } ) => {
+	await page.goto( plugin.adminPath, { waitUntil: 'networkidle' } );
+	const trigger = page
+		.getByRole( 'button', { name: 'Edit details' } )
+		.first();
+	await expect( trigger ).toBeVisible();
+	await trigger.click();
+
+	const modal = page.getByRole( 'dialog', { name: 'Edit inventory pool' } );
+	await expect( modal ).toBeVisible();
+	await expect( modal.getByLabel( 'Pool name' ) ).toBeFocused();
+	await page.keyboard.press( 'Escape' );
+	await expect( modal ).toBeHidden();
+	await expect( trigger ).toBeFocused();
+} );
+
+test( 'activity pagination uses the compact page picker', async ( { page } ) => {
+	await page.goto( `${ plugin.adminPath }&section=activity`, {
+		waitUntil: 'networkidle',
+	} );
+	const pagination = page.locator( '.laqi-lusm-pagination' );
+	await expect( pagination ).toBeVisible();
+	if ( ( await pagination.getByRole( 'navigation' ).count() ) > 0 ) {
+		await expect( pagination.getByLabel( 'Page', { exact: true } ) ).toBeVisible();
+		await expect( pagination.getByRole( 'button', { name: 'Go' } ) ).toBeVisible();
+		await expect( pagination.locator( '.page-numbers' ) ).toHaveCount( 0 );
+	}
+} );
+
 test( 'deactivation leaves no plugin assets loaded', async ( { page } ) => {
 	await page.goto( '/wp-admin/plugins.php' );
 	// Match on data-plugin, not data-slug. WordPress fills data-slug with

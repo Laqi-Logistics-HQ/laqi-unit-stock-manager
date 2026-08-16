@@ -178,18 +178,24 @@ final class PoolStockSection implements ScreenSectionInterface {
 			<span><?php echo esc_html( $row['internal_sku'] ); ?></span>
 			<span><?php echo esc_html( $this->units->get( $row['display_unit'] )->label() . ' (' . $this->units->get( $row['display_unit'] )->symbol() . ')' ); ?></span>
 		</div>
-		<details class="laqi-lusm-pool-editor">
-			<summary><?php esc_html_e( 'Edit details', 'laqi-unit-stock-manager' ); ?></summary>
+		<button type="button" class="button-link laqi-lusm-pool-editor-trigger" aria-haspopup="dialog" aria-controls="laqi-lusm-pool-editor-<?php echo esc_attr( $row['id'] ); ?>">
+			<?php esc_html_e( 'Edit details', 'laqi-unit-stock-manager' ); ?>
+		</button>
+		<div id="laqi-lusm-pool-editor-<?php echo esc_attr( $row['id'] ); ?>" class="laqi-lusm-modal" role="dialog" aria-modal="true" aria-labelledby="laqi-lusm-pool-editor-title-<?php echo esc_attr( $row['id'] ); ?>" hidden>
+			<div class="laqi-lusm-modal-backdrop" data-laqi-lusm-close-modal></div>
+			<div class="laqi-lusm-modal-panel" role="document">
+				<button type="button" class="laqi-lusm-modal-close" data-laqi-lusm-close-modal aria-label="<?php esc_attr_e( 'Close pool details', 'laqi-unit-stock-manager' ); ?>"><span aria-hidden="true">&times;</span></button>
+				<h2 id="laqi-lusm-pool-editor-title-<?php echo esc_attr( $row['id'] ); ?>"><?php esc_html_e( 'Edit inventory pool', 'laqi-unit-stock-manager' ); ?></h2>
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="laqi-lusm-pool-details">
 			<input type="hidden" name="action" value="laqi_lusm_update_pool" />
 			<input type="hidden" name="pool_id" value="<?php echo esc_attr( $row['id'] ); ?>" />
 			<input type="hidden" name="pool_version" value="<?php echo esc_attr( $row['version'] ); ?>" />
 			<?php wp_nonce_field( 'laqi_lusm_update_pool_' . $row['id'] ); ?>
-			<label class="screen-reader-text" for="laqi-lusm-pool-name-<?php echo esc_attr( $row['id'] ); ?>"><?php esc_html_e( 'Pool name', 'laqi-unit-stock-manager' ); ?></label>
+			<label for="laqi-lusm-pool-name-<?php echo esc_attr( $row['id'] ); ?>"><?php esc_html_e( 'Pool name', 'laqi-unit-stock-manager' ); ?></label>
 			<input id="laqi-lusm-pool-name-<?php echo esc_attr( $row['id'] ); ?>" name="pool_name" value="<?php echo esc_attr( $row['name'] ); ?>" required />
-			<label class="screen-reader-text" for="laqi-lusm-pool-sku-<?php echo esc_attr( $row['id'] ); ?>"><?php esc_html_e( 'Internal SKU', 'laqi-unit-stock-manager' ); ?></label>
+			<label for="laqi-lusm-pool-sku-<?php echo esc_attr( $row['id'] ); ?>"><?php esc_html_e( 'Internal SKU', 'laqi-unit-stock-manager' ); ?></label>
 			<input id="laqi-lusm-pool-sku-<?php echo esc_attr( $row['id'] ); ?>" name="internal_sku" value="<?php echo esc_attr( $row['internal_sku'] ); ?>" placeholder="<?php esc_attr_e( 'Internal SKU', 'laqi-unit-stock-manager' ); ?>" />
-			<label class="screen-reader-text" for="laqi-lusm-pool-unit-<?php echo esc_attr( $row['id'] ); ?>"><?php esc_html_e( 'Display unit', 'laqi-unit-stock-manager' ); ?></label>
+			<label for="laqi-lusm-pool-unit-<?php echo esc_attr( $row['id'] ); ?>"><?php esc_html_e( 'Display unit', 'laqi-unit-stock-manager' ); ?></label>
 			<select id="laqi-lusm-pool-unit-<?php echo esc_attr( $row['id'] ); ?>" name="display_unit">
 			<?php foreach ( $this->units->all() as $unit ) : ?>
 				<?php if ( $unit->family() === $row['family'] ) : ?>
@@ -199,7 +205,8 @@ final class PoolStockSection implements ScreenSectionInterface {
 			</select>
 			<?php submit_button( __( 'Save details', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?>
 		</form>
-		</details>
+			</div>
+		</div>
 		<?php
 	}
 
