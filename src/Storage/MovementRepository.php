@@ -59,6 +59,43 @@ final class MovementRepository {
 	}
 
 	/**
+	 * Get recent movements for one or more mapped pools.
+	 *
+	 * @param int[] $pool_ids Pool IDs.
+	 * @param int   $limit Maximum rows.
+	 * @param int   $offset Matching rows to skip.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function recent_for_pools( array $pool_ids, int $limit = 50, int $offset = 0 ): array {
+		$pool_ids = array_values( array_unique( array_filter( array_map( 'absint', $pool_ids ) ) ) );
+		if ( array() === $pool_ids ) {
+			return array();
+		}
+		$limit        = max( 1, min( 500, $limit ) );
+		$offset       = max( 0, $offset );
+		$placeholders = implode( ', ', array_fill( 0, count( $pool_ids ), '%d' ) );
+		$sql          = 'SELECT m.id, m.pool_id, m.type, m.delta_base, m.balance_base, m.source_type, m.source_id, m.actor_id, m.reason, m.created_at, p.name AS pool_name, p.family, p.display_unit FROM ' . Schema::table( 'movements' ) . ' m LEFT JOIN ' . Schema::table( 'pools' ) . ' p ON p.id = m.pool_id WHERE m.pool_id IN (' . $placeholders . ') ORDER BY m.id DESC LIMIT %d OFFSET %d';
+		$args         = array_merge( $pool_ids, array( $limit, $offset ) );
+		$rows         = $this->db->get_results( $this->db->prepare( $sql, ...$args ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Dynamic placeholders are generated from validated integer IDs.
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/** Count movements for one or more mapped pools.
+	 *
+	 * @param int[] $pool_ids Pool IDs.
+	 * @return int
+	 */
+	public function count_for_pools( array $pool_ids ): int {
+		$pool_ids = array_values( array_unique( array_filter( array_map( 'absint', $pool_ids ) ) ) );
+		if ( array() === $pool_ids ) {
+			return 0;
+		}
+		$placeholders = implode( ', ', array_fill( 0, count( $pool_ids ), '%d' ) );
+		$sql          = 'SELECT COUNT(*) FROM ' . Schema::table( 'movements' ) . ' WHERE pool_id IN (' . $placeholders . ')';
+		return (int) $this->db->get_var( $this->db->prepare( $sql, ...$pool_ids ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Dynamic placeholders are generated from validated integer IDs.
+	}
+
+	/**
 	 * Search immutable movements for registered operational modules.
 	 *
 	 * @param string $term   Pool, type, source, or reason search.

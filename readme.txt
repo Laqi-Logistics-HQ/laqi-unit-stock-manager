@@ -22,6 +22,8 @@ For example, keep 10 kg of an ingredient in one inventory pool and link 0.1 g, 0
 
 Products > Unit Stock contains all cross-product inventory workflows as tabs under one menu item. Product-specific configuration stays with the product: simple products use their Unit Stock Product data panel, while each variation has Unit Stock controls inside its native variation panel. A compact variable-product summary shows how many variations are configured.
 
+The Products list includes a bulk-loaded Unit Stock status column and filters for linked, unlinked, incomplete, warning, and recipe-backed products. Its links open the relevant product panel. The central mapping directory can also open the exact variation, pool diagnostics, or stock activity filtered to the mapping's pools.
+
 * Stock: search pools by pool name, internal SKU, linked product name, product or variation SKU, or variation attribute. See current balance, linked packages, per-item consumption, sellable quantity, diagnostics, and inline adjustments.
 * Setup: create pools, bulk-link simple products or individual variations, review or unlink active consumption rules, decide what to do with existing WooCommerce stock, and define custom merchant units. Ongoing mapping edits link back to the owning product.
 * Activity: browse the complete append-only correctness ledger created by orders, refunds, restorations, migrations, edits, and manual adjustments.

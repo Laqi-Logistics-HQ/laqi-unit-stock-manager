@@ -462,8 +462,42 @@
 
 .laqi-lusm-product-mapping-actions {
 	display: flex;
+	flex-wrap: wrap;
 	gap: 8px;
 	align-items: center;
+	margin-top: 10px;
+}
+
+.column-laqi_lusm_status {
+	width: 15rem;
+}
+
+.laqi-lusm-product-status {
+	display: block;
+	font-weight: 600;
+}
+
+.laqi-lusm-product-status--muted,
+.laqi-lusm-product-status-detail {
+	color: #646970;
+}
+
+.laqi-lusm-product-status-detail,
+.laqi-lusm-product-status-warning {
+	display: block;
+	margin-top: 3px;
+	font-size: 12px;
+}
+
+.laqi-lusm-product-status-warning {
+	color: #b32d2e;
+	font-weight: 600;
+}
+
+.laqi-lusm-context-filter {
+	padding: 10px 12px;
+	border-left: 4px solid #2271b1;
+	background: #fff;
 }
 
 .laqi-lusm-setup-grid .laqi-lusm-custom-units form {

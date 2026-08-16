@@ -65,14 +65,19 @@ final class ActivitySection implements ScreenSectionInterface {
 
 	/** Render recent movements. @return void */
 	public function render(): void {
-		$total       = $this->movements->count();
-		$total_pages = max( 1, intdiv( $total + self::PER_PAGE - 1, self::PER_PAGE ) );
-		$page        = isset( $_GET['activity_page'] ) ? absint( $_GET['activity_page'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$page        = max( 1, min( $total_pages, $page ) );
-		$offset      = ( $page - 1 ) * self::PER_PAGE;
-		$rows        = array_map( array( $this->presenter, 'present' ), $this->movements->recent( self::PER_PAGE, $offset ) );
+		$pool_ids      = $this->requested_pool_ids();
+		$total         = array() === $pool_ids ? $this->movements->count() : $this->movements->count_for_pools( $pool_ids );
+		$total_pages   = max( 1, intdiv( $total + self::PER_PAGE - 1, self::PER_PAGE ) );
+		$page          = isset( $_GET['activity_page'] ) ? absint( $_GET['activity_page'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$page          = max( 1, min( $total_pages, $page ) );
+		$offset        = ( $page - 1 ) * self::PER_PAGE;
+		$movement_rows = array() === $pool_ids ? $this->movements->recent( self::PER_PAGE, $offset ) : $this->movements->recent_for_pools( $pool_ids, self::PER_PAGE, $offset );
+		$rows          = array_map( array( $this->presenter, 'present' ), $movement_rows );
 		?>
 		<p><?php esc_html_e( 'The latest pooled-stock changes are shown below. These records are append-only.', 'laqi-unit-stock-manager' ); ?></p>
+		<?php if ( array() !== $pool_ids ) : ?>
+			<p class="laqi-lusm-context-filter"><strong><?php esc_html_e( 'Filtered to the pools used by the selected product.', 'laqi-unit-stock-manager' ); ?></strong> <a href="<?php echo esc_url( $this->activity_url() ); ?>"><?php esc_html_e( 'Show all activity', 'laqi-unit-stock-manager' ); ?></a></p>
+		<?php endif; ?>
 		<div class="laqi-lusm-table-scroll">
 		<table class="widefat striped laqi-lusm-activity-table">
 			<thead><tr>
@@ -111,8 +116,9 @@ final class ActivitySection implements ScreenSectionInterface {
 				__( 'Stock movement pages', 'laqi-unit-stock-manager' ),
 				'activity_page',
 				array(
-					'page'    => UnitStockPage::SLUG,
-					'section' => 'activity',
+					'page'     => UnitStockPage::SLUG,
+					'section'  => 'activity',
+					'pool_ids' => implode( ',', $pool_ids ),
 				),
 				$page,
 				$total_pages
@@ -120,6 +126,24 @@ final class ActivitySection implements ScreenSectionInterface {
 		}
 		?>
 		<?php
+	}
+
+	/** Read validated contextual pool IDs from the URL. @return int[] */
+	private function requested_pool_ids(): array {
+		$value = isset( $_GET['pool_ids'] ) ? sanitize_text_field( wp_unslash( $_GET['pool_ids'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return array_values( array_unique( array_filter( array_map( 'absint', explode( ',', $value ) ) ) ) );
+	}
+
+	/** Build the unfiltered Activity URL. @return string */
+	private function activity_url(): string {
+		return add_query_arg(
+			array(
+				'post_type' => 'product',
+				'page'      => UnitStockPage::SLUG,
+				'section'   => 'activity',
+			),
+			admin_url( 'edit.php' )
+		);
 	}
 
 	/** Get a readable movement source.

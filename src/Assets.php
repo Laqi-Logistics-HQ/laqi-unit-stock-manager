@@ -38,7 +38,8 @@ final class Assets {
 		$is_workspace = 'product_page_laqi-unit-stock-manager' === $hook_suffix;
 		$screen       = get_current_screen();
 		$is_product   = in_array( $hook_suffix, array( 'post.php', 'post-new.php' ), true ) && $screen && 'product' === $screen->post_type;
-		if ( ! $is_workspace && ! $is_product ) {
+		$is_list      = 'edit.php' === $hook_suffix && $screen && 'product' === $screen->post_type;
+		if ( ! $is_workspace && ! $is_product && ! $is_list ) {
 			return;
 		}
 
@@ -51,6 +52,9 @@ final class Assets {
 			array(),
 			$style_version
 		);
+		if ( $is_list ) {
+			return;
+		}
 
 		wp_enqueue_script( 'wc-enhanced-select' );
 		wp_enqueue_script(

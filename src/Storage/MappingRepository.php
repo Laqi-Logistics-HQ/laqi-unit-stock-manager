@@ -259,4 +259,14 @@ final class MappingRepository {
 	public function find_for_pool( int $pool_id ): array {
 		return $this->reader->find_for_pool( $pool_id );
 	}
+
+	/**
+	 * Build bulk product-list summaries without per-row mapping queries.
+	 *
+	 * @param int[] $product_ids Parent/simple product IDs.
+	 * @return array<int, array<string, mixed>> Summaries keyed by product ID.
+	 */
+	public function summaries_for_products( array $product_ids ): array {
+		return $this->reader->summaries_for_products( $product_ids );
+	}
 }

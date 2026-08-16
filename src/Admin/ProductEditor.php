@@ -185,11 +185,21 @@ final class ProductEditor {
 		$purchasable_id = $variation_id > 0 ? $variation_id : $product_id;
 		$mapping        = $this->mappings->find_for_product( $product_id, $variation_id );
 		if ( $mapping && 'single_pool' !== $mapping->calculator_type() ) {
+			$type_label = (string) apply_filters( 'laqi_lusm_mapping_type_label', ucwords( str_replace( '_', ' ', $mapping->calculator_type() ) ), $mapping );
 			?>
 			<section class="laqi-lusm-product-mapping <?php echo $variation_context ? 'laqi-lusm-variation-mapping' : ''; ?>">
 				<h4><?php echo esc_html( $label ); ?></h4>
-				<p><?php esc_html_e( 'This product uses a multi-component recipe. Edit it in the Unit Stock workspace.', 'laqi-unit-stock-manager' ); ?></p>
-				<a class="button" href="<?php echo esc_url( $this->workspace_url() ); ?>"><?php esc_html_e( 'Open product links', 'laqi-unit-stock-manager' ); ?></a>
+				<p>
+				<?php
+				printf(
+					/* translators: 1: mapping type, 2: component count. */
+					esc_html__( '%1$s with %2$d components.', 'laqi-unit-stock-manager' ),
+					esc_html( $type_label ),
+					count( $mapping->components() )
+				);
+				?>
+				</p>
+				<?php $this->render_context_actions( $mapping, $product_id, $variation_id ); ?>
 			</section>
 			<?php
 			return;
@@ -227,6 +237,9 @@ final class ProductEditor {
 				}
 				?>
 			</p>
+			<?php if ( $mapping ) : ?>
+				<?php $this->render_context_actions( $mapping, $product_id, $variation_id ); ?>
+			<?php endif; ?>
 		</section>
 		<?php
 	}
@@ -352,16 +365,89 @@ final class ProductEditor {
 		}
 	}
 
-	/** Product links workspace URL. @return string */
-	private function workspace_url(): string {
+	/** Render navigation to related product context without duplicating screens.
+	 *
+	 * @param ProductMapping $mapping Mapping.
+	 * @param int            $product_id Parent/simple product ID.
+	 * @param int            $variation_id Variation ID or zero.
+	 * @return void
+	 */
+	private function render_context_actions( ProductMapping $mapping, int $product_id, int $variation_id ): void {
+		$product      = wc_get_product( $variation_id > 0 ? $variation_id : $product_id );
+		$sku          = $product ? $product->get_sku() : '';
+		$search       = $product ? ( '' !== $sku ? $sku : wp_strip_all_tags( $product->get_name() ) ) : (string) $product_id;
+		$pool_ids     = array_values(
+			array_unique(
+				array_map(
+					static function ( $component ): int {
+						return $component->pool_id();
+					},
+					$mapping->components()
+				)
+			)
+		);
+		$editor_url   = (string) apply_filters( 'laqi_lusm_mapping_editor_url', $this->workspace_url(), $mapping, $product_id, $variation_id );
+		$editor_label = (string) apply_filters( 'laqi_lusm_mapping_editor_label', __( 'Open product links', 'laqi-unit-stock-manager' ), $mapping );
+		$actions      = array(
+			'editor'      => array(
+				'label' => $editor_label,
+				'url'   => $editor_url,
+			),
+			'diagnostics' => array(
+				'label' => __( 'View pool and diagnostics', 'laqi-unit-stock-manager' ),
+				'url'   => $this->section_url( 'stock', array( 's' => $search ) ),
+			),
+			'activity'    => array(
+				'label' => __( 'View stock activity', 'laqi-unit-stock-manager' ),
+				'url'   => $this->section_url( 'activity', array( 'pool_ids' => implode( ',', $pool_ids ) ) ),
+			),
+		);
+		/**
+		 * Filters contextual product-mapping navigation actions.
+		 *
+		 * @param array<string, array{label:string,url:string}> $actions Context links.
+		 * @param ProductMapping                              $mapping Mapping.
+		 * @param int                                         $product_id Parent/simple product ID.
+		 * @param int                                         $variation_id Variation ID or zero.
+		 */
+		$actions = apply_filters( 'laqi_lusm_mapping_context_actions', $actions, $mapping, $product_id, $variation_id );
+		echo '<div class="laqi-lusm-product-mapping-actions">';
+		foreach ( $actions as $action ) {
+			if ( empty( $action['url'] ) || empty( $action['label'] ) ) {
+				continue;
+			}
+			echo '<a class="button button-secondary" href="' . esc_url( $action['url'] ) . '">' . esc_html( $action['label'] ) . '</a>';
+		}
+		echo '</div>';
+	}
+
+	/** Build a Unit Stock section URL.
+	 *
+	 * @param string               $section Section ID.
+	 * @param array<string,string> $extra Extra query arguments.
+	 * @return string
+	 */
+	private function section_url( string $section, array $extra = array() ): string {
 		return add_query_arg(
-			array(
-				'post_type'  => 'product',
-				'page'       => UnitStockPage::SLUG,
-				'section'    => 'setup',
-				'setup_view' => 'products',
+			array_merge(
+				array(
+					'post_type' => 'product',
+					'page'      => UnitStockPage::SLUG,
+					'section'   => $section,
+				),
+				$extra
 			),
 			admin_url( 'edit.php' )
+		);
+	}
+
+	/** Product links workspace URL. @return string */
+	private function workspace_url(): string {
+		return $this->section_url(
+			'setup',
+			array(
+				'setup_view' => 'products',
+			)
 		);
 	}
 }
