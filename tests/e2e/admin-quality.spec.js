@@ -74,19 +74,13 @@ test( 'admin screen renders without serious accessibility or runtime failures', 
 test( 'setup pool picker performs an authorized paginated search', async ( {
 	page,
 } ) => {
-	await page.goto( `${ plugin.adminPath }&section=setup`, {
-		waitUntil: 'networkidle',
-	} );
-	let picker = page.locator( '.laqi-lusm-pool-search' ).first();
-	if ( ( await picker.count() ) === 0 ) {
-		await page.locator( '#laqi-lusm-pool_name' ).fill( 'Browser test pool' );
-		await page.locator( '#laqi-lusm-opening_balance' ).fill( '1' );
-		await Promise.all( [
-			page.waitForURL( /section=setup/ ),
-			page.getByRole( 'button', { name: 'Create pool' } ).click(),
-		] );
-		picker = page.locator( '.laqi-lusm-pool-search' ).first();
-	}
+	await page.goto(
+		`${ plugin.adminPath }&section=setup&setup_view=products`,
+		{
+			waitUntil: 'networkidle',
+		}
+	);
+	const picker = page.locator( '.laqi-lusm-pool-search' ).first();
 	await expect( picker ).toBeAttached();
 	await picker
 		.locator( 'xpath=following-sibling::span[contains(@class,"select2")]' )
@@ -104,7 +98,9 @@ test( 'setup pool picker performs an authorized paginated search', async ( {
 	expect( typeof payload.data.pagination.more ).toBe( 'boolean' );
 } );
 
-test( 'stock details open in a keyboard-accessible modal', async ( { page } ) => {
+test( 'stock details open in a keyboard-accessible modal', async ( {
+	page,
+} ) => {
 	await page.goto( plugin.adminPath, { waitUntil: 'networkidle' } );
 	const trigger = page
 		.getByRole( 'button', { name: 'Edit details' } )
@@ -120,7 +116,9 @@ test( 'stock details open in a keyboard-accessible modal', async ( { page } ) =>
 	await expect( trigger ).toBeFocused();
 } );
 
-test( 'activity pagination uses the compact page picker', async ( { page } ) => {
+test( 'activity pagination uses the compact page picker', async ( {
+	page,
+} ) => {
 	await page.goto( `${ plugin.adminPath }&section=activity`, {
 		waitUntil: 'networkidle',
 	} );
@@ -129,7 +127,9 @@ test( 'activity pagination uses the compact page picker', async ( { page } ) => 
 	if ( ( await pagination.getByRole( 'navigation' ).count() ) > 0 ) {
 		const pagePicker = pagination.getByLabel( 'Page', { exact: true } );
 		await expect( pagePicker ).toBeVisible();
-		await expect( pagination.getByRole( 'button', { name: 'Go' } ) ).toHaveCount( 0 );
+		await expect(
+			pagination.getByRole( 'button', { name: 'Go' } )
+		).toHaveCount( 0 );
 		await expect( pagination.locator( '.page-numbers' ) ).toHaveCount( 0 );
 		await pagePicker.selectOption( '2' );
 		await expect( page ).toHaveURL( /activity_page=2/ );
@@ -154,9 +154,13 @@ test( 'deactivation leaves no plugin assets loaded', async ( { page } ) => {
 
 	await page.goto( '/wp-admin/', { waitUntil: 'networkidle' } );
 	const resources = await page.evaluate( () =>
-		performance.getEntriesByType( 'resource' ).map( ( entry ) => entry.name )
+		performance
+			.getEntriesByType( 'resource' )
+			.map( ( entry ) => entry.name )
 	);
 	expect(
-		resources.filter( ( url ) => url.includes( `/plugins/${ plugin.slug }/` ) )
+		resources.filter( ( url ) =>
+			url.includes( `/plugins/${ plugin.slug }/` )
+		)
 	).toEqual( [] );
 } );

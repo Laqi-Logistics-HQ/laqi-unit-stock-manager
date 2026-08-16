@@ -15,12 +15,22 @@
 }
 
 .laqi-lusm-wrap input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="hidden"]):not([type="file"]),
-.laqi-lusm-wrap select,
-.laqi-lusm-wrap .select2-selection {
+.laqi-lusm-wrap select {
 	box-sizing: border-box;
 	height: 40px;
 	padding: 6px 12px;
 	line-height: 1.4;
+}
+
+.laqi-lusm-wrap .select2-selection {
+	box-sizing: border-box;
+	height: 40px;
+	padding: 0;
+}
+
+.laqi-lusm-wrap .select2-selection__rendered {
+	padding-right: 32px;
+	padding-left: 12px;
 }
 
 .laqi-lusm-wrap textarea {
