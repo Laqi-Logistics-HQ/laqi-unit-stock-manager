@@ -21,13 +21,25 @@
 		}
 
 		document.addEventListener( 'click', ( event ) => {
+			const variationsTrigger = event.target.closest(
+				'[data-laqi-lusm-open-variations]'
+			);
 			const trigger = event.target.closest(
 				'.laqi-lusm-pool-editor-trigger'
 			);
 			const close = event.target.closest(
 				'[data-laqi-lusm-close-modal]'
 			);
-			if ( trigger ) {
+			if ( variationsTrigger ) {
+				event.preventDefault();
+				const variationsTab = document.querySelector(
+					'.variations_tab a'
+				);
+				if ( variationsTab ) {
+					variationsTab.click();
+					variationsTab.focus();
+				}
+			} else if ( trigger ) {
 				const modal = document.getElementById(
 					trigger.getAttribute( 'aria-controls' )
 				);

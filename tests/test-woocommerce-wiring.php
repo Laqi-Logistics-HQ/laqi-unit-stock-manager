@@ -25,6 +25,8 @@ class Test_WooCommerce_Wiring extends WP_UnitTestCase {
 		$this->assertNotFalse( has_action( 'admin_menu' ) );
 		$this->assertNotFalse( has_filter( 'woocommerce_product_data_tabs' ) );
 		$this->assertNotFalse( has_action( 'woocommerce_product_data_panels' ) );
+		$this->assertNotFalse( has_action( 'woocommerce_product_after_variable_attributes' ) );
+		$this->assertNotFalse( has_action( 'woocommerce_save_product_variation' ) );
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_adjust_stock' ) );
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_create_pool' ) );
 		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_save_mapping' ) );

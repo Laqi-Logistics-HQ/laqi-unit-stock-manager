@@ -146,7 +146,7 @@ final class SetupSection implements ScreenSectionInterface {
 			</section>
 			<section class="card laqi-lusm-setup-wide">
 				<h2><?php esc_html_e( 'Current product links', 'laqi-unit-stock-manager' ); ?></h2>
-			<p><?php esc_html_e( 'Edit active consumption rules or unlink an item. Changes affect future purchases only and do not alter past order snapshots.', 'laqi-unit-stock-manager' ); ?></p>
+			<p><?php esc_html_e( 'Review all active links here. Edit a product to change its consumption rule; changes affect future purchases only and do not alter past order snapshots.', 'laqi-unit-stock-manager' ); ?></p>
 				<?php $this->render_mappings(); ?>
 			</section>
 			<?php else : ?>
@@ -204,6 +204,8 @@ final class SetupSection implements ScreenSectionInterface {
 					'value' => '',
 					'unit'  => '',
 				);
+				$edit_id   = $mapping->variation_id() > 0 ? $mapping->product_id() : ( $product ? $product->get_id() : $mapping->product_id() );
+				$edit_url  = get_edit_post_link( $edit_id, '' );
 				?>
 				<tr>
 					<th scope="row">
@@ -219,32 +221,24 @@ final class SetupSection implements ScreenSectionInterface {
 							echo esc_html( sprintf( __( '%1$s mapping with %2$d components. Use its dedicated section to edit it.', 'laqi-unit-stock-manager' ), $mapping->calculator_type(), count( $mapping->components() ) ) );
 							?>
 						<?php else : ?>
-						<form id="laqi-lusm-mapping-edit-<?php echo esc_attr( $mapping->id() ); ?>" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="laqi-lusm-mapping-edit">
-							<input type="hidden" name="action" value="laqi_lusm_update_mapping" />
-							<input type="hidden" name="setup_view" value="products" />
-							<input type="hidden" name="mapping_id" value="<?php echo esc_attr( $mapping->id() ); ?>" />
-							<input type="hidden" name="mapping_version" value="<?php echo esc_attr( $mapping->version() ); ?>" />
-							<?php wp_nonce_field( 'laqi_lusm_update_mapping_' . $mapping->id() ); ?>
-							<label class="screen-reader-text" for="laqi-lusm-edit-pool-<?php echo esc_attr( $mapping->id() ); ?>"><?php esc_html_e( 'Inventory pool', 'laqi-unit-stock-manager' ); ?></label>
-							<select id="laqi-lusm-edit-pool-<?php echo esc_attr( $mapping->id() ); ?>" class="laqi-lusm-pool-search" name="pool_id" data-placeholder="<?php esc_attr_e( 'Search inventory pools', 'laqi-unit-stock-manager' ); ?>" required>
-							<?php if ( $pool ) : ?>
-								<option value="<?php echo esc_attr( $pool->id() ); ?>" selected><?php echo esc_html( $pool->name() . ' (' . $pool->display_unit() . ')' ); ?></option>
+							<strong><?php echo esc_html( $pool ? $pool->name() : __( 'Unavailable inventory pool', 'laqi-unit-stock-manager' ) ); ?></strong>
+							<?php if ( $pool && '' !== $editable['value'] ) : ?>
+								<br /><span class="description">
+								<?php
+								printf(
+									/* translators: 1: consumption quantity, 2: unit key. */
+									esc_html__( 'Uses %1$s %2$s per sold item', 'laqi-unit-stock-manager' ),
+									esc_html( $editable['value'] ),
+									esc_html( $editable['unit'] )
+								);
+								?>
+								</span>
 							<?php endif; ?>
-							</select>
-							<label class="screen-reader-text" for="laqi-lusm-edit-consumption-<?php echo esc_attr( $mapping->id() ); ?>"><?php esc_html_e( 'Consumption per sold item', 'laqi-unit-stock-manager' ); ?></label>
-							<input id="laqi-lusm-edit-consumption-<?php echo esc_attr( $mapping->id() ); ?>" name="consumption" type="text" inputmode="decimal" value="<?php echo esc_attr( $editable['value'] ); ?>" required size="8" />
-							<label class="screen-reader-text" for="laqi-lusm-edit-unit-<?php echo esc_attr( $mapping->id() ); ?>"><?php esc_html_e( 'Consumption unit', 'laqi-unit-stock-manager' ); ?></label>
-							<select id="laqi-lusm-edit-unit-<?php echo esc_attr( $mapping->id() ); ?>" name="consumption_unit" required>
-							<?php foreach ( $this->units->all() as $unit ) : ?>
-								<option value="<?php echo esc_attr( $unit->key() ); ?>" <?php selected( $editable['unit'] === $unit->key() ); ?>><?php echo esc_html( $unit->key() . ' (' . $unit->system() . ')' ); ?></option>
-							<?php endforeach; ?>
-							</select>
-						</form>
 						<?php endif; ?>
 					</td>
 					<td>
-						<?php if ( 'single_pool' === $mapping->calculator_type() ) : ?>
-							<p class="submit"><button type="submit" class="button button-secondary button-small" form="laqi-lusm-mapping-edit-<?php echo esc_attr( $mapping->id() ); ?>"><?php esc_html_e( 'Save changes', 'laqi-unit-stock-manager' ); ?></button></p>
+						<?php if ( $edit_url ) : ?>
+							<a class="button button-secondary button-small" href="<?php echo esc_url( $edit_url ); ?>"><?php esc_html_e( 'Edit product', 'laqi-unit-stock-manager' ); ?></a>
 						<?php endif; ?>
 						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 							<input type="hidden" name="action" value="laqi_lusm_unlink_mapping" />
