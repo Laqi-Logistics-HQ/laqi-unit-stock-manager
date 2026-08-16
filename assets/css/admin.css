@@ -90,11 +90,23 @@
 	margin: 0;
 }
 
-.laqi-lusm-custom-units li {
-	display: flex;
-	gap: 0.75rem;
-	align-items: center;
-	justify-content: space-between;
+.laqi-lusm-subtabs {
+	margin-bottom: 20px;
+}
+
+.laqi-lusm-custom-unit-directory {
+	grid-column: 1 / -1;
+}
+
+.laqi-lusm-custom-units th,
+.laqi-lusm-custom-units td {
+	vertical-align: middle;
+}
+
+.laqi-lusm-custom-units th:last-child,
+.laqi-lusm-custom-units td:last-child {
+	width: 1%;
+	white-space: nowrap;
 }
 
 .laqi-lusm-linked-products li:last-child {
@@ -359,6 +371,7 @@
 
 	.laqi-lusm-stock-table thead,
 	.laqi-lusm-mapping-table thead,
+	.laqi-lusm-custom-units thead,
 	.laqi-lusm-activity-table thead {
 		display: none;
 	}
@@ -369,11 +382,39 @@
 	.laqi-lusm-mapping-table tr,
 	.laqi-lusm-mapping-table th,
 	.laqi-lusm-mapping-table td,
+	.laqi-lusm-custom-units tr,
+	.laqi-lusm-custom-units th,
+	.laqi-lusm-custom-units td,
 	.laqi-lusm-activity-table tr,
 	.laqi-lusm-activity-table th,
 	.laqi-lusm-activity-table td {
 		display: block;
 		width: auto;
+	}
+
+	.laqi-lusm-custom-units tr {
+		padding: 0.65rem 0;
+	}
+
+	.laqi-lusm-custom-units tr + tr {
+		border-top: 1px solid #c3c4c7;
+	}
+
+	.laqi-lusm-custom-units th,
+	.laqi-lusm-custom-units td {
+		padding: 0.5rem 0.75rem;
+		white-space: normal;
+	}
+
+	.laqi-lusm-custom-units [data-label]::before {
+		display: block;
+		margin-bottom: 0.35rem;
+		color: #50575e;
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		content: attr(data-label);
 	}
 
 	.laqi-lusm-activity-table tr {

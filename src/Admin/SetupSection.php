@@ -97,13 +97,39 @@ final class SetupSection implements ScreenSectionInterface {
 
 	/** Render setup forms. @return void */
 	public function render(): void {
+		$views  = array(
+			'pools'    => __( 'Inventory pools', 'laqi-unit-stock-manager' ),
+			'products' => __( 'Product links', 'laqi-unit-stock-manager' ),
+			'units'    => __( 'Custom units', 'laqi-unit-stock-manager' ),
+		);
+		$active = isset( $_GET['setup_view'] ) ? sanitize_key( wp_unslash( $_GET['setup_view'] ) ) : 'pools'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! isset( $views[ $active ] ) ) {
+			$active = 'pools';
+		}
 		?>
+		<nav class="nav-tab-wrapper laqi-lusm-subtabs" aria-label="<?php esc_attr_e( 'Setup workspace', 'laqi-unit-stock-manager' ); ?>">
+			<?php
+			foreach ( $views as $id => $label ) :
+				$url = add_query_arg(
+					array(
+						'page'       => UnitStockPage::SLUG,
+						'section'    => 'setup',
+						'setup_view' => $id,
+					),
+					admin_url( 'admin.php' )
+				);
+				?>
+				<a class="nav-tab <?php echo $id === $active ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( $url ); ?>" <?php echo $id === $active ? 'aria-current="page"' : ''; ?>><?php echo esc_html( $label ); ?></a>
+			<?php endforeach; ?>
+		</nav>
 		<div class="laqi-lusm-setup-grid">
+			<?php if ( 'pools' === $active ) : ?>
 			<section class="card">
 				<h2><?php esc_html_e( 'Create inventory pool', 'laqi-unit-stock-manager' ); ?></h2>
 				<p><?php esc_html_e( 'Create the authoritative bulk quantity that products and variations will consume.', 'laqi-unit-stock-manager' ); ?></p>
 				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 					<input type="hidden" name="action" value="laqi_lusm_create_pool" />
+					<input type="hidden" name="setup_view" value="pools" />
 					<?php wp_nonce_field( 'laqi_lusm_create_pool' ); ?>
 					<?php $this->text_field( 'pool_name', __( 'Pool name', 'laqi-unit-stock-manager' ), true ); ?>
 					<?php $this->text_field( 'internal_sku', __( 'Internal SKU', 'laqi-unit-stock-manager' ), false ); ?>
@@ -112,6 +138,7 @@ final class SetupSection implements ScreenSectionInterface {
 					<?php submit_button( __( 'Create pool', 'laqi-unit-stock-manager' ) ); ?>
 				</form>
 			</section>
+			<?php elseif ( 'products' === $active ) : ?>
 			<section class="card">
 				<h2><?php esc_html_e( 'Link a product or variation', 'laqi-unit-stock-manager' ); ?></h2>
 				<p><?php esc_html_e( 'Choose exactly how much pooled stock one sold item consumes. Labels are never parsed automatically.', 'laqi-unit-stock-manager' ); ?></p>
@@ -122,11 +149,13 @@ final class SetupSection implements ScreenSectionInterface {
 			<p><?php esc_html_e( 'Edit active consumption rules or unlink an item. Changes affect future purchases only and do not alter past order snapshots.', 'laqi-unit-stock-manager' ); ?></p>
 				<?php $this->render_mappings(); ?>
 			</section>
-			<section class="card">
+			<?php else : ?>
+			<section class="card laqi-lusm-custom-unit-create">
 				<h2><?php esc_html_e( 'Create custom unit', 'laqi-unit-stock-manager' ); ?></h2>
 				<p><?php esc_html_e( 'Define a merchant unit as an exact quantity of any existing unit, such as one sack equaling 25 kg.', 'laqi-unit-stock-manager' ); ?></p>
 				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 					<input type="hidden" name="action" value="laqi_lusm_create_unit" />
+					<input type="hidden" name="setup_view" value="units" />
 					<?php wp_nonce_field( 'laqi_lusm_create_unit' ); ?>
 					<?php $this->text_field( 'unit_key', __( 'Unit key', 'laqi-unit-stock-manager' ), true ); ?>
 					<?php $this->text_field( 'unit_label', __( 'Label', 'laqi-unit-stock-manager' ), true ); ?>
@@ -135,8 +164,13 @@ final class SetupSection implements ScreenSectionInterface {
 					<?php $this->unit_field( 'reference_unit', __( 'Of unit', 'laqi-unit-stock-manager' ) ); ?>
 					<?php submit_button( __( 'Create custom unit', 'laqi-unit-stock-manager' ) ); ?>
 				</form>
+			</section>
+			<section class="card laqi-lusm-custom-unit-directory">
+				<h2><?php esc_html_e( 'Custom units', 'laqi-unit-stock-manager' ); ?></h2>
+				<p><?php esc_html_e( 'Review merchant-defined units and retire definitions that are no longer needed.', 'laqi-unit-stock-manager' ); ?></p>
 				<?php $this->render_custom_units(); ?>
 			</section>
+			<?php endif; ?>
 		</div>
 		<?php
 	}
@@ -187,6 +221,7 @@ final class SetupSection implements ScreenSectionInterface {
 						<?php else : ?>
 						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="laqi-lusm-mapping-edit">
 							<input type="hidden" name="action" value="laqi_lusm_update_mapping" />
+							<input type="hidden" name="setup_view" value="products" />
 							<input type="hidden" name="mapping_id" value="<?php echo esc_attr( $mapping->id() ); ?>" />
 							<input type="hidden" name="mapping_version" value="<?php echo esc_attr( $mapping->version() ); ?>" />
 							<?php wp_nonce_field( 'laqi_lusm_update_mapping_' . $mapping->id() ); ?>
@@ -211,6 +246,7 @@ final class SetupSection implements ScreenSectionInterface {
 					<td>
 						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 							<input type="hidden" name="action" value="laqi_lusm_unlink_mapping" />
+							<input type="hidden" name="setup_view" value="products" />
 							<input type="hidden" name="mapping_id" value="<?php echo esc_attr( $mapping->id() ); ?>" />
 							<?php wp_nonce_field( 'laqi_lusm_unlink_mapping_' . $mapping->id() ); ?>
 							<?php submit_button( __( 'Unlink', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?>
@@ -228,8 +264,9 @@ final class SetupSection implements ScreenSectionInterface {
 			__( 'Product link pages', 'laqi-unit-stock-manager' ),
 			'mapping_page',
 			array(
-				'page'    => UnitStockPage::SLUG,
-				'section' => 'setup',
+				'page'       => UnitStockPage::SLUG,
+				'section'    => 'setup',
+				'setup_view' => 'products',
 			),
 			$page,
 			$total_pages
@@ -242,25 +279,25 @@ final class SetupSection implements ScreenSectionInterface {
 	private function render_custom_units(): void {
 		$units = $this->custom_units->active();
 		if ( array() === $units ) {
+			echo '<p>' . esc_html__( 'No custom units have been created yet.', 'laqi-unit-stock-manager' ) . '</p>';
 			return;
 		}
-		echo '<h3>' . esc_html__( 'Custom units', 'laqi-unit-stock-manager' ) . '</h3>';
 		echo '<p class="description">' . esc_html__( 'Unused units can be retired. Units used by an inventory pool or another active custom unit are protected.', 'laqi-unit-stock-manager' ) . '</p>';
-		echo '<ul class="laqi-lusm-custom-units">';
+		echo '<table class="widefat striped laqi-lusm-custom-units"><thead><tr><th scope="col">' . esc_html__( 'Unit', 'laqi-unit-stock-manager' ) . '</th><th scope="col">' . esc_html__( 'Equivalent quantity', 'laqi-unit-stock-manager' ) . '</th><th scope="col">' . esc_html__( 'Actions', 'laqi-unit-stock-manager' ) . '</th></tr></thead><tbody>';
 		foreach ( $units as $unit ) {
-			/* translators: 1: unit label, 2: unit key, 3: equivalent quantity, 4: reference unit. */
-			echo '<li><span>' . esc_html( sprintf( __( '%1$s (%2$s) = %3$s %4$s', 'laqi-unit-stock-manager' ), $unit['label'], $unit['unit_key'], $unit['reference_value'], $unit['reference_unit'] ) ) . '</span>';
+			echo '<tr><th scope="row">' . esc_html( $unit['label'] . ' (' . $unit['unit_key'] . ')' ) . '</th><td data-label="' . esc_attr__( 'Equivalent quantity', 'laqi-unit-stock-manager' ) . '">' . esc_html( $unit['reference_value'] . ' ' . $unit['reference_unit'] ) . '</td><td data-label="' . esc_attr__( 'Actions', 'laqi-unit-stock-manager' ) . '">';
 			?>
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<input type="hidden" name="action" value="laqi_lusm_retire_unit" />
+				<input type="hidden" name="setup_view" value="units" />
 				<input type="hidden" name="unit_id" value="<?php echo esc_attr( $unit['id'] ); ?>" />
 				<?php wp_nonce_field( 'laqi_lusm_retire_unit_' . $unit['id'] ); ?>
 				<?php submit_button( __( 'Retire', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?>
 			</form>
 			<?php
-			echo '</li>';
+			echo '</td></tr>';
 		}
-		echo '</ul>';
+		echo '</tbody></table>';
 	}
 
 	/** Render the mapping form. @return void */
@@ -272,6 +309,7 @@ final class SetupSection implements ScreenSectionInterface {
 		?>
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 			<input type="hidden" name="action" value="laqi_lusm_save_mapping" />
+			<input type="hidden" name="setup_view" value="products" />
 			<?php wp_nonce_field( 'laqi_lusm_save_mapping' ); ?>
 			<label for="laqi-lusm-product"><?php esc_html_e( 'Product or variation', 'laqi-unit-stock-manager' ); ?></label>
 			<select id="laqi-lusm-product" class="wc-product-search" name="purchasable_id" data-placeholder="<?php esc_attr_e( 'Search for a product or variation', 'laqi-unit-stock-manager' ); ?>" data-action="woocommerce_json_search_products_and_variations" data-allow_clear="true" required></select>
