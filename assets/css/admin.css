@@ -432,4 +432,8 @@
 	.laqi-lusm-adjustment {
 		grid-template-columns: 1fr;
 	}
+
+	.laqi-lusm-setup-grid .laqi-lusm-mapping-table .laqi-lusm-mapping-edit {
+		grid-template-columns: minmax(0, 1fr);
+	}
 }
