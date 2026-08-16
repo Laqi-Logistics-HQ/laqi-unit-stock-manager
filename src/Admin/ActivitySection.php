@@ -18,7 +18,7 @@ use LaqiUnitStockManager\Storage\MovementRepository;
 final class ActivitySection implements ScreenSectionInterface {
 
 	/** Movements displayed per page. */
-	const PER_PAGE = 50;
+	const PER_PAGE = 25;
 
 	/**
 	 * Movement reads.
