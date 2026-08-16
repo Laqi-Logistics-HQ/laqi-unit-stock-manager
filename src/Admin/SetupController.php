@@ -280,11 +280,16 @@ final class SetupController {
 	 * @param string $result Result code.
 	 * @return void */
 	private function redirect( string $result ): void {
+		$view = isset( $_POST['setup_view'] ) ? sanitize_key( wp_unslash( $_POST['setup_view'] ) ) : 'pools'; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( ! in_array( $view, array( 'pools', 'products', 'units' ), true ) ) {
+			$view = 'pools';
+		}
 		wp_safe_redirect(
 			add_query_arg(
 				array(
 					'page'             => UnitStockPage::SLUG,
 					'section'          => 'setup',
+					'setup_view'       => $view,
 					'laqi_lusm_result' => $result,
 				),
 				admin_url( 'admin.php' )
