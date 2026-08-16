@@ -219,7 +219,7 @@ final class SetupSection implements ScreenSectionInterface {
 							echo esc_html( sprintf( __( '%1$s mapping with %2$d components. Use its dedicated section to edit it.', 'laqi-unit-stock-manager' ), $mapping->calculator_type(), count( $mapping->components() ) ) );
 							?>
 						<?php else : ?>
-						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="laqi-lusm-mapping-edit">
+						<form id="laqi-lusm-mapping-edit-<?php echo esc_attr( $mapping->id() ); ?>" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="laqi-lusm-mapping-edit">
 							<input type="hidden" name="action" value="laqi_lusm_update_mapping" />
 							<input type="hidden" name="setup_view" value="products" />
 							<input type="hidden" name="mapping_id" value="<?php echo esc_attr( $mapping->id() ); ?>" />
@@ -239,11 +239,13 @@ final class SetupSection implements ScreenSectionInterface {
 								<option value="<?php echo esc_attr( $unit->key() ); ?>" <?php selected( $editable['unit'] === $unit->key() ); ?>><?php echo esc_html( $unit->key() . ' (' . $unit->system() . ')' ); ?></option>
 							<?php endforeach; ?>
 							</select>
-							<?php submit_button( __( 'Save changes', 'laqi-unit-stock-manager' ), 'secondary small', '', false ); ?>
 						</form>
 						<?php endif; ?>
 					</td>
 					<td>
+						<?php if ( 'single_pool' === $mapping->calculator_type() ) : ?>
+							<p class="submit"><button type="submit" class="button button-secondary button-small" form="laqi-lusm-mapping-edit-<?php echo esc_attr( $mapping->id() ); ?>"><?php esc_html_e( 'Save changes', 'laqi-unit-stock-manager' ); ?></button></p>
+						<?php endif; ?>
 						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 							<input type="hidden" name="action" value="laqi_lusm_unlink_mapping" />
 							<input type="hidden" name="setup_view" value="products" />
@@ -312,7 +314,7 @@ final class SetupSection implements ScreenSectionInterface {
 			<input type="hidden" name="setup_view" value="products" />
 			<?php wp_nonce_field( 'laqi_lusm_save_mapping' ); ?>
 			<label for="laqi-lusm-product"><?php esc_html_e( 'Product or variation', 'laqi-unit-stock-manager' ); ?></label>
-			<select id="laqi-lusm-product" class="wc-product-search" name="purchasable_id" data-placeholder="<?php esc_attr_e( 'Search for a product or variation', 'laqi-unit-stock-manager' ); ?>" data-action="woocommerce_json_search_products_and_variations" data-allow_clear="true" required></select>
+			<select id="laqi-lusm-product" class="wc-product-search" name="purchasable_id" data-placeholder="<?php esc_attr_e( 'Search for a product or variation', 'laqi-unit-stock-manager' ); ?>" data-action="woocommerce_json_search_products_and_variations" required></select>
 			<label for="laqi-lusm-pool"><?php esc_html_e( 'Inventory pool', 'laqi-unit-stock-manager' ); ?></label>
 		<select id="laqi-lusm-pool" class="laqi-lusm-pool-search" name="pool_id" data-placeholder="<?php esc_attr_e( 'Search inventory pools', 'laqi-unit-stock-manager' ); ?>" required></select>
 			<?php $this->text_field( 'consumption', __( 'Consumption per sold item', 'laqi-unit-stock-manager' ), true, 'decimal' ); ?>
