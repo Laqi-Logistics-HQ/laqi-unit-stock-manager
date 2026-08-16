@@ -77,7 +77,9 @@ final class ProductEditor {
 	public function register(): void {
 		add_filter( 'woocommerce_product_data_tabs', array( $this, 'add_tab' ) );
 		add_action( 'woocommerce_product_data_panels', array( $this, 'render_panel' ) );
-		add_action( 'woocommerce_process_product_meta', array( $this, 'save' ) );
+		add_action( 'woocommerce_product_after_variable_attributes', array( $this, 'render_variation_fields' ), 20, 3 );
+		add_action( 'woocommerce_process_product_meta', array( $this, 'save_product' ) );
+		add_action( 'woocommerce_save_product_variation', array( $this, 'save_variation' ), 20, 2 );
 	}
 
 	/**
@@ -110,12 +112,14 @@ final class ProductEditor {
 				$children = $product->get_children();
 				if ( array() === $children ) {
 					echo '<p class="laqi-lusm-product-editor-intro">' . esc_html__( 'Create and save at least one variation before configuring Unit Stock.', 'laqi-unit-stock-manager' ) . '</p>';
-				}
-				foreach ( $children as $variation_id ) {
-					$variation = wc_get_product( $variation_id );
-					if ( $variation ) {
-						$this->render_mapping( $product->get_id(), $variation_id, wp_strip_all_tags( $variation->get_formatted_name() ) );
+				} else {
+					$configured = 0;
+					foreach ( $children as $variation_id ) {
+						if ( $this->mappings->find_for_product( $product->get_id(), $variation_id ) ) {
+							++$configured;
+						}
 					}
+					$this->render_variable_summary( $configured, count( $children ) );
 				}
 			} else {
 				$this->render_mapping( $product->get_id(), 0, $product->get_name() );
@@ -126,19 +130,63 @@ final class ProductEditor {
 	}
 
 	/**
+	 * Render Unit Stock fields inside one native variation panel.
+	 *
+	 * @param int      $loop Variation loop index.
+	 * @param array    $variation_data Variation metadata.
+	 * @param \WP_Post $variation Variation post.
+	 * @return void
+	 */
+	public function render_variation_fields( int $loop, array $variation_data, \WP_Post $variation ): void {
+		unset( $loop, $variation_data );
+		$product_id = (int) $variation->post_parent;
+		if ( $product_id > 0 ) {
+			$this->render_mapping( $product_id, (int) $variation->ID, __( 'Unit Stock', 'laqi-unit-stock-manager' ), true );
+		}
+	}
+
+	/**
+	 * Render the compact variable-product summary.
+	 *
+	 * @param int $configured Number of configured variations.
+	 * @param int $total Total saved variations.
+	 * @return void
+	 */
+	private function render_variable_summary( int $configured, int $total ): void {
+		?>
+		<section class="laqi-lusm-product-mapping laqi-lusm-variable-summary">
+			<h4><?php esc_html_e( 'Variation mappings', 'laqi-unit-stock-manager' ); ?></h4>
+			<p>
+			<?php
+			printf(
+				/* translators: 1: configured variation count, 2: total variation count. */
+				esc_html__( '%1$d of %2$d variations are configured for Unit Stock.', 'laqi-unit-stock-manager' ),
+				(int) $configured,
+				(int) $total
+			);
+			?>
+			</p>
+			<button type="button" class="button" data-laqi-lusm-open-variations><?php esc_html_e( 'Open variations', 'laqi-unit-stock-manager' ); ?></button>
+			<p class="description"><?php esc_html_e( 'Expand a variation to manage its pool, consumption quantity, unit, or recipe link.', 'laqi-unit-stock-manager' ); ?></p>
+		</section>
+		<?php
+	}
+
+	/**
 	 * Render one purchasable mapping.
 	 *
 	 * @param int    $product_id Product ID.
 	 * @param int    $variation_id Variation ID or zero.
 	 * @param string $label Purchasable label.
+	 * @param bool   $variation_context Whether this renders inside a variation.
 	 * @return void
 	 */
-	private function render_mapping( int $product_id, int $variation_id, string $label ): void {
+	private function render_mapping( int $product_id, int $variation_id, string $label, bool $variation_context = false ): void {
 		$purchasable_id = $variation_id > 0 ? $variation_id : $product_id;
 		$mapping        = $this->mappings->find_for_product( $product_id, $variation_id );
 		if ( $mapping && 'single_pool' !== $mapping->calculator_type() ) {
 			?>
-			<section class="laqi-lusm-product-mapping">
+			<section class="laqi-lusm-product-mapping <?php echo $variation_context ? 'laqi-lusm-variation-mapping' : ''; ?>">
 				<h4><?php echo esc_html( $label ); ?></h4>
 				<p><?php esc_html_e( 'This product uses a multi-component recipe. Edit it in the Unit Stock workspace.', 'laqi-unit-stock-manager' ); ?></p>
 				<a class="button" href="<?php echo esc_url( $this->workspace_url() ); ?>"><?php esc_html_e( 'Open product links', 'laqi-unit-stock-manager' ); ?></a>
@@ -154,7 +202,7 @@ final class ProductEditor {
 			'unit'  => '',
 		);
 		?>
-		<section class="laqi-lusm-product-mapping">
+		<section class="laqi-lusm-product-mapping <?php echo $variation_context ? 'laqi-lusm-variation-mapping' : ''; ?>">
 			<h4><?php echo esc_html( $label ); ?></h4>
 			<div class="laqi-lusm-product-mapping-grid">
 				<?php if ( $mapping ) : ?>
@@ -170,32 +218,72 @@ final class ProductEditor {
 					<label class="laqi-lusm-product-unlink"><input type="checkbox" name="laqi_lusm_mapping[<?php echo esc_attr( $purchasable_id ); ?>][unlink]" value="1" /> <span><?php esc_html_e( 'Unlink from Unit Stock', 'laqi-unit-stock-manager' ); ?></span></label>
 				<?php endif; ?>
 			</div>
-			<p class="description"><?php esc_html_e( 'Unit Stock changes are saved when you update the product.', 'laqi-unit-stock-manager' ); ?></p>
+			<p class="description">
+				<?php
+				if ( $variation_context ) {
+					esc_html_e( 'Unit Stock changes use this variation panel’s Save changes button.', 'laqi-unit-stock-manager' );
+				} else {
+					esc_html_e( 'Unit Stock changes are saved when you update the product.', 'laqi-unit-stock-manager' );
+				}
+				?>
+			</p>
 		</section>
 		<?php
 	}
 
-	/**
-	 * Save native product-editor mapping fields.
+	/** Save a simple product's native mapping fields.
 	 *
 	 * @param int $product_id Product being saved.
-	 * @return void
-	 */
-	public function save( int $product_id ): void {
+	 * @return void */
+	public function save_product( int $product_id ): void {
 		if ( ! current_user_can( 'manage_woocommerce' ) || ! isset( $_POST['woocommerce_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['woocommerce_meta_nonce'] ) ), 'woocommerce_save_data' ) ) {
 			return;
 		}
+		$product = wc_get_product( $product_id );
+		if ( $product && ! $product->is_type( 'variable' ) ) {
+			$this->save_submitted_mapping( $product_id, $product_id );
+		}
+	}
+
+	/**
+	 * Save one variation's native mapping fields.
+	 *
+	 * WooCommerce authorizes its variation-save request before firing this hook.
+	 *
+	 * @param int $variation_id Variation being saved.
+	 * @param int $loop Variation loop index.
+	 * @return void
+	 */
+	public function save_variation( int $variation_id, int $loop ): void {
+		unset( $loop );
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			return;
+		}
+		$product_id = (int) wp_get_post_parent_id( $variation_id );
+		if ( $product_id > 0 ) {
+			$this->save_submitted_mapping( $product_id, $variation_id );
+		}
+	}
+
+	/**
+	 * Save one matching item from the submitted mapping collection.
+	 *
+	 * @param int $product_id Parent/simple product ID.
+	 * @param int $purchasable_id Product or variation ID.
+	 * @return void
+	 */
+	private function save_submitted_mapping( int $product_id, int $purchasable_id ): void {
+		// WooCommerce verifies its product or variation nonce before these save hooks run.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$submitted = isset( $_POST['laqi_lusm_mapping'] ) && is_array( $_POST['laqi_lusm_mapping'] ) ? map_deep( wp_unslash( $_POST['laqi_lusm_mapping'] ), 'sanitize_text_field' ) : array();
-		foreach ( $submitted as $purchasable_id => $fields ) {
-			$purchasable_id = absint( $purchasable_id );
-			if ( ! is_array( $fields ) || ( $product_id !== $purchasable_id && (int) wp_get_post_parent_id( $purchasable_id ) !== $product_id ) ) {
-				continue;
-			}
-			try {
-				$this->save_mapping_fields( $product_id, $purchasable_id, $fields );
-			} catch ( Throwable $error ) {
-				\WC_Admin_Meta_Boxes::add_error( $error->getMessage() );
-			}
+		$fields    = isset( $submitted[ $purchasable_id ] ) && is_array( $submitted[ $purchasable_id ] ) ? $submitted[ $purchasable_id ] : null;
+		if ( null === $fields ) {
+			return;
+		}
+		try {
+			$this->save_mapping_fields( $product_id, $purchasable_id, $fields );
+		} catch ( Throwable $error ) {
+			\WC_Admin_Meta_Boxes::add_error( $error->getMessage() );
 		}
 	}
 

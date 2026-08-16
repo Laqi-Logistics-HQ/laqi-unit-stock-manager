@@ -94,12 +94,15 @@ byte-identical PHP files that would indicate a copied runtime.
 Styles live in `assets/css` and are enqueued by `src/Assets.php` only on the
 Unit Stock workspace and WooCommerce product editor, with a unique handle and
 file-mtime cache busting. The workspace is registered under **Products → Unit
-Stock**. A product's single-pool mappings can also be linked, reviewed, edited,
-or unlinked in its **Unit Stock** Product data panel and save with WooCommerce's
-normal **Update** action. Multi-component recipes remain in their dedicated
-central workspace. The Setup tab uses WooCommerce's enhanced selector for scalable AJAX
-product, variation, and inventory-pool search. Active links are reviewed and
-soft-unlinked in the same tab; historical mapping components remain available
+Stock**. A simple product's single-pool mapping lives in its **Unit Stock** Product
+data panel. Variable-product mappings live inside each native variation panel;
+the product-level Unit Stock panel provides only a compact configured-count summary.
+They save with WooCommerce's normal product or variation action. Multi-component
+recipes remain in their dedicated central workspace. The Setup tab uses
+WooCommerce's enhanced selector for scalable AJAX
+product, variation, and inventory-pool search. Active links are reviewed in a
+compact directory that routes ongoing edits back to the owning product, and can
+be soft-unlinked there; historical mapping components remain available
 for immutable order restoration. The plugin has no frontend UI and registers no
 one screen-scoped plugin script; it registers no storefront assets.
 
