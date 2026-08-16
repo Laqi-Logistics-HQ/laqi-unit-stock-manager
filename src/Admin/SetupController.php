@@ -292,7 +292,7 @@ final class SetupController {
 					'setup_view'       => $view,
 					'laqi_lusm_result' => $result,
 				),
-				admin_url( 'admin.php' )
+				admin_url( 'edit.php?post_type=product' )
 			)
 		);
 		exit;

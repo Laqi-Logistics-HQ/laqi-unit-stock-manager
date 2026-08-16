@@ -116,7 +116,7 @@ final class SetupSection implements ScreenSectionInterface {
 						'section'    => 'setup',
 						'setup_view' => $id,
 					),
-					admin_url( 'admin.php' )
+					admin_url( 'edit.php?post_type=product' )
 				);
 				?>
 				<a class="nav-tab <?php echo $id === $active ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( $url ); ?>" <?php echo $id === $active ? 'aria-current="page"' : ''; ?>><?php echo esc_html( $label ); ?></a>
