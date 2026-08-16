@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-15T19:03:46+00:00\n"
+"POT-Creation-Date: 2026-08-16T09:50:54+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -91,7 +91,7 @@ msgstr ""
 
 #: src/Admin/ActivitySection.php:85
 #: src/Admin/ActivitySection.php:99
-#: src/Admin/PoolStockSection.php:278
+#: src/Admin/PoolStockSection.php:285
 #: src/Privacy.php:128
 msgid "Reason"
 msgstr ""
@@ -114,11 +114,26 @@ msgstr ""
 msgid "System"
 msgstr ""
 
-#: src/Admin/PaginationRenderer.php:43
+#: src/Admin/PaginationRenderer.php:37
 msgid "Previous"
 msgstr ""
 
-#: src/Admin/PaginationRenderer.php:44
+#: src/Admin/PaginationRenderer.php:43
+msgid "Page"
+msgstr ""
+
+#. translators: %d: total page count.
+#: src/Admin/PaginationRenderer.php:49
+#, php-format
+msgid "of %d"
+msgstr ""
+
+#. translators: %d: total page count.
+#: src/Admin/PaginationRenderer.php:50
+msgid "Go"
+msgstr ""
+
+#: src/Admin/PaginationRenderer.php:53
 msgid "Next"
 msgstr ""
 
@@ -179,71 +194,79 @@ msgstr ""
 msgid "Edit details"
 msgstr ""
 
+#: src/Admin/PoolStockSection.php:187
+msgid "Close pool details"
+msgstr ""
+
 #: src/Admin/PoolStockSection.php:188
+msgid "Edit inventory pool"
+msgstr ""
+
+#: src/Admin/PoolStockSection.php:194
 #: src/Admin/SetupSection.php:108
 msgid "Pool name"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:190
-#: src/Admin/PoolStockSection.php:191
+#: src/Admin/PoolStockSection.php:196
+#: src/Admin/PoolStockSection.php:197
 #: src/Admin/SetupSection.php:109
 msgid "Internal SKU"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:192
+#: src/Admin/PoolStockSection.php:198
 msgid "Display unit"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:200
+#: src/Admin/PoolStockSection.php:206
 msgid "Save details"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:214
+#: src/Admin/PoolStockSection.php:221
 msgid "No products linked"
 msgstr ""
 
 #. translators: %s: exact pool quantity consumed by one sold item.
-#: src/Admin/PoolStockSection.php:235
+#: src/Admin/PoolStockSection.php:242
 #, php-format
 msgid "Uses %s per item."
 msgstr ""
 
 #. translators: %s: number of sellable items or Unlimited.
-#: src/Admin/PoolStockSection.php:238
+#: src/Admin/PoolStockSection.php:245
 #, php-format
 msgid "Sellable: %s"
 msgstr ""
 
 #. translators: %s: number of sellable items or Unlimited.
-#: src/Admin/PoolStockSection.php:238
+#: src/Admin/PoolStockSection.php:245
 msgid "Unlimited"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:263
+#: src/Admin/PoolStockSection.php:270
 msgid "Type"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:265
+#: src/Admin/PoolStockSection.php:272
 msgid "Set to"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:266
+#: src/Admin/PoolStockSection.php:273
 msgid "Add"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:267
+#: src/Admin/PoolStockSection.php:274
 msgid "Subtract"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:271
+#: src/Admin/PoolStockSection.php:278
 msgid "Quantity"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:279
+#: src/Admin/PoolStockSection.php:286
 msgid "Reason (optional)"
 msgstr ""
 
-#: src/Admin/PoolStockSection.php:289
+#: src/Admin/PoolStockSection.php:296
 msgid "Apply"
 msgstr ""
 
