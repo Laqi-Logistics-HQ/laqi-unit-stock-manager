@@ -97,30 +97,25 @@ final class OrderStockMetaBox {
 		$rows          = array_map( array( $this->presenter, 'present' ), $movement_rows );
 		$state         = (string) $order->get_meta( OrderStockLifecycle::STATE_META, true );
 		?>
-		<p>
+		<p class="laqi-lusm-order-stock-state">
 			<strong><?php esc_html_e( 'Pooled stock state:', 'laqi-unit-stock-manager' ); ?></strong>
-			<?php echo esc_html( $this->state_label( $state ) ); ?>
+			<span class="laqi-lusm-order-stock-state__value laqi-lusm-order-stock-state__value--<?php echo esc_attr( $this->state_class( $state ) ); ?>"><?php echo esc_html( $this->state_label( $state ) ); ?></span>
 		</p>
 		<?php if ( array() === $rows ) : ?>
 			<p><?php esc_html_e( 'No pooled-stock movements have been recorded for this order.', 'laqi-unit-stock-manager' ); ?></p>
 		<?php else : ?>
 			<ul class="laqi-lusm-order-stock-movements">
 			<?php foreach ( $rows as $row ) : ?>
-				<li>
-					<strong><?php echo esc_html( $row['type_label'] ); ?></strong><br>
-					<?php
-					echo esc_html(
-						sprintf(
-							/* translators: 1: inventory pool name, 2: signed stock change, 3: resulting pool balance. */
-							__( '%1$s: %2$s, balance %3$s', 'laqi-unit-stock-manager' ),
-							$row['pool_name'],
-							$row['delta_display'],
-							$row['balance_display']
-						)
-					);
-					?>
-					<br>
-					<small><?php echo esc_html( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $row['created_at'] . ' UTC' ) ) ); ?></small>
+				<?php $direction = (int) $row['delta_base'] < 0 ? 'out' : 'in'; ?>
+				<li class="laqi-lusm-order-stock-movement laqi-lusm-order-stock-movement--<?php echo esc_attr( $direction ); ?>">
+					<div class="laqi-lusm-order-stock-movement__heading">
+						<span class="laqi-lusm-order-stock-movement__icon" aria-hidden="true"><?php echo 'out' === $direction ? '↓' : '↑'; ?></span>
+						<span><strong><?php echo esc_html( 'out' === $direction ? __( 'Stock reduced', 'laqi-unit-stock-manager' ) : __( 'Stock restored', 'laqi-unit-stock-manager' ) ); ?></strong><small><?php echo esc_html( $row['type_label'] ); ?></small></span>
+					</div>
+					<span class="laqi-lusm-order-stock-movement__pool"><?php echo esc_html( $row['pool_name'] ); ?></span>
+					<span class="laqi-lusm-order-stock-movement__change"><?php echo esc_html( $this->signed_change( $row ) ); ?></span>
+					<span class="laqi-lusm-order-stock-movement__balance"><?php esc_html_e( 'Balance after change:', 'laqi-unit-stock-manager' ); ?> <strong><?php echo esc_html( $row['balance_display'] ); ?></strong></span>
+					<small class="laqi-lusm-order-stock-movement__date"><?php echo esc_html( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $row['created_at'] . ' UTC' ) ) ); ?></small>
 				</li>
 			<?php endforeach; ?>
 			</ul>
@@ -149,5 +144,25 @@ final class OrderStockMetaBox {
 			return __( 'Restored', 'laqi-unit-stock-manager' );
 		}
 		return __( 'Not reduced', 'laqi-unit-stock-manager' );
+	}
+
+	/**
+	 * Get a safe state modifier.
+	 *
+	 * @param string $state Stored lifecycle state.
+	 * @return string
+	 */
+	private function state_class( string $state ): string {
+		return in_array( $state, array( 'reduced', 'restored' ), true ) ? $state : 'not-reduced';
+	}
+
+	/**
+	 * Format a signed stock change.
+	 *
+	 * @param array<string,mixed> $row Presented movement.
+	 * @return string
+	 */
+	private function signed_change( array $row ): string {
+		return ( (int) $row['delta_base'] > 0 ? '+' : '' ) . (string) $row['delta_display'];
 	}
 }
