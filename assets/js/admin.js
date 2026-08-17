@@ -9,7 +9,10 @@
 			const params = new URLSearchParams( window.location.search );
 			const requested = params.get( 'laqi_lusm_open' );
 			if ( 'unit-stock' === requested ) {
-				$( '.laqi_lusm_options' ).trigger( 'click' ).find( 'a' ).focus();
+				$( '.laqi_lusm_options' )
+					.trigger( 'click' )
+					.find( 'a' )
+					.focus();
 				return;
 			}
 			if ( 'variations' !== requested && 'variation' !== requested ) {
@@ -36,7 +39,8 @@
 				const list = $(
 					'#variable_product_options .woocommerce_variations'
 				);
-				const currentPage = parseInt( list.attr( 'data-page' ), 10 ) || 1;
+				const currentPage =
+					parseInt( list.attr( 'data-page' ), 10 ) || 1;
 				if ( currentPage !== targetPage && ! pageRequested ) {
 					pageRequested = true;
 					$( '.variations-pagenav .page-selector' )
@@ -101,9 +105,8 @@
 			);
 			if ( variationsTrigger ) {
 				event.preventDefault();
-				const variationsTab = document.querySelector(
-					'.variations_tab a'
-				);
+				const variationsTab =
+					document.querySelector( '.variations_tab a' );
 				if ( variationsTab ) {
 					variationsTab.click();
 					variationsTab.focus();
@@ -186,6 +189,140 @@
 				.find( '.select2-selection__rendered' )
 				.attr( 'aria-label', label || field.data( 'placeholder' ) );
 		} );
+
+		document
+			.querySelectorAll( '.laqi-lusm-unit-picker' )
+			.forEach( ( picker ) => {
+				const family = picker.querySelector( '.laqi-lusm-unit-family' );
+				const system = picker.querySelector( '.laqi-lusm-unit-system' );
+				const unit = picker.querySelector( '.laqi-lusm-unit-choice' );
+				const options = Array.from( unit.options ).map( ( option ) =>
+					option.cloneNode( true )
+				);
+				const systemOptions = Array.from( system.options ).map(
+					( option ) => option.cloneNode( true )
+				);
+
+				const filterSystems = () => {
+					const available = new Set(
+						options
+							.filter(
+								( option ) =>
+									option.dataset.family === family.value
+							)
+							.map( ( option ) => option.dataset.system )
+					);
+					const matches = systemOptions.filter(
+						( option ) =>
+							'' === option.value || available.has( option.value )
+					);
+					const previous = system.value;
+					system.replaceChildren(
+						...matches.map( ( option ) => option.cloneNode( true ) )
+					);
+					if (
+						matches.some( ( option ) => option.value === previous )
+					) {
+						system.value = previous;
+					}
+				};
+
+				const filterUnits = () => {
+					const previous = unit.value;
+					const matches = options.filter(
+						( option ) =>
+							option.dataset.family === family.value &&
+							( '' === system.value ||
+								option.dataset.system === system.value )
+					);
+					unit.replaceChildren(
+						...matches.map( ( option ) => option.cloneNode( true ) )
+					);
+					if (
+						matches.some( ( option ) => option.value === previous )
+					) {
+						unit.value = previous;
+					}
+				};
+
+				family.addEventListener( 'change', () => {
+					filterSystems();
+					filterUnits();
+				} );
+				system.addEventListener( 'change', filterUnits );
+				filterSystems();
+				filterUnits();
+			} );
+
+		const converter = document.querySelector( '.laqi-lusm-unit-converter' );
+		if ( converter ) {
+			const value = converter.querySelector(
+				'#laqi-lusm-conversion-value'
+			);
+			const from = converter.querySelector(
+				'[name="conversion_from_unit"]'
+			);
+			const to = converter.querySelector( '[name="conversion_to_unit"]' );
+			const result = converter.querySelector(
+				'.laqi-lusm-conversion-result'
+			);
+
+			const decimalRatio = ( numerator, denominator ) => {
+				const whole = numerator / denominator;
+				let remainder = numerator % denominator;
+				let fraction = '';
+				for ( let index = 0; index < 12 && 0n !== remainder; index++ ) {
+					remainder *= 10n;
+					fraction += ( remainder / denominator ).toString();
+					remainder %= denominator;
+				}
+				return {
+					approximate: 0n !== remainder,
+					value: fraction
+						? `${ whole }.${ fraction }`
+						: whole.toString(),
+				};
+			};
+
+			const calculate = () => {
+				const input = value.value.trim();
+				const match = input.match(
+					/^(0|[1-9][0-9]*)(?:\.([0-9]{1,12}))?$/
+				);
+				if ( ! match ) {
+					result.textContent = config.i18n.invalidConversionQuantity;
+					result.classList.add( 'notice-error' );
+					return;
+				}
+
+				const fromOption = from.selectedOptions[ 0 ];
+				const toOption = to.selectedOptions[ 0 ];
+				if (
+					! fromOption ||
+					! toOption ||
+					fromOption.dataset.family !== toOption.dataset.family
+				) {
+					result.textContent = config.i18n.incompatibleUnitFamilies;
+					result.classList.add( 'notice-error' );
+					return;
+				}
+
+				const fraction = match[ 2 ] || '';
+				const scaled = window.BigInt( match[ 1 ] + fraction );
+				const scale = 10n ** window.BigInt( fraction.length );
+				const converted = decimalRatio(
+					scaled * window.BigInt( fromOption.dataset.factor ),
+					scale * window.BigInt( toOption.dataset.factor )
+				);
+				const prefix = converted.approximate ? '≈ ' : '';
+				result.textContent = `${ input } ${ fromOption.dataset.symbol } = ${ prefix }${ converted.value } ${ toOption.dataset.symbol }`;
+				result.classList.remove( 'notice-error' );
+			};
+
+			converter.addEventListener( 'input', calculate );
+			converter.addEventListener( 'change', calculate );
+			calculate();
+		}
 
 		openProductContext();
 	} );

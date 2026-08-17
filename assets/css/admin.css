@@ -40,6 +40,54 @@
 	line-height: 1.4;
 }
 
+.laqi-lusm-unit-picker {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 0.75rem;
+}
+
+.laqi-lusm-unit-picker label {
+	display: grid;
+	min-width: 0;
+	gap: 0.35rem;
+}
+
+.laqi-lusm-unit-picker select {
+	box-sizing: border-box;
+	width: 100%;
+	min-width: 0;
+}
+
+.laqi-lusm-unit-converter > label {
+	display: block;
+	margin-bottom: 0.35rem;
+}
+
+.laqi-lusm-unit-converter .laqi-lusm-unit-picker {
+	margin-top: 1rem;
+}
+
+.laqi-lusm-conversion-result {
+	margin: 1rem 0 0;
+	padding: 0.8rem 1rem;
+	border-left: 4px solid #2271b1;
+	background: #f0f6fc;
+	font-size: 1.1rem;
+	font-weight: 600;
+}
+
+.laqi-lusm-conversion-result.notice-error {
+	border-left-color: #d63638;
+	background: #fcf0f1;
+}
+
+@media screen and (max-width: 782px) {
+
+	.laqi-lusm-unit-picker {
+		grid-template-columns: 1fr;
+	}
+}
+
 .laqi-lusm-stock-table th,
 .laqi-lusm-stock-table td {
 	padding: 1rem;
@@ -403,8 +451,7 @@
 	display: inline-block;
 	margin: 0 0.35rem 0 0;
 }
-
-
+/* stylelint-disable-next-line selector-id-pattern */
 #laqi_lusm_product_data .laqi-lusm-product-editor-intro {
 	padding: 0 12px;
 }
@@ -627,6 +674,7 @@
 		grid-template-columns: minmax(0, 1fr);
 	}
 }
+
 /* WooCommerce order stock audit. */
 #laqi-lusm-order-stock .inside {
 	margin: 0;
