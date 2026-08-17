@@ -64,7 +64,7 @@ coding standards, PHP syntax, PHPUnit across the supported PHP/WordPress matrix,
 the WordPress.org archive, and an authenticated Playwright + axe admin-quality
 test in a real WordPress/WooCommerce environment.
 Complete the manual screen-reader, keyboard, zoom, contrast, and performance
-checks in `docs/release-quality-checklist.md` before a Marketplace upload.
+checks in `docs/release-quality-checklist.md` before WordPress.org publication.
 Releases call that same workflow and cannot package until it passes.
 Build locally with:
 

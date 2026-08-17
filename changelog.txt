@@ -1,4 +1,11 @@
 *** Laqi Unit Stock Manager for WooCommerce Changelog ***
 
-2026-08-13 - version 0.1.0
-* Add - Initial development version.
+2026-08-17 - version 1.0.0
+* Add - Initial WordPress.org release of the complete Free shared-stock engine.
+* Add - Exact inventory pools shared by simple products and individual variations, with mass, volume, length, count, and custom merchant units.
+* Add - Combined-cart availability checks for classic checkout and the Store API used by Cart and Checkout Blocks.
+* Add - Immutable order-item mapping snapshots and idempotent reductions, restorations, refunds, and admin order-edit reconciliation.
+* Add - Native simple-product and variation mapping controls, Products-list mapping coverage and filters, stock diagnostics, and synchronized stock status.
+* Add - Searchable pool management, inline stock corrections, explicit existing-stock migration choices, and safe custom-unit conversion and retirement.
+* Add - Paginated product-link and append-only activity views plus detailed pooled-stock audits on WooCommerce orders.
+* Add - Privacy export and erasure support, uninstall cleanup, versioned REST endpoints, HPOS compatibility, and a stable extension API for the separate Pro add-on.
