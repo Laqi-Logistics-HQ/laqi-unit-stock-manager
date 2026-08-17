@@ -79,8 +79,8 @@ jobs:
             fi
           done
 
-          if grep -Eq '(^|/)\.[^/]+(/|$)|\.zip$' <<< "$contents"; then
-            echo "::error::Release archive contains a hidden path or nested ZIP."
+          if grep -Eq '(^|/)\.[^/]+(/|$)|\.(zip|tar|tgz|phar)(~|$)|~$' <<< "$contents"; then
+            echo "::error::Release archive contains a hidden path, archive, or backup file."
             exit 1
           fi
 
@@ -99,7 +99,7 @@ jobs:
             exit 1
           fi
 
-          if [ -f package-lock.json ]; then
+          if node -e "const p=require('./package.json'); process.exit(p.scripts?.build ? 0 : 1)"; then
             for required_asset in \
               laqi-unit-stock-manager/build/index.js \
               laqi-unit-stock-manager/build/index.asset.php; do
