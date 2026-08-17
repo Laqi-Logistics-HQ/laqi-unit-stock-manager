@@ -668,21 +668,22 @@
 .laqi-lusm-order-stock-movement,
 .laqi-lusmp-order-batch-allocation {
 	margin: 0;
-	padding: 0.75rem;
+	padding: 0.8rem;
 	border: 1px solid #dcdcde;
-	border-left-width: 4px;
-	border-radius: 4px;
+	border-radius: 6px;
 	background: #fff;
 }
 
 .laqi-lusm-order-stock-movement--out,
 .laqi-lusmp-order-batch-allocation--out {
-	border-left-color: #c93535;
+	border-color: #efc8ca;
+	background: #fcf0f1;
 }
 
 .laqi-lusm-order-stock-movement--in,
 .laqi-lusmp-order-batch-allocation--in {
-	border-left-color: #2f8f4e;
+	border-color: #b8dfc2;
+	background: #edfaef;
 }
 
 .laqi-lusm-order-stock-movement__heading,
@@ -708,24 +709,27 @@
 	width: 1.65rem;
 	height: 1.65rem;
 	border-radius: 999px;
-	color: #fff;
+	border: 1px solid currentcolor;
 	font-size: 1rem;
 	font-weight: 700;
 }
 
 .laqi-lusm-order-stock-movement--out .laqi-lusm-order-stock-movement__icon,
 .laqi-lusmp-order-batch-allocation--out .laqi-lusmp-order-batch-allocation__icon {
-	background: #c93535;
+	color: #8a2424;
+	background: #f7d7d9;
 }
 
 .laqi-lusm-order-stock-movement--in .laqi-lusm-order-stock-movement__icon,
 .laqi-lusmp-order-batch-allocation--in .laqi-lusmp-order-batch-allocation__icon {
-	background: #2f8f4e;
+	color: #176b32;
+	background: #d8f0de;
 }
 
 .laqi-lusm-order-stock-movement__pool,
 .laqi-lusmp-order-batch-allocation__batch,
 .laqi-lusmp-order-batch-allocation__pool,
+.laqi-lusmp-order-batch-allocation__balance,
 .laqi-lusm-order-stock-movement__balance,
 .laqi-lusm-order-stock-movement__date,
 .laqi-lusmp-order-batch-allocation__date {
