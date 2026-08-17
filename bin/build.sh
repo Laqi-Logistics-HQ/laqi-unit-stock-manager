@@ -69,6 +69,7 @@ rsync -a --no-owner --no-group --delete \
   --exclude 'tests' \
   --exclude 'test-results' \
   --exclude 'docs' \
+  --exclude 'wordpress-org-assets' \
   --exclude 'assets/src' \
   --exclude '.wp-env.json' \
   --exclude 'playwright.config.js' \
