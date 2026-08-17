@@ -4,7 +4,7 @@ Tags: woocommerce, inventory, stock management, variable products, units
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 7.1
@@ -134,6 +134,9 @@ Deleting the final installed edition removes the plugin's custom inventory table
 This plugin ships human-readable PHP, JavaScript, and CSS without minified or generated runtime assets. No separate compilation step is required to inspect or reproduce the distributed code.
 
 == Changelog ==
+
+= 1.0.1 =
+* Improved the plugin description shown on the Plugins screen.
 
 = 1.0.0 =
 * Initial WordPress.org release of the complete Free shared-stock engine.
