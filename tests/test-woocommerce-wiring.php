@@ -6,6 +6,7 @@
  */
 
 use LaqiUnitStockManager\WooCommerce\OrderItemSnapshotter;
+use LaqiUnitStockManager\WooCommerce\OrderStockLifecycle;
 
 /**
  * Verifies classic, Store API, and checkout snapshot hooks are active.
@@ -22,6 +23,11 @@ class Test_WooCommerce_Wiring extends WP_UnitTestCase {
 		$this->assertNotFalse( has_action( 'woocommerce_reduce_order_stock' ) );
 		$this->assertNotFalse( has_action( 'woocommerce_restore_order_stock' ) );
 		$this->assertNotFalse( has_filter( 'woocommerce_can_restock_refunded_items' ) );
+		$this->assertNotFalse( has_action( 'add_meta_boxes' ) );
+		$this->assertNotFalse( has_filter( 'woocommerce_hidden_order_itemmeta' ) );
+		$hidden_item_meta = apply_filters( 'woocommerce_hidden_order_itemmeta', array() );
+		$this->assertContains( OrderItemSnapshotter::META_KEY, $hidden_item_meta );
+		$this->assertContains( OrderStockLifecycle::RESTOCKED_QUANTITY_META, $hidden_item_meta );
 		$this->assertNotFalse( has_action( 'admin_menu' ) );
 		$this->assertNotFalse( has_filter( 'woocommerce_product_data_tabs' ) );
 		$this->assertNotFalse( has_action( 'woocommerce_product_data_panels' ) );
