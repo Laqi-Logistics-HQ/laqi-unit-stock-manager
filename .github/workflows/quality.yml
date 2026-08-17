@@ -181,9 +181,10 @@ jobs:
       - name: Build and verify the complete Free archive
         shell: bash
         run: |
-          bash bin/build.sh --channel wordpressorg --version 0.0.0-test
+          release_version="$(grep -oP '^\s*\*\s*Version:\s*\K\S+' laqi-unit-stock-manager.php | head -n1)"
+          bash bin/build.sh --channel wordpressorg
 
-          free_archive="dist/laqi-unit-stock-manager-0.0.0-test-wordpressorg.zip"
+          free_archive="dist/laqi-unit-stock-manager-${release_version}-wordpressorg.zip"
           free_contents="$(unzip -Z1 "$free_archive")"
 
           if ! unzip -p "$free_archive" laqi-unit-stock-manager/laqi-unit-stock-manager.php | grep '^ \* Plugin Name:       Laqi Unit Stock Manager for WooCommerce$' > /dev/null; then
@@ -198,8 +199,8 @@ jobs:
             fi
           done
 
-          if grep -Eq '(^|/)\.[^/]+(/|$)|\.zip$' <<< "$free_contents"; then
-            echo "::error::Release archive contains a hidden path or nested ZIP."
+          if grep -Eq '(^|/)\.[^/]+(/|$)|\.(zip|tar|tgz|phar)(~|$)|~$' <<< "$free_contents"; then
+            echo "::error::Release archive contains a hidden path, archive, or backup file."
             exit 1
           fi
 

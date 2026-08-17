@@ -38,6 +38,13 @@ if [ -z "$VERSION" ]; then
 fi
 [ -n "$VERSION" ] || { echo "could not determine version (pass --version)" >&2; exit 1; }
 
+HEADER_VERSION="$(grep -ioP '^\s*\*\s*Version:\s*\K[0-9][^\s]*' "$SLUG.php" | head -n1 || true)"
+STABLE_VERSION="$(grep -ioP '^Stable tag:\s*\K\S+' readme.txt | head -n1 || true)"
+if [ "$VERSION" != "$HEADER_VERSION" ] || [ "$VERSION" != "$STABLE_VERSION" ]; then
+  echo "refusing to package: requested version $VERSION, header version ${HEADER_VERSION:-<missing>}, stable tag ${STABLE_VERSION:-<missing>}" >&2
+  exit 1
+fi
+
 # A real npm build script marks a generated runtime. The committed lockfile also
 # supports linting-only plugins, so it is not evidence that build/ must exist.
 HAS_BUILD_SCRIPT=0
@@ -63,7 +70,11 @@ rsync -a --no-owner --no-group --delete \
   --exclude '.github' \
   --exclude 'node_modules' \
   --exclude 'dist' \
-  --exclude '*.zip' \
+  --exclude '*.zip*' \
+  --exclude '*.tar*' \
+  --exclude '*.tgz' \
+  --exclude '*.phar' \
+  --exclude '*~' \
   --exclude '.*' \
   --exclude 'bin' \
   --exclude 'tests' \
@@ -96,7 +107,7 @@ fi
 
 # Reject package pollution even if a future tool writes to a new path that was
 # not anticipated by the rsync exclusions above.
-FORBIDDEN_ARTIFACT="$(find "$DEST" -type f \( -name '*.zip' -o -name '.*' \) -print -quit)"
+FORBIDDEN_ARTIFACT="$(find "$DEST" -type f \( -name '*.zip*' -o -name '*.tar*' -o -name '*.tgz' -o -name '*.phar' -o -name '*~' -o -name '.*' \) -print -quit)"
 if [ -n "$FORBIDDEN_ARTIFACT" ] || [ -d "$DEST/test-results" ]; then
   echo "refusing to package development artifact: ${FORBIDDEN_ARTIFACT:-$DEST/test-results}" >&2
   rm -rf "$STAGE"
