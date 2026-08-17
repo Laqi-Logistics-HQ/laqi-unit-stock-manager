@@ -71,6 +71,10 @@ final class Assets {
 			array(
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 				'nonce'   => wp_create_nonce( 'laqi_lusm_search_pools' ),
+				'i18n'    => array(
+					'invalidConversionQuantity' => __( 'Enter a non-negative number with no more than 12 decimal places.', 'laqi-unit-stock-manager' ),
+					'incompatibleUnitFamilies'  => __( 'These units cannot be converted because they belong to different measurement families.', 'laqi-unit-stock-manager' ),
+				),
 			)
 		);
 		wp_enqueue_style( 'woocommerce_admin_styles' );

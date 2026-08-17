@@ -61,9 +61,21 @@ class Test_Quantity extends WP_UnitTestCase {
 		$units = new UnitRegistry();
 
 		$this->assertSame( 1000000000, $units->normalize( '1', 'm' )->amount() );
+		$this->assertSame( 100000000, $units->normalize( '1', 'dm' )->amount() );
 		$this->assertSame( 304800000, $units->normalize( '1', 'ft' )->amount() );
 		$this->assertSame( 914400000, $units->normalize( '1', 'yd' )->amount() );
+		$this->assertSame( 1609344000000, $units->normalize( '1', 'mi' )->amount() );
 		$this->assertSame( 'length', $units->normalize( '50', 'm' )->family() );
+	}
+
+	/** Surface-area units convert within a separate exact family. */
+	public function test_area_units_are_exact_and_separate_from_length(): void {
+		$units = new UnitRegistry();
+
+		$this->assertSame( 1000000000000, $units->normalize( '1', 'm2' )->amount() );
+		$this->assertSame( 92903040000, $units->normalize( '1', 'ft2' )->amount() );
+		$this->assertSame( 'area', $units->normalize( '1', 'yd2' )->family() );
+		$this->assertNotSame( $units->normalize( '1', 'm' )->family(), $units->normalize( '1', 'm2' )->family() );
 	}
 
 	/**

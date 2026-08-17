@@ -165,7 +165,16 @@ final class SetupSection implements ScreenSectionInterface {
 					<?php submit_button( __( 'Create custom unit', 'laqi-unit-stock-manager' ) ); ?>
 				</form>
 			</section>
-			<section class="card laqi-lusm-custom-unit-directory">
+			<section class="card laqi-lusm-unit-converter">
+				<h2><?php esc_html_e( 'Conversion calculator', 'laqi-unit-stock-manager' ); ?></h2>
+				<p><?php esc_html_e( 'Check a conversion without changing stock. Metric, Imperial, and US customary units convert when they belong to the same measurement family; units from different families do not.', 'laqi-unit-stock-manager' ); ?></p>
+				<label for="laqi-lusm-conversion-value"><?php esc_html_e( 'Quantity to convert', 'laqi-unit-stock-manager' ); ?></label>
+				<input id="laqi-lusm-conversion-value" class="widefat" type="text" inputmode="decimal" value="1" />
+				<?php $this->unit_field( 'conversion_from_unit', __( 'Convert from', 'laqi-unit-stock-manager' ) ); ?>
+				<?php $this->unit_field( 'conversion_to_unit', __( 'Convert to', 'laqi-unit-stock-manager' ) ); ?>
+				<p class="laqi-lusm-conversion-result" role="status" aria-live="polite"></p>
+			</section>
+			<section class="card laqi-lusm-custom-unit-directory laqi-lusm-setup-wide">
 				<h2><?php esc_html_e( 'Custom units', 'laqi-unit-stock-manager' ); ?></h2>
 				<p><?php esc_html_e( 'Review merchant-defined units and retire definitions that are no longer needed.', 'laqi-unit-stock-manager' ); ?></p>
 				<?php $this->render_custom_units(); ?>
@@ -349,7 +358,7 @@ final class SetupSection implements ScreenSectionInterface {
 		<select id="laqi-lusm-pool" class="laqi-lusm-pool-search" name="pool_id" data-placeholder="<?php esc_attr_e( 'Search inventory pools', 'laqi-unit-stock-manager' ); ?>" required></select>
 			<?php $this->text_field( 'consumption', __( 'Consumption per sold item', 'laqi-unit-stock-manager' ), true, 'decimal' ); ?>
 			<?php $this->unit_field( 'consumption_unit', __( 'Consumption unit', 'laqi-unit-stock-manager' ) ); ?>
-			<p class="description laqi-lusm-form-description"><?php esc_html_e( 'The quantity consumed by one sold item may use a different unit from the pool display when both units belong to the same measurement family. For example, a product can consume 250 g from a pool displayed in kilograms. Mass, volume, length, and count cannot be mixed.', 'laqi-unit-stock-manager' ); ?></p>
+			<p class="description laqi-lusm-form-description"><?php esc_html_e( 'The quantity consumed by one sold item may use a different unit from the pool display when both units belong to the same measurement family. For example, 250 g converts to 0.25 kg and 12 in converts to 1 ft. Units from different families, such as length and mass, cannot be converted.', 'laqi-unit-stock-manager' ); ?></p>
 			<label for="laqi-lusm-existing-stock"><?php esc_html_e( 'Existing WooCommerce stock', 'laqi-unit-stock-manager' ); ?></label>
 			<select id="laqi-lusm-existing-stock" name="existing_stock_decision" required>
 				<option value="disable"><?php esc_html_e( 'Disable native quantity management', 'laqi-unit-stock-manager' ); ?></option>
@@ -384,20 +393,27 @@ final class SetupSection implements ScreenSectionInterface {
 	 * @return void
 	 */
 	private function unit_field( string $name, string $label ): void {
-		echo '<label for="laqi-lusm-' . esc_attr( $name ) . '">' . esc_html( $label ) . '</label>';
-		echo '<select id="laqi-lusm-' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '" required>';
 		$grouped = array();
 		foreach ( $this->units->all() as $unit ) {
 			$grouped[ $unit->family() ][] = $unit;
 		}
+		$filter_id = 'laqi-lusm-' . $name . '-filters';
+		echo '<div id="' . esc_attr( $filter_id ) . '" class="laqi-lusm-unit-picker">';
+		echo '<label>' . esc_html__( 'Measurement family', 'laqi-unit-stock-manager' ) . '<select class="laqi-lusm-unit-family">';
 		foreach ( $grouped as $family => $units ) {
-			echo '<optgroup label="' . esc_attr( $this->family_label( $family ) ) . '">';
-			foreach ( $units as $unit ) {
-				echo '<option value="' . esc_attr( $unit->key() ) . '">' . esc_html( $unit->label() . ' (' . $unit->symbol() . ') — ' . $this->system_label( $unit->system() ) ) . '</option>';
-			}
-			echo '</optgroup>';
+			echo '<option value="' . esc_attr( $family ) . '">' . esc_html( $this->family_label( $family ) ) . '</option>';
 		}
-		echo '</select>';
+		echo '</select></label>';
+		echo '<label>' . esc_html__( 'Unit system', 'laqi-unit-stock-manager' ) . '<select class="laqi-lusm-unit-system"><option value="">' . esc_html__( 'All systems', 'laqi-unit-stock-manager' ) . '</option>';
+		foreach ( array( 'metric', 'imperial', 'us_customary', 'international', 'count', 'custom' ) as $system ) {
+			echo '<option value="' . esc_attr( $system ) . '">' . esc_html( $this->system_label( $system ) ) . '</option>';
+		}
+		echo '</select></label>';
+		echo '<label for="laqi-lusm-' . esc_attr( $name ) . '">' . esc_html( $label ) . '<select id="laqi-lusm-' . esc_attr( $name ) . '" class="laqi-lusm-unit-choice" name="' . esc_attr( $name ) . '" required>';
+		foreach ( $this->units->all() as $unit ) {
+			echo '<option value="' . esc_attr( $unit->key() ) . '" data-family="' . esc_attr( $unit->family() ) . '" data-system="' . esc_attr( $unit->system() ) . '" data-factor="' . esc_attr( (string) $unit->base_factor() ) . '" data-symbol="' . esc_attr( $unit->symbol() ) . '">' . esc_html( $unit->label() . ' (' . $unit->symbol() . ')' ) . '</option>';
+		}
+		echo '</select></label></div>';
 	}
 
 	/**
@@ -411,6 +427,7 @@ final class SetupSection implements ScreenSectionInterface {
 			'mass'   => __( 'Mass', 'laqi-unit-stock-manager' ),
 			'volume' => __( 'Volume', 'laqi-unit-stock-manager' ),
 			'length' => __( 'Length', 'laqi-unit-stock-manager' ),
+			'area'   => __( 'Area', 'laqi-unit-stock-manager' ),
 			'count'  => __( 'Count', 'laqi-unit-stock-manager' ),
 		);
 
@@ -425,11 +442,12 @@ final class SetupSection implements ScreenSectionInterface {
 	 */
 	private function system_label( string $system ): string {
 		$labels = array(
-			'metric'       => __( 'Metric', 'laqi-unit-stock-manager' ),
-			'imperial'     => __( 'Imperial', 'laqi-unit-stock-manager' ),
-			'us_customary' => __( 'US customary', 'laqi-unit-stock-manager' ),
-			'count'        => __( 'Count', 'laqi-unit-stock-manager' ),
-			'custom'       => __( 'Custom', 'laqi-unit-stock-manager' ),
+			'metric'        => __( 'Metric', 'laqi-unit-stock-manager' ),
+			'imperial'      => __( 'Imperial', 'laqi-unit-stock-manager' ),
+			'us_customary'  => __( 'US customary', 'laqi-unit-stock-manager' ),
+			'international' => __( 'International', 'laqi-unit-stock-manager' ),
+			'count'         => __( 'Count', 'laqi-unit-stock-manager' ),
+			'custom'        => __( 'Custom', 'laqi-unit-stock-manager' ),
 		);
 
 		return isset( $labels[ $system ] ) ? $labels[ $system ] : $system;

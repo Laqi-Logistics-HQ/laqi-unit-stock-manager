@@ -229,7 +229,7 @@ final class ProductEditor {
 				<?php endif; ?>
 			</div>
 			<p class="description">
-				<?php esc_html_e( 'The quantity consumed by one sold item may use a different unit from the pool display when both units belong to the same measurement family. For example, a product can consume 250 g from a pool displayed in kilograms. Mass, volume, length, and count cannot be mixed.', 'laqi-unit-stock-manager' ); ?>
+				<?php esc_html_e( 'The quantity consumed by one sold item may use a different unit from the pool display when both units belong to the same measurement family. For example, 250 g converts to 0.25 kg and 12 in converts to 1 ft. Units from different families, such as length and mass, cannot be converted.', 'laqi-unit-stock-manager' ); ?>
 				<br>
 				<?php
 				if ( $variation_context ) {
@@ -362,8 +362,16 @@ final class ProductEditor {
 	 * @return void
 	 */
 	private function render_unit_options( string $selected ): void {
+		$grouped = array();
 		foreach ( $this->units->all() as $unit ) {
-			echo '<option value="' . esc_attr( $unit->key() ) . '" ' . selected( $selected, $unit->key(), false ) . '>' . esc_html( $unit->label() . ' (' . $unit->symbol() . ') — ' . $this->family_label( $unit->family() ) ) . '</option>';
+			$grouped[ $unit->family() ][] = $unit;
+		}
+		foreach ( $grouped as $family => $units ) {
+			echo '<optgroup label="' . esc_attr( $this->family_label( $family ) ) . '">';
+			foreach ( $units as $unit ) {
+				echo '<option value="' . esc_attr( $unit->key() ) . '" ' . selected( $selected, $unit->key(), false ) . '>' . esc_html( $unit->label() . ' (' . $unit->symbol() . ')' ) . '</option>';
+			}
+			echo '</optgroup>';
 		}
 	}
 
@@ -378,6 +386,7 @@ final class ProductEditor {
 			'mass'   => __( 'Mass', 'laqi-unit-stock-manager' ),
 			'volume' => __( 'Volume', 'laqi-unit-stock-manager' ),
 			'length' => __( 'Length', 'laqi-unit-stock-manager' ),
+			'area'   => __( 'Area', 'laqi-unit-stock-manager' ),
 			'count'  => __( 'Count', 'laqi-unit-stock-manager' ),
 		);
 

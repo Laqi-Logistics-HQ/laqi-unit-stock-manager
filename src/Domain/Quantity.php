@@ -38,7 +38,7 @@ final class Quantity {
 	 * @throws InvalidArgumentException When the family is unknown.
 	 */
 	public function __construct( string $family, int $amount ) {
-		if ( ! in_array( $family, array( 'mass', 'volume', 'length', 'count' ), true ) ) {
+		if ( ! in_array( $family, array( 'mass', 'volume', 'length', 'area', 'count' ), true ) ) {
 			throw new InvalidArgumentException( 'Unknown quantity family.' );
 		}
 

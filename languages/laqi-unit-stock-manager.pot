@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-17T12:58:19+00:00\n"
+"POT-Creation-Date: 2026-08-17T13:19:01+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -73,7 +73,7 @@ msgstr ""
 #: src/Admin/PoolStockSection.php:129
 #: src/Admin/PoolStockSection.php:140
 #: src/Admin/ProductEditor.php:222
-#: src/Admin/SetupSection.php:348
+#: src/Admin/SetupSection.php:357
 msgid "Inventory pool"
 msgstr ""
 
@@ -199,7 +199,7 @@ msgid "Stock"
 msgstr ""
 
 #: src/Admin/PoolStockSection.php:123
-#: src/Admin/SetupSection.php:349
+#: src/Admin/SetupSection.php:358
 msgid "Search inventory pools"
 msgstr ""
 
@@ -361,13 +361,13 @@ msgid "Consumption per sale"
 msgstr ""
 
 #: src/Admin/ProductEditor.php:224
-#: src/Admin/SetupSection.php:318
-#: src/Unit/UnitRegistry.php:61
+#: src/Admin/SetupSection.php:327
+#: src/Unit/UnitRegistry.php:85
 msgid "Unit"
 msgstr ""
 
 #: src/Admin/ProductEditor.php:226
-#: src/Admin/SetupSection.php:353
+#: src/Admin/SetupSection.php:362
 msgid "Existing WooCommerce stock"
 msgstr ""
 
@@ -388,8 +388,8 @@ msgid "Unlink from Unit Stock"
 msgstr ""
 
 #: src/Admin/ProductEditor.php:232
-#: src/Admin/SetupSection.php:352
-msgid "The quantity consumed by one sold item may use a different unit from the pool display when both units belong to the same measurement family. For example, a product can consume 250 g from a pool displayed in kilograms. Mass, volume, length, and count cannot be mixed."
+#: src/Admin/SetupSection.php:361
+msgid "The quantity consumed by one sold item may use a different unit from the pool display when both units belong to the same measurement family. For example, 250 g converts to 0.25 kg and 12 in converts to 1 ft. Units from different families, such as length and mass, cannot be converted."
 msgstr ""
 
 #: src/Admin/ProductEditor.php:236
@@ -412,36 +412,41 @@ msgstr ""
 msgid "Select an inventory pool"
 msgstr ""
 
-#: src/Admin/ProductEditor.php:373
-#: src/Admin/SetupSection.php:406
+#: src/Admin/ProductEditor.php:386
+#: src/Admin/SetupSection.php:427
 msgid "Mass"
 msgstr ""
 
-#: src/Admin/ProductEditor.php:374
-#: src/Admin/SetupSection.php:407
+#: src/Admin/ProductEditor.php:387
+#: src/Admin/SetupSection.php:428
 msgid "Volume"
 msgstr ""
 
-#: src/Admin/ProductEditor.php:375
-#: src/Admin/SetupSection.php:408
+#: src/Admin/ProductEditor.php:388
+#: src/Admin/SetupSection.php:429
 msgid "Length"
 msgstr ""
 
-#: src/Admin/ProductEditor.php:376
-#: src/Admin/SetupSection.php:409
-#: src/Admin/SetupSection.php:426
+#: src/Admin/ProductEditor.php:389
+#: src/Admin/SetupSection.php:430
+msgid "Area"
+msgstr ""
+
+#: src/Admin/ProductEditor.php:390
+#: src/Admin/SetupSection.php:431
+#: src/Admin/SetupSection.php:449
 msgid "Count"
 msgstr ""
 
-#: src/Admin/ProductEditor.php:404
+#: src/Admin/ProductEditor.php:418
 msgid "Open product links"
 msgstr ""
 
-#: src/Admin/ProductEditor.php:411
+#: src/Admin/ProductEditor.php:425
 msgid "View pool and diagnostics"
 msgstr ""
 
-#: src/Admin/ProductEditor.php:415
+#: src/Admin/ProductEditor.php:429
 msgid "View stock activity"
 msgstr ""
 
@@ -512,7 +517,7 @@ msgid "Product links"
 msgstr ""
 
 #: src/Admin/SetupSection.php:103
-#: src/Admin/SetupSection.php:169
+#: src/Admin/SetupSection.php:178
 msgid "Custom units"
 msgstr ""
 
@@ -579,8 +584,8 @@ msgid "Symbol"
 msgstr ""
 
 #: src/Admin/SetupSection.php:163
-#: src/Admin/SetupSection.php:318
-#: src/Admin/SetupSection.php:320
+#: src/Admin/SetupSection.php:327
+#: src/Admin/SetupSection.php:329
 msgid "Equivalent quantity"
 msgstr ""
 
@@ -588,134 +593,170 @@ msgstr ""
 msgid "Of unit"
 msgstr ""
 
+#: src/Admin/SetupSection.php:169
+msgid "Conversion calculator"
+msgstr ""
+
 #: src/Admin/SetupSection.php:170
+msgid "Check a conversion without changing stock. Metric, Imperial, and US customary units convert when they belong to the same measurement family; units from different families do not."
+msgstr ""
+
+#: src/Admin/SetupSection.php:171
+msgid "Quantity to convert"
+msgstr ""
+
+#: src/Admin/SetupSection.php:173
+msgid "Convert from"
+msgstr ""
+
+#: src/Admin/SetupSection.php:174
+msgid "Convert to"
+msgstr ""
+
+#: src/Admin/SetupSection.php:179
 msgid "Review merchant-defined units and retire definitions that are no longer needed."
 msgstr ""
 
-#: src/Admin/SetupSection.php:187
+#: src/Admin/SetupSection.php:196
 msgid "No products or variations are linked yet."
 msgstr ""
 
-#: src/Admin/SetupSection.php:193
-#: src/Admin/SetupSection.php:346
+#: src/Admin/SetupSection.php:202
+#: src/Admin/SetupSection.php:355
 msgid "Product or variation"
 msgstr ""
 
-#: src/Admin/SetupSection.php:194
+#: src/Admin/SetupSection.php:203
 msgid "Consumption rule"
 msgstr ""
 
-#: src/Admin/SetupSection.php:195
-#: src/Admin/SetupSection.php:318
-#: src/Admin/SetupSection.php:320
+#: src/Admin/SetupSection.php:204
+#: src/Admin/SetupSection.php:327
+#: src/Admin/SetupSection.php:329
 msgid "Actions"
 msgstr ""
 
 #. translators: %d: unavailable WooCommerce product or variation ID.
-#: src/Admin/SetupSection.php:213
+#: src/Admin/SetupSection.php:222
 #, php-format
 msgid "Unavailable product #%d"
 msgstr ""
 
 #. translators: 1: mapping calculator type, 2: component count.
-#: src/Admin/SetupSection.php:220
+#: src/Admin/SetupSection.php:229
 #, php-format
 msgid "%1$s mapping with %2$d components. Use its dedicated section to edit it."
 msgstr ""
 
-#: src/Admin/SetupSection.php:223
+#: src/Admin/SetupSection.php:232
 msgid "Unavailable inventory pool"
 msgstr ""
 
 #. translators: 1: consumption quantity, 2: unit key.
-#: src/Admin/SetupSection.php:229
+#: src/Admin/SetupSection.php:238
 #, php-format
 msgid "Uses %1$s %2$s per sold item"
 msgstr ""
 
-#: src/Admin/SetupSection.php:240
+#: src/Admin/SetupSection.php:249
 msgid "Edit variation"
 msgstr ""
 
-#: src/Admin/SetupSection.php:240
+#: src/Admin/SetupSection.php:249
 msgid "Edit product"
 msgstr ""
 
-#: src/Admin/SetupSection.php:247
+#: src/Admin/SetupSection.php:256
 msgid "Unlink"
 msgstr ""
 
 #. translators: 1: first visible mapping number, 2: last visible mapping number, 3: total active mappings.
-#: src/Admin/SetupSection.php:256
+#: src/Admin/SetupSection.php:265
 #, php-format
 msgid "Showing %1$d-%2$d of %3$d product links."
 msgstr ""
 
-#: src/Admin/SetupSection.php:259
+#: src/Admin/SetupSection.php:268
 msgid "Product link pages"
 msgstr ""
 
-#: src/Admin/SetupSection.php:314
+#: src/Admin/SetupSection.php:323
 msgid "No custom units have been created yet."
 msgstr ""
 
-#: src/Admin/SetupSection.php:317
+#: src/Admin/SetupSection.php:326
 msgid "Unused units can be retired. Units used by an inventory pool or another active custom unit are protected."
 msgstr ""
 
-#: src/Admin/SetupSection.php:327
+#: src/Admin/SetupSection.php:336
 msgid "Retire"
 msgstr ""
 
-#: src/Admin/SetupSection.php:338
+#: src/Admin/SetupSection.php:347
 msgid "Create an inventory pool before linking products."
 msgstr ""
 
-#: src/Admin/SetupSection.php:347
+#: src/Admin/SetupSection.php:356
 msgid "Search for a product or variation"
 msgstr ""
 
-#: src/Admin/SetupSection.php:350
+#: src/Admin/SetupSection.php:359
 msgid "Consumption per sold item"
 msgstr ""
 
-#: src/Admin/SetupSection.php:351
+#: src/Admin/SetupSection.php:360
 msgid "Consumption unit"
 msgstr ""
 
-#: src/Admin/SetupSection.php:355
+#: src/Admin/SetupSection.php:364
 msgid "Disable native quantity management"
 msgstr ""
 
-#: src/Admin/SetupSection.php:356
+#: src/Admin/SetupSection.php:365
 msgid "Add native item count to this pool, then disable it"
 msgstr ""
 
-#: src/Admin/SetupSection.php:357
+#: src/Admin/SetupSection.php:366
 msgid "Keep native quantity management unchanged"
 msgstr ""
 
-#: src/Admin/SetupSection.php:359
+#: src/Admin/SetupSection.php:368
 msgid "Transferring multiplies the current native item count by the consumption per item and adds that exact quantity to the pool once."
 msgstr ""
 
-#: src/Admin/SetupSection.php:360
+#: src/Admin/SetupSection.php:369
 msgid "Save mapping"
 msgstr ""
 
-#: src/Admin/SetupSection.php:423
+#: src/Admin/SetupSection.php:402
+msgid "Measurement family"
+msgstr ""
+
+#: src/Admin/SetupSection.php:407
+msgid "Unit system"
+msgstr ""
+
+#: src/Admin/SetupSection.php:407
+msgid "All systems"
+msgstr ""
+
+#: src/Admin/SetupSection.php:445
 msgid "Metric"
 msgstr ""
 
-#: src/Admin/SetupSection.php:424
+#: src/Admin/SetupSection.php:446
 msgid "Imperial"
 msgstr ""
 
-#: src/Admin/SetupSection.php:425
+#: src/Admin/SetupSection.php:447
 msgid "US customary"
 msgstr ""
 
-#: src/Admin/SetupSection.php:427
+#: src/Admin/SetupSection.php:448
+msgid "International"
+msgstr ""
+
+#: src/Admin/SetupSection.php:450
 msgid "Custom"
 msgstr ""
 
@@ -785,6 +826,14 @@ msgstr ""
 
 #: src/Admin/UnitStockPage.php:274
 msgid "Inventory stock could not be updated. Check the quantity and try again."
+msgstr ""
+
+#: src/Assets.php:75
+msgid "Enter a non-negative number with no more than 12 decimal places."
+msgstr ""
+
+#: src/Assets.php:76
+msgid "These units cannot be converted because they belong to different measurement families."
 msgstr ""
 
 #: src/Container.php:193
@@ -895,71 +944,155 @@ msgstr ""
 msgid "Stone"
 msgstr ""
 
+#: src/Unit/UnitRegistry.php:39
+msgid "US short ton"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:40
+msgid "Imperial long ton"
+msgstr ""
+
 #: src/Unit/UnitRegistry.php:41
-msgid "Millimetre"
-msgstr ""
-
-#: src/Unit/UnitRegistry.php:42
-msgid "Centimetre"
-msgstr ""
-
-#: src/Unit/UnitRegistry.php:43
-msgid "Metre"
+msgid "Carat"
 msgstr ""
 
 #: src/Unit/UnitRegistry.php:44
-msgid "Kilometre"
+msgid "Micrometre"
 msgstr ""
 
 #: src/Unit/UnitRegistry.php:45
-msgid "Inch"
+msgid "Millimetre"
 msgstr ""
 
 #: src/Unit/UnitRegistry.php:46
-msgid "Foot"
+msgid "Centimetre"
 msgstr ""
 
 #: src/Unit/UnitRegistry.php:47
-msgid "Yard"
+msgid "Decimetre"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:48
+msgid "Metre"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:49
+msgid "Kilometre"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:50
+msgid "Inch"
 msgstr ""
 
 #: src/Unit/UnitRegistry.php:51
-msgid "Millilitre"
+msgid "Foot"
 msgstr ""
 
 #: src/Unit/UnitRegistry.php:52
-msgid "Litre"
+msgid "Yard"
 msgstr ""
 
 #: src/Unit/UnitRegistry.php:53
-msgid "US fluid ounce"
+msgid "Mile"
 msgstr ""
 
 #: src/Unit/UnitRegistry.php:54
-msgid "US pint"
-msgstr ""
-
-#: src/Unit/UnitRegistry.php:55
-msgid "US quart"
-msgstr ""
-
-#: src/Unit/UnitRegistry.php:56
-msgid "US gallon"
-msgstr ""
-
-#: src/Unit/UnitRegistry.php:57
-msgid "Imperial fluid ounce"
+msgid "Nautical mile"
 msgstr ""
 
 #: src/Unit/UnitRegistry.php:58
-msgid "Imperial pint"
+msgid "Square millimetre"
 msgstr ""
 
 #: src/Unit/UnitRegistry.php:59
-msgid "Imperial gallon"
+msgid "Square centimetre"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:60
+msgid "Square metre"
 msgstr ""
 
 #: src/Unit/UnitRegistry.php:61
+msgid "Hectare"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:62
+msgid "Square inch"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:63
+msgid "Square foot"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:64
+msgid "Square yard"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:65
+msgid "Acre"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:69
+msgid "Millilitre"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:70
+msgid "Litre"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:71
+msgid "Centilitre"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:72
+msgid "Decilitre"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:73
+msgid "Cubic metre"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:74
+msgid "US fluid ounce"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:75
+msgid "US pint"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:76
+msgid "US quart"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:77
+msgid "US gallon"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:78
+msgid "Imperial fluid ounce"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:79
+msgid "Imperial pint"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:80
+msgid "Imperial gallon"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:81
+msgid "Cubic inch"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:82
+msgid "Cubic foot"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:83
+msgid "Cubic yard"
+msgstr ""
+
+#: src/Unit/UnitRegistry.php:85
 msgid "units"
 msgstr ""
 
