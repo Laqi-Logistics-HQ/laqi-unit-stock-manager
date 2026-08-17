@@ -39,7 +39,8 @@ final class Assets {
 		$screen       = get_current_screen();
 		$is_product   = in_array( $hook_suffix, array( 'post.php', 'post-new.php' ), true ) && $screen && 'product' === $screen->post_type;
 		$is_list      = 'edit.php' === $hook_suffix && $screen && 'product' === $screen->post_type;
-		if ( ! $is_workspace && ! $is_product && ! $is_list ) {
+		$is_order     = $screen && ( 'shop_order' === $screen->post_type || 'woocommerce_page_wc-orders' === $screen->id );
+		if ( ! $is_workspace && ! $is_product && ! $is_list && ! $is_order ) {
 			return;
 		}
 
@@ -52,7 +53,7 @@ final class Assets {
 			array(),
 			$style_version
 		);
-		if ( $is_list ) {
+		if ( $is_list || $is_order ) {
 			return;
 		}
 

@@ -229,6 +229,8 @@ final class ProductEditor {
 				<?php endif; ?>
 			</div>
 			<p class="description">
+				<?php esc_html_e( 'The consumption unit may differ from the pool display unit when both use the same measurement family, such as 250 g from a kilogram pool. Mass, volume, and count cannot be mixed.', 'laqi-unit-stock-manager' ); ?>
+				<br>
 				<?php
 				if ( $variation_context ) {
 					esc_html_e( 'Unit Stock changes use this variation panel’s Save changes button.', 'laqi-unit-stock-manager' );

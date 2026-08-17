@@ -349,6 +349,7 @@ final class SetupSection implements ScreenSectionInterface {
 		<select id="laqi-lusm-pool" class="laqi-lusm-pool-search" name="pool_id" data-placeholder="<?php esc_attr_e( 'Search inventory pools', 'laqi-unit-stock-manager' ); ?>" required></select>
 			<?php $this->text_field( 'consumption', __( 'Consumption per sold item', 'laqi-unit-stock-manager' ), true, 'decimal' ); ?>
 			<?php $this->unit_field( 'consumption_unit', __( 'Consumption unit', 'laqi-unit-stock-manager' ) ); ?>
+			<p class="description laqi-lusm-form-description"><?php esc_html_e( 'The consumption unit may differ from the pool display unit when both use the same measurement family. For example, a kilogram pool can consume 250 g. Mass, volume, and count cannot be mixed.', 'laqi-unit-stock-manager' ); ?></p>
 			<label for="laqi-lusm-existing-stock"><?php esc_html_e( 'Existing WooCommerce stock', 'laqi-unit-stock-manager' ); ?></label>
 			<select id="laqi-lusm-existing-stock" name="existing_stock_decision" required>
 				<option value="disable"><?php esc_html_e( 'Disable native quantity management', 'laqi-unit-stock-manager' ); ?></option>
