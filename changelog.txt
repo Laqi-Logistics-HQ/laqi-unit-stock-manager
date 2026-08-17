@@ -1,5 +1,8 @@
 *** Laqi Unit Stock Manager for WooCommerce Changelog ***
 
+2026-08-18 - version 1.0.1
+* Update - Improved the plugin description shown on the Plugins screen.
+
 2026-08-17 - version 1.0.0
 * Add - Initial WordPress.org release of the complete Free shared-stock engine.
 * Add - Exact inventory pools shared by simple products and individual variations, with mass, volume, length, count, and custom merchant units.
