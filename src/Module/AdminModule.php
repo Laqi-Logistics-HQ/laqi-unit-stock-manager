@@ -32,6 +32,7 @@ final class AdminModule implements ModuleInterface {
 		( new Admin\UnitStockPage( $sections ) )->register();
 		( new Admin\ProductEditor( $container->pool_repository(), $container->mapping_repository(), $container->unit_registry(), $container->quantity_formatter(), new WooCommerce\ExistingStockMigrator( $container->stock_mutation_service() ) ) )->register();
 		( new Admin\ProductList( $container->mapping_repository() ) )->register();
+		( new Admin\OrderStockMetaBox( $container->movement_repository(), $container->movement_presenter() ) )->register();
 		( new Admin\StockAdjustmentController( $container->stock_adjustment_service() ) )->register();
 		( new Admin\SetupController( $container->pool_repository(), $container->mapping_repository(), $container->unit_registry(), $container->stock_mutation_service(), $container->custom_unit_repository(), new WooCommerce\ExistingStockMigrator( $container->stock_mutation_service() ), new WooCommerce\PurchasableResolver() ) )->register();
 		( new Admin\PoolSearchController( $container->pool_repository() ) )->register();

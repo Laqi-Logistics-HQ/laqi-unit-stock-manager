@@ -59,6 +59,35 @@ final class MovementRepository {
 	}
 
 	/**
+	 * Get movements attributed to one operational source.
+	 *
+	 * @param string $source_type Source type.
+	 * @param int    $source_id   Source object ID.
+	 * @param int    $limit       Maximum rows.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function for_source( string $source_type, int $source_id, int $limit = 100 ): array {
+		$source_type = sanitize_key( $source_type );
+		$source_id   = absint( $source_id );
+		$limit       = max( 1, min( 500, $limit ) );
+		if ( '' === $source_type || $source_id < 1 ) {
+			return array();
+		}
+
+		$rows = $this->db->get_results(
+			$this->db->prepare(
+				'SELECT m.id, m.pool_id, m.type, m.delta_base, m.balance_base, m.source_type, m.source_id, m.actor_id, m.reason, m.created_at, p.name AS pool_name, p.family, p.display_unit FROM ' . Schema::table( 'movements' ) . ' m LEFT JOIN ' . Schema::table( 'pools' ) . ' p ON p.id = m.pool_id WHERE m.source_type = %s AND m.source_id = %d ORDER BY m.id DESC LIMIT %d',
+				$source_type,
+				$source_id,
+				$limit
+			),
+			ARRAY_A
+		);
+
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
 	 * Get recent movements for one or more mapped pools.
 	 *
 	 * @param int[] $pool_ids Pool IDs.

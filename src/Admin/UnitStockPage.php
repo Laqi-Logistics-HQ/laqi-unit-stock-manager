@@ -109,7 +109,12 @@ final class UnitStockPage {
 			<?php endforeach; ?>
 		</nav>
 		<?php
-		$group_sections = array_intersect_key( $sections, array_flip( $groups[ $active_group ]['sections'] ) );
+		$group_sections = array();
+		foreach ( $groups[ $active_group ]['sections'] as $section_id ) {
+			if ( isset( $sections[ $section_id ] ) ) {
+				$group_sections[ $section_id ] = $sections[ $section_id ];
+			}
+		}
 		$this->render_section_tabs( $group_sections, $active, __( 'Workspace sections', 'laqi-unit-stock-manager' ), 'laqi-lusm-workspace-section-tabs' );
 	}
 
