@@ -229,7 +229,7 @@ final class ProductEditor {
 				<?php endif; ?>
 			</div>
 			<p class="description">
-				<?php esc_html_e( 'The consumption unit may differ from the pool display unit when both use the same measurement family, such as 250 g from a kilogram pool. Mass, volume, and count cannot be mixed.', 'laqi-unit-stock-manager' ); ?>
+				<?php esc_html_e( 'The quantity consumed by one sold item may use a different unit from the pool display when both units belong to the same measurement family. For example, a product can consume 250 g from a pool displayed in kilograms. Mass, volume, length, and count cannot be mixed.', 'laqi-unit-stock-manager' ); ?>
 				<br>
 				<?php
 				if ( $variation_context ) {
@@ -363,8 +363,25 @@ final class ProductEditor {
 	 */
 	private function render_unit_options( string $selected ): void {
 		foreach ( $this->units->all() as $unit ) {
-			echo '<option value="' . esc_attr( $unit->key() ) . '" ' . selected( $selected, $unit->key(), false ) . '>' . esc_html( $unit->label() . ' (' . $unit->symbol() . ')' ) . '</option>';
+			echo '<option value="' . esc_attr( $unit->key() ) . '" ' . selected( $selected, $unit->key(), false ) . '>' . esc_html( $unit->label() . ' (' . $unit->symbol() . ') — ' . $this->family_label( $unit->family() ) ) . '</option>';
 		}
+	}
+
+	/**
+	 * Human-readable measurement family.
+	 *
+	 * @param string $family Stored family key.
+	 * @return string
+	 */
+	private function family_label( string $family ): string {
+		$labels = array(
+			'mass'   => __( 'Mass', 'laqi-unit-stock-manager' ),
+			'volume' => __( 'Volume', 'laqi-unit-stock-manager' ),
+			'length' => __( 'Length', 'laqi-unit-stock-manager' ),
+			'count'  => __( 'Count', 'laqi-unit-stock-manager' ),
+		);
+
+		return isset( $labels[ $family ] ) ? $labels[ $family ] : $family;
 	}
 
 	/** Render navigation to related product context without duplicating screens.

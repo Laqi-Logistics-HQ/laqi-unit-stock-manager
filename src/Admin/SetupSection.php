@@ -152,7 +152,7 @@ final class SetupSection implements ScreenSectionInterface {
 			<?php else : ?>
 			<section class="card laqi-lusm-custom-unit-create">
 				<h2><?php esc_html_e( 'Create custom unit', 'laqi-unit-stock-manager' ); ?></h2>
-				<p><?php esc_html_e( 'Define a merchant unit as an exact quantity of any existing unit, such as one sack equaling 25 kg.', 'laqi-unit-stock-manager' ); ?></p>
+				<p><?php esc_html_e( 'Define a merchant unit as an exact quantity of an existing unit, such as one sack equaling 25 kg or one rope roll equaling 50 m. The new unit automatically inherits that unit’s measurement family.', 'laqi-unit-stock-manager' ); ?></p>
 				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 					<input type="hidden" name="action" value="laqi_lusm_create_unit" />
 					<input type="hidden" name="setup_view" value="units" />
@@ -349,7 +349,7 @@ final class SetupSection implements ScreenSectionInterface {
 		<select id="laqi-lusm-pool" class="laqi-lusm-pool-search" name="pool_id" data-placeholder="<?php esc_attr_e( 'Search inventory pools', 'laqi-unit-stock-manager' ); ?>" required></select>
 			<?php $this->text_field( 'consumption', __( 'Consumption per sold item', 'laqi-unit-stock-manager' ), true, 'decimal' ); ?>
 			<?php $this->unit_field( 'consumption_unit', __( 'Consumption unit', 'laqi-unit-stock-manager' ) ); ?>
-			<p class="description laqi-lusm-form-description"><?php esc_html_e( 'The consumption unit may differ from the pool display unit when both use the same measurement family. For example, a kilogram pool can consume 250 g. Mass, volume, and count cannot be mixed.', 'laqi-unit-stock-manager' ); ?></p>
+			<p class="description laqi-lusm-form-description"><?php esc_html_e( 'The quantity consumed by one sold item may use a different unit from the pool display when both units belong to the same measurement family. For example, a product can consume 250 g from a pool displayed in kilograms. Mass, volume, length, and count cannot be mixed.', 'laqi-unit-stock-manager' ); ?></p>
 			<label for="laqi-lusm-existing-stock"><?php esc_html_e( 'Existing WooCommerce stock', 'laqi-unit-stock-manager' ); ?></label>
 			<select id="laqi-lusm-existing-stock" name="existing_stock_decision" required>
 				<option value="disable"><?php esc_html_e( 'Disable native quantity management', 'laqi-unit-stock-manager' ); ?></option>
@@ -386,10 +386,35 @@ final class SetupSection implements ScreenSectionInterface {
 	private function unit_field( string $name, string $label ): void {
 		echo '<label for="laqi-lusm-' . esc_attr( $name ) . '">' . esc_html( $label ) . '</label>';
 		echo '<select id="laqi-lusm-' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '" required>';
+		$grouped = array();
 		foreach ( $this->units->all() as $unit ) {
-			echo '<option value="' . esc_attr( $unit->key() ) . '">' . esc_html( $unit->label() . ' (' . $unit->symbol() . ') — ' . $this->system_label( $unit->system() ) ) . '</option>';
+			$grouped[ $unit->family() ][] = $unit;
+		}
+		foreach ( $grouped as $family => $units ) {
+			echo '<optgroup label="' . esc_attr( $this->family_label( $family ) ) . '">';
+			foreach ( $units as $unit ) {
+				echo '<option value="' . esc_attr( $unit->key() ) . '">' . esc_html( $unit->label() . ' (' . $unit->symbol() . ') — ' . $this->system_label( $unit->system() ) ) . '</option>';
+			}
+			echo '</optgroup>';
 		}
 		echo '</select>';
+	}
+
+	/**
+	 * Human-readable measurement family.
+	 *
+	 * @param string $family Stored family key.
+	 * @return string
+	 */
+	private function family_label( string $family ): string {
+		$labels = array(
+			'mass'   => __( 'Mass', 'laqi-unit-stock-manager' ),
+			'volume' => __( 'Volume', 'laqi-unit-stock-manager' ),
+			'length' => __( 'Length', 'laqi-unit-stock-manager' ),
+			'count'  => __( 'Count', 'laqi-unit-stock-manager' ),
+		);
+
+		return isset( $labels[ $family ] ) ? $labels[ $family ] : $family;
 	}
 
 	/**

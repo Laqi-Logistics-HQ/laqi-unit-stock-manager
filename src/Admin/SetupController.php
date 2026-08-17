@@ -270,6 +270,7 @@ final class SetupController {
 		$units = array(
 			'mass'   => 'ng',
 			'volume' => 'sixteenth_nanolitre',
+			'length' => 'nm',
 			'count'  => 'unit',
 		);
 		return isset( $units[ $family ] ) ? $units[ $family ] : $family;

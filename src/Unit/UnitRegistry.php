@@ -32,8 +32,19 @@ final class UnitRegistry {
 		$this->register( new UnitDefinition( 'mg', 'mass', 1000000, 'metric', __( 'Milligram', 'laqi-unit-stock-manager' ), 'mg' ) );
 		$this->register( new UnitDefinition( 'g', 'mass', 1000000000, 'metric', __( 'Gram', 'laqi-unit-stock-manager' ), 'g' ) );
 		$this->register( new UnitDefinition( 'kg', 'mass', 1000000000000, 'metric', __( 'Kilogram', 'laqi-unit-stock-manager' ), 'kg' ) );
+		$this->register( new UnitDefinition( 't', 'mass', 1000000000000000, 'metric', __( 'Tonne', 'laqi-unit-stock-manager' ), 't' ) );
 		$this->register( new UnitDefinition( 'oz', 'mass', 28349523125, 'imperial', __( 'Ounce', 'laqi-unit-stock-manager' ), 'oz' ) );
 		$this->register( new UnitDefinition( 'lb', 'mass', 453592370000, 'imperial', __( 'Pound', 'laqi-unit-stock-manager' ), 'lb' ) );
+		$this->register( new UnitDefinition( 'st', 'mass', 6350293180000, 'imperial', __( 'Stone', 'laqi-unit-stock-manager' ), 'st' ) );
+
+		// Length base: nanometre. Metric and international imperial units are exact.
+		$this->register( new UnitDefinition( 'mm', 'length', 1000000, 'metric', __( 'Millimetre', 'laqi-unit-stock-manager' ), 'mm' ) );
+		$this->register( new UnitDefinition( 'cm', 'length', 10000000, 'metric', __( 'Centimetre', 'laqi-unit-stock-manager' ), 'cm' ) );
+		$this->register( new UnitDefinition( 'm', 'length', 1000000000, 'metric', __( 'Metre', 'laqi-unit-stock-manager' ), 'm' ) );
+		$this->register( new UnitDefinition( 'km', 'length', 1000000000000, 'metric', __( 'Kilometre', 'laqi-unit-stock-manager' ), 'km' ) );
+		$this->register( new UnitDefinition( 'in', 'length', 25400000, 'imperial', __( 'Inch', 'laqi-unit-stock-manager' ), 'in' ) );
+		$this->register( new UnitDefinition( 'ft', 'length', 304800000, 'imperial', __( 'Foot', 'laqi-unit-stock-manager' ), 'ft' ) );
+		$this->register( new UnitDefinition( 'yd', 'length', 914400000, 'imperial', __( 'Yard', 'laqi-unit-stock-manager' ), 'yd' ) );
 
 		// Volume base: one sixteenth of a nanolitre. This keeps common US and
 		// imperial definitions exact while retaining practical BIGINT capacity.
@@ -135,7 +146,7 @@ final class UnitRegistry {
 	/**
 	 * Define a merchant unit as an exact multiple of an existing unit.
 	 *
-	 * Examples: sack = 25 kg, drum = 200 l, tray = 24 units.
+	 * Examples: sack = 25 kg, rope roll = 50 m, tray = 24 units.
 	 *
 	 * @param string $key        Custom unit key.
 	 * @param string $equivalent Decimal quantity of the reference unit.
