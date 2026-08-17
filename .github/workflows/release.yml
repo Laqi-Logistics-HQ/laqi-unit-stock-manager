@@ -72,7 +72,7 @@ jobs:
           archive="dist/laqi-unit-stock-manager-${{ steps.ver.outputs.version }}-wordpressorg.zip"
           contents="$(unzip -Z1 "$archive")"
 
-          for forbidden in .wp-env.json playwright.config.js docs/ tests/ test-results/ .github/ package.json package-lock.json README.md phpunit.integration.xml.dist vendor/ freemius/; do
+          for forbidden in .wp-env.json playwright.config.js docs/ wordpress-org-assets/ tests/ test-results/ .github/ package.json package-lock.json README.md phpunit.integration.xml.dist vendor/ freemius/; do
             if grep -q "^laqi-unit-stock-manager/${forbidden}" <<< "$contents"; then
               echo "::error::Release archive contains development-only path: $forbidden"
               exit 1

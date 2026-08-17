@@ -51,10 +51,12 @@ actions:
 3. Publish GitHub tag/release `1.0.0`, then wait for the release workflow and its
    reused quality workflow to pass.
 4. Download the workflow-built `-wordpressorg.zip` and verify its checksum.
-5. Complete the canonical WordPress.org submission checklist and both official
-   Plugin Check passes against that exact archive immediately before uploading it.
-6. Verify that the screenshot captions in `readme.txt` match the final numbered
-   assets prepared for the WordPress.org SVN repository.
+5. Repeat the canonical WordPress.org submission checklist and both official
+   Plugin Check passes against the workflow-built archive immediately before
+   uploading it. The local exact-slug 1.0.0 archive passed both checks without
+   errors or warnings on 2026-08-17.
+6. Review the banner, icon, and six numbered files in `wordpress-org-assets/`
+   against the screenshot captions before the first SVN publication.
 
 Publishing the GitHub release, enabling deployment variables, and submitting an
 archive are intentionally outside this repository sign-off; each changes an

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+	<title id="title">Laqi Unit Stock Manager icon</title>
+	<desc id="desc">One inventory container connected to three different package sizes.</desc>
+	<rect width="160" height="160" rx="24" fill="#1b2540"/>
+	<path d="M80 65v20M80 85 34 108M80 85l46 23" fill="none" stroke="#e2641e" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+	<path d="M53 20h54l7 16-7 34H53l-7-34z" fill="#ffffff"/>
+	<path d="M57 31h46" stroke="#8a93a8" stroke-width="5" stroke-linecap="round"/>
+	<text x="80" y="55" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="16" font-weight="700">10 kg</text>
+	<rect x="16" y="105" width="36" height="34" rx="7" fill="#ffffff"/>
+	<rect x="62" y="99" width="36" height="40" rx="7" fill="#ffffff"/>
+	<rect x="108" y="91" width="36" height="48" rx="7" fill="#e2641e"/>
+	<text x="34" y="126" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="9" font-weight="700">250 g</text>
+	<text x="80" y="124" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="10" font-weight="700">1 kg</text>
+	<text x="126" y="120" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10" font-weight="700">2 kg</text>
+</svg>
