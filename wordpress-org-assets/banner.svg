@@ -1,26 +1,42 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1544 500" role="img" aria-labelledby="title desc">
 	<title id="title">Laqi Unit Stock Manager for WooCommerce</title>
-	<desc id="desc">One physical inventory pool supplying products sold in several package sizes.</desc>
+	<desc id="desc">A 10 kilogram stock pool supplies exact quantities to three orders, leaving 7 kilograms.</desc>
 	<rect width="1544" height="500" fill="#1b2540"/>
 	<circle cx="1390" cy="64" r="250" fill="#25314f"/>
 	<circle cx="116" cy="470" r="235" fill="#222e4a"/>
 	<g transform="translate(110 92)">
 		<text x="0" y="58" fill="#e2641e" font-family="Arial, sans-serif" font-size="31" font-weight="700" letter-spacing="4">LAQI LOGISTICS</text>
 		<text x="0" y="147" fill="#ffffff" font-family="Arial, sans-serif" font-size="66" font-weight="700">Unit Stock Manager</text>
-		<text x="0" y="207" fill="#d9deea" font-family="Arial, sans-serif" font-size="32">One stock quantity shared across package sizes.</text>
-		<rect x="0" y="252" width="280" height="58" rx="29" fill="#e2641e"/>
-		<text x="140" y="291" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="25" font-weight="700">Exact unit conversion</text>
+		<text x="0" y="207" fill="#d9deea" font-family="Arial, sans-serif" font-size="32">One stock pool shared by every linked product.</text>
+		<rect x="0" y="252" width="410" height="58" rx="29" fill="#e2641e"/>
+		<text x="205" y="291" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="25" font-weight="700">Exact deductions on every order</text>
 	</g>
-	<g transform="translate(1050 95)">
-		<path d="M220 78v78M220 156 74 234M220 156l146 78" fill="none" stroke="#e2641e" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
-		<path d="M142 30h156l20 48-20 98H142l-20-98z" fill="#ffffff"/>
-		<path d="M151 57h138" stroke="#8a93a8" stroke-width="11" stroke-linecap="round"/>
-		<text x="220" y="130" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="31" font-weight="700">10 kg</text>
-		<rect x="18" y="220" width="112" height="98" rx="18" fill="#ffffff"/>
-		<rect x="164" y="206" width="112" height="112" rx="18" fill="#ffffff"/>
-		<rect x="310" y="188" width="112" height="130" rx="18" fill="#e2641e"/>
-		<text x="74" y="280" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="24" font-weight="700">250 g</text>
-		<text x="220" y="273" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="24" font-weight="700">1 kg</text>
-		<text x="366" y="260" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="24" font-weight="700">2 kg</text>
+	<g transform="translate(1045 40)">
+		<path d="M220 128v62M220 190H62v32M220 190v32M220 190h158v32" fill="none" stroke="#e2641e" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+		<path d="M128 44c0-16 41-29 92-29s92 13 92 29v84c0 16-41 29-92 29s-92-13-92-29z" fill="#ffffff"/>
+		<ellipse cx="220" cy="44" rx="92" ry="29" fill="#eef0f5"/>
+		<ellipse cx="220" cy="44" rx="70" ry="17" fill="#8a93a8"/>
+		<text x="220" y="99" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="31" font-weight="700">10 kg</text>
+		<text x="220" y="126" text-anchor="middle" fill="#8a93a8" font-family="Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="2">STOCK POOL</text>
+		<g transform="translate(0 222)">
+			<rect width="124" height="104" rx="16" fill="#ffffff"/>
+			<text x="62" y="27" text-anchor="middle" fill="#8a93a8" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="1.5">ORDER</text>
+			<path d="M25 42h74M25 56h48" fill="none" stroke="#8a93a8" stroke-width="7" stroke-linecap="round"/>
+			<text x="62" y="88" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="23" font-weight="700">−250 g</text>
+		</g>
+		<g transform="translate(158 222)">
+			<rect width="124" height="104" rx="16" fill="#ffffff"/>
+			<text x="62" y="27" text-anchor="middle" fill="#8a93a8" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="1.5">ORDER</text>
+			<path d="M25 42h74M25 56h48" fill="none" stroke="#8a93a8" stroke-width="7" stroke-linecap="round"/>
+			<text x="62" y="88" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="23" font-weight="700">−750 g</text>
+		</g>
+		<g transform="translate(316 222)">
+			<rect width="124" height="104" rx="16" fill="#ffffff"/>
+			<text x="62" y="27" text-anchor="middle" fill="#8a93a8" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="1.5">ORDER</text>
+			<path d="M25 42h74M25 56h48" fill="none" stroke="#8a93a8" stroke-width="7" stroke-linecap="round"/>
+			<text x="62" y="88" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="23" font-weight="700">−2 kg</text>
+		</g>
+		<rect x="145" y="344" width="150" height="48" rx="24" fill="#e2641e"/>
+		<text x="220" y="376" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="23" font-weight="700">7 kg left</text>
 	</g>
 </svg>
