@@ -7,9 +7,9 @@
 	<g transform="translate(110 92)">
 		<text x="0" y="58" fill="#e2641e" font-family="Arial, sans-serif" font-size="31" font-weight="700" letter-spacing="4">LAQI LOGISTICS</text>
 		<text x="0" y="147" fill="#ffffff" font-family="Arial, sans-serif" font-size="66" font-weight="700">Unit Stock Manager</text>
-		<text x="0" y="207" fill="#d9deea" font-family="Arial, sans-serif" font-size="32">One physical quantity. Every package size.</text>
-		<rect x="0" y="252" width="315" height="58" rx="29" fill="#e2641e"/>
-		<text x="158" y="291" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="25" font-weight="700">Exact shared inventory</text>
+		<text x="0" y="207" fill="#d9deea" font-family="Arial, sans-serif" font-size="32">One stock quantity shared across package sizes.</text>
+		<rect x="0" y="252" width="280" height="58" rx="29" fill="#e2641e"/>
+		<text x="140" y="291" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="25" font-weight="700">Exact unit conversion</text>
 	</g>
 	<g transform="translate(1050 95)">
 		<path d="M220 78v78M220 156 74 234M220 156l146 78" fill="none" stroke="#e2641e" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
