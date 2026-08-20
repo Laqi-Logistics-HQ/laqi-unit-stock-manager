@@ -26,9 +26,10 @@ final class AdminModule implements ModuleInterface {
 	public function register( Container $container ): void {
 		$sections   = $container->screen_section_catalog();
 		$pagination = new Admin\PaginationRenderer();
+		$tables     = new Admin\DatasetRenderer( $pagination );
 		$sections->register( new Admin\PoolStockSection( $container->pool_repository(), $container->pool_presenter(), $container->mapping_repository(), $container->availability_service(), $container->quantity_formatter(), $container->mapping_diagnostics(), $pagination, $container->unit_registry() ) );
 		$sections->register( new Admin\SetupSection( $container->pool_repository(), $container->unit_registry(), $container->custom_unit_repository(), $container->mapping_repository(), $container->quantity_formatter(), $pagination ) );
-		$sections->register( new Admin\ActivitySection( $container->movement_repository(), $container->movement_presenter(), $pagination ) );
+		$sections->register( new Admin\ActivitySection( $container->movement_repository(), $container->movement_presenter(), $tables, $container->movement_registry(), $container->pool_repository() ) );
 		( new Admin\UnitStockPage( $sections ) )->register();
 		( new Admin\ProductEditor( $container->pool_repository(), $container->mapping_repository(), $container->unit_registry(), $container->quantity_formatter(), new WooCommerce\ExistingStockMigrator( $container->stock_mutation_service() ) ) )->register();
 		( new Admin\ProductList( $container->mapping_repository() ) )->register();

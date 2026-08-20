@@ -27,7 +27,7 @@ if ( is_array( $laqi_lusm_editions ) ) {
 }
 
 global $wpdb;
-foreach ( array( 'batch_events', 'batch_allocations', 'batches', 'stock_holds', 'reservations', 'receipt_costs', 'pool_costs', 'incoming_deliveries', 'receipts', 'supplier_packs', 'suppliers', 'alert_deliveries', 'movements', 'mapping_components', 'mappings', 'units', 'pools' ) as $laqi_lusm_suffix ) {
+foreach ( array( 'batch_events', 'batch_allocations', 'batches', 'stock_holds', 'reservations', 'receipt_costs', 'pool_costs', 'incoming_deliveries', 'receipts', 'supplier_packs', 'suppliers', 'alert_deliveries', 'movements', 'mapping_components', 'mappings', 'units', 'pool_policies', 'pools' ) as $laqi_lusm_suffix ) {
 	$laqi_lusm_table = $wpdb->prefix . 'laqi_lusm_' . $laqi_lusm_suffix;
 	$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $laqi_lusm_table ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 }

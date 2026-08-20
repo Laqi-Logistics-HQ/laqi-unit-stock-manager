@@ -135,6 +135,13 @@ This plugin ships human-readable PHP, JavaScript, and CSS without minified or ge
 
 == Changelog ==
 
+= 1.1.0 =
+* Added filters to the Activity ledger: inventory pool, movement, source, actor, date range, and recorded reason. Page links keep the filters, and the empty state names the ones hiding your rows.
+* Added shared dataset components so Free and registered add-on tabs paginate and filter growing tables the same way.
+* Added extension API 1.1: pool policies can be counted and paged by namespace, and movement reads accept categorical filters.
+* Changed movement reads to run through one filtered query rather than three near-identical pairs.
+* Changed how pools owning an extension policy are found, from decoding every stored policy in PHP to a keyed index. Existing policies are indexed automatically on upgrade.
+
 = 1.0.1 =
 * Improved the plugin description shown on the Plugins screen.
 

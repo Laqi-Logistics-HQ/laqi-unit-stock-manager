@@ -117,6 +117,53 @@
 	line-height: 1.4;
 }
 
+.laqi-lusm-dataset-filters {
+	margin: 1rem 0;
+}
+
+.laqi-lusm-dataset-filters fieldset {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem 1rem;
+	align-items: flex-end;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.laqi-lusm-dataset-filter {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	min-width: 0;
+}
+
+.laqi-lusm-dataset-filter label {
+	font-weight: 600;
+}
+
+.laqi-lusm-dataset-filter input,
+.laqi-lusm-dataset-filter select {
+	min-width: 11rem;
+	max-width: 16rem;
+}
+
+.laqi-lusm-dataset-filter-actions {
+	display: flex;
+	gap: 0.75rem;
+	align-items: center;
+}
+
+.laqi-lusm-dataset-empty {
+	margin: 1rem 0;
+}
+
+.laqi-lusm-dataset-active-filters {
+	margin: 0 0 0.75rem;
+	padding-left: 1.25rem;
+	list-style: disc;
+}
+
 .laqi-lusm-pagination {
 	display: flex;
 	flex-wrap: wrap;

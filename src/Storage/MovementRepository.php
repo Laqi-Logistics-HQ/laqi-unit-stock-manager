@@ -31,31 +31,175 @@ final class MovementRepository {
 		$this->db = $db;
 	}
 
+
+
+	/** Columns every ledger read selects. */
+	const COLUMNS = 'm.id, m.pool_id, m.type, m.delta_base, m.balance_base, m.source_type, m.source_id, m.actor_id, m.reason, m.created_at, p.name AS pool_name, p.family, p.display_unit, u.display_name AS actor_name';
+
+	/**
+	 * Count the movements matching the given filters.
+	 *
+	 * @param array<string, mixed> $filters Filters.
+	 * @return int
+	 */
+	public function count( array $filters = array() ): int {
+		return $this->query( $filters )->count( $this->ledger_from() );
+	}
+
+	/**
+	 * Read one ordered page of movements matching the given filters.
+	 *
+	 * @param array<string, mixed> $filters Filters.
+	 * @param int                  $limit   Maximum rows.
+	 * @param int                  $offset  Row offset.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function page( array $filters, int $limit = 25, int $offset = 0 ): array {
+		return $this->query( $filters )->page( self::COLUMNS, $this->ledger_from(), 'm.id DESC', $limit, $offset );
+	}
+
 	/**
 	 * Get the latest correctness movements.
 	 *
-	 * @param int $limit Maximum rows.
+	 * @param int $limit  Maximum rows.
 	 * @param int $offset Number of recent rows to skip.
 	 * @return array<int, array<string, mixed>>
 	 */
 	public function recent( int $limit = 50, int $offset = 0 ): array {
-		$limit  = max( 1, min( 500, $limit ) );
-		$offset = max( 0, $offset );
-		$rows   = $this->db->get_results(
-			$this->db->prepare(
-				'SELECT m.id, m.pool_id, m.type, m.delta_base, m.balance_base, m.source_type, m.source_id, m.actor_id, m.reason, m.created_at, p.name AS pool_name, p.family, p.display_unit FROM ' . Schema::table( 'movements' ) . ' m LEFT JOIN ' . Schema::table( 'pools' ) . ' p ON p.id = m.pool_id ORDER BY m.id DESC LIMIT %d OFFSET %d',
-				$limit,
-				$offset
-			),
-			ARRAY_A
-		);
+		return $this->page( array(), $limit, $offset );
+	}
 
+	/**
+	 * Get the latest movements for a set of pools.
+	 *
+	 * @param int[] $pool_ids Pool IDs.
+	 * @param int   $limit    Maximum rows.
+	 * @param int   $offset   Number of recent rows to skip.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function recent_for_pools( array $pool_ids, int $limit = 50, int $offset = 0 ): array {
+		return array() === $this->pool_ids( $pool_ids ) ? array() : $this->page( array( 'pool_ids' => $pool_ids ), $limit, $offset );
+	}
+
+	/**
+	 * Count the movements recorded against a set of pools.
+	 *
+	 * @param int[] $pool_ids Pool IDs.
+	 * @return int
+	 */
+	public function count_for_pools( array $pool_ids ): int {
+		return array() === $this->pool_ids( $pool_ids ) ? 0 : $this->count( array( 'pool_ids' => $pool_ids ) );
+	}
+
+	/**
+	 * Search movements across pool, type, source, reason, and actor.
+	 *
+	 * @param string $term   Search term.
+	 * @param int    $limit  Maximum rows.
+	 * @param int    $offset Row offset.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function search( string $term, int $limit = 50, int $offset = 0 ): array {
+		return $this->page( array( 'search' => $term ), $limit, $offset );
+	}
+
+	/**
+	 * Count the movements matching a search term.
+	 *
+	 * @param string $term Search term.
+	 * @return int
+	 */
+	public function count_search( string $term ): int {
+		return $this->count( array( 'search' => $term ) );
+	}
+
+	/**
+	 * Movement types that appear in the ledger, for building filter choices.
+	 *
+	 * @return string[]
+	 */
+	public function used_types(): array {
+		$rows = $this->db->get_col( 'SELECT DISTINCT type FROM ' . Schema::table( 'movements' ) . " WHERE type != '' ORDER BY type ASC" );
 		return is_array( $rows ) ? $rows : array();
 	}
 
-	/** Get the total number of immutable movements. @return int */
-	public function count(): int {
-		return (int) $this->db->get_var( 'SELECT COUNT(*) FROM ' . Schema::table( 'movements' ) );
+	/**
+	 * Movement sources that appear in the ledger, for building filter choices.
+	 *
+	 * @return string[]
+	 */
+	public function used_sources(): array {
+		$rows = $this->db->get_col( 'SELECT DISTINCT source_type FROM ' . Schema::table( 'movements' ) . " WHERE source_type != '' ORDER BY source_type ASC" );
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
+	 * Actors who recorded at least one movement, for building filter choices.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function used_actors(): array {
+		$rows = $this->db->get_results( 'SELECT DISTINCT m.actor_id AS id, u.display_name AS name FROM ' . Schema::table( 'movements' ) . ' m LEFT JOIN ' . $this->db->users . ' u ON u.ID = m.actor_id WHERE m.actor_id > 0 ORDER BY u.display_name ASC', ARRAY_A );
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
+	 * Convert a site-local calendar boundary to the stored UTC timestamp.
+	 *
+	 * Movements are recorded in UTC, so a date chosen in the site's timezone
+	 * has to be translated or the last day of a range would be cut short.
+	 *
+	 * @param string $date Calendar date, or an empty string.
+	 * @param string $time Boundary time of day.
+	 * @return string
+	 */
+	private static function utc_boundary( string $date, string $time ): string {
+		return '' === $date ? '' : get_gmt_from_date( $date . ' ' . $time );
+	}
+
+	/**
+	 * Shared ledger FROM clause.
+	 *
+	 * @return string
+	 */
+	private function ledger_from(): string {
+		return Schema::table( 'movements' ) . ' m LEFT JOIN ' . Schema::table( 'pools' ) . ' p ON p.id = m.pool_id LEFT JOIN ' . $this->db->users . ' u ON u.ID = m.actor_id';
+	}
+
+	/**
+	 * Normalize a requested pool ID list.
+	 *
+	 * @param mixed $pool_ids Requested IDs.
+	 * @return int[]
+	 */
+	private function pool_ids( $pool_ids ): array {
+		return is_array( $pool_ids ) ? array_values( array_unique( array_filter( array_map( 'absint', $pool_ids ) ) ) ) : array();
+	}
+
+	/**
+	 * Ledger conditions.
+	 *
+	 * An actor filter of "0" means system-recorded movements, which is a real
+	 * choice rather than an absent one, so it is applied separately from the
+	 * integer filters that treat zero as unset.
+	 *
+	 * @param array<string, mixed> $filters Filters.
+	 * @return FilteredQuery
+	 */
+	private function query( array $filters ): FilteredQuery {
+		$pool_ids = $this->pool_ids( $filters['pool_ids'] ?? null );
+		$query    = ( new FilteredQuery( $this->db ) )
+			->in_ints( 'm.pool_id', array() === $pool_ids ? null : $pool_ids )
+			->positive_int( 'm.pool_id', $filters['pool_id'] ?? 0 )
+			->text( 'm.type', $filters['type'] ?? '' )
+			->text( 'm.source_type', $filters['source_type'] ?? '' )
+			->from( 'm.created_at', self::utc_boundary( (string) ( $filters['from'] ?? '' ), '00:00:00' ) )
+			->to( 'm.created_at', self::utc_boundary( (string) ( $filters['to'] ?? '' ), '23:59:59' ) )
+			->search( array( 'm.reason' ), $filters['reason'] ?? '' )
+			->search( array( 'p.name', 'm.type', 'm.source_type', 'm.reason', 'u.display_name', 'u.user_login' ), $filters['search'] ?? '' );
+		$actor    = (string) ( $filters['actor'] ?? '' );
+
+		return '' === $actor ? $query : $query->raw( 'm.actor_id = %d', array( (int) $actor ) );
 	}
 
 	/**
@@ -87,91 +231,9 @@ final class MovementRepository {
 		return is_array( $rows ) ? $rows : array();
 	}
 
-	/**
-	 * Get recent movements for one or more mapped pools.
-	 *
-	 * @param int[] $pool_ids Pool IDs.
-	 * @param int   $limit Maximum rows.
-	 * @param int   $offset Matching rows to skip.
-	 * @return array<int, array<string, mixed>>
-	 */
-	public function recent_for_pools( array $pool_ids, int $limit = 50, int $offset = 0 ): array {
-		$pool_ids = array_values( array_unique( array_filter( array_map( 'absint', $pool_ids ) ) ) );
-		if ( array() === $pool_ids ) {
-			return array();
-		}
-		$limit        = max( 1, min( 500, $limit ) );
-		$offset       = max( 0, $offset );
-		$placeholders = implode( ', ', array_fill( 0, count( $pool_ids ), '%d' ) );
-		$sql          = 'SELECT m.id, m.pool_id, m.type, m.delta_base, m.balance_base, m.source_type, m.source_id, m.actor_id, m.reason, m.created_at, p.name AS pool_name, p.family, p.display_unit FROM ' . Schema::table( 'movements' ) . ' m LEFT JOIN ' . Schema::table( 'pools' ) . ' p ON p.id = m.pool_id WHERE m.pool_id IN (' . $placeholders . ') ORDER BY m.id DESC LIMIT %d OFFSET %d';
-		$args         = array_merge( $pool_ids, array( $limit, $offset ) );
-		$rows         = $this->db->get_results( $this->db->prepare( $sql, ...$args ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Dynamic placeholders are generated from validated integer IDs.
-		return is_array( $rows ) ? $rows : array();
-	}
 
-	/** Count movements for one or more mapped pools.
-	 *
-	 * @param int[] $pool_ids Pool IDs.
-	 * @return int
-	 */
-	public function count_for_pools( array $pool_ids ): int {
-		$pool_ids = array_values( array_unique( array_filter( array_map( 'absint', $pool_ids ) ) ) );
-		if ( array() === $pool_ids ) {
-			return 0;
-		}
-		$placeholders = implode( ', ', array_fill( 0, count( $pool_ids ), '%d' ) );
-		$sql          = 'SELECT COUNT(*) FROM ' . Schema::table( 'movements' ) . ' WHERE pool_id IN (' . $placeholders . ')';
-		return (int) $this->db->get_var( $this->db->prepare( $sql, ...$pool_ids ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Dynamic placeholders are generated from validated integer IDs.
-	}
 
-	/**
-	 * Search immutable movements for registered operational modules.
-	 *
-	 * @param string $term   Pool, type, source, or reason search.
-	 * @param int    $limit  Maximum rows.
-	 * @param int    $offset Matching rows to skip.
-	 * @return array<int, array<string, mixed>>
-	 */
-	public function search( string $term, int $limit = 50, int $offset = 0 ): array {
-		$limit  = max( 1, min( 500, $limit ) );
-		$offset = max( 0, $offset );
-		$like   = '%' . $this->db->esc_like( $term ) . '%';
-		$rows   = $this->db->get_results(
-			$this->db->prepare(
-				'SELECT m.id, m.pool_id, m.type, m.delta_base, m.balance_base, m.source_type, m.source_id, m.actor_id, m.reason, m.created_at, p.name AS pool_name, p.family, p.display_unit, u.display_name AS actor_name FROM ' . Schema::table( 'movements' ) . ' m LEFT JOIN ' . Schema::table( 'pools' ) . ' p ON p.id = m.pool_id LEFT JOIN ' . $this->db->users . ' u ON u.ID = m.actor_id WHERE p.name LIKE %s OR m.type LIKE %s OR m.source_type LIKE %s OR m.reason LIKE %s OR u.display_name LIKE %s OR u.user_login LIKE %s ORDER BY m.id DESC LIMIT %d OFFSET %d',
-				$like,
-				$like,
-				$like,
-				$like,
-				$like,
-				$like,
-				$limit,
-				$offset
-			),
-			ARRAY_A
-		);
-		return is_array( $rows ) ? $rows : array();
-	}
 
-	/** Count movements matching an operational search.
-	 *
-	 * @param string $term Search.
-	 * @return int
-	 */
-	public function count_search( string $term ): int {
-		$like = '%' . $this->db->esc_like( $term ) . '%';
-		return (int) $this->db->get_var(
-			$this->db->prepare(
-				'SELECT COUNT(*) FROM ' . Schema::table( 'movements' ) . ' m LEFT JOIN ' . Schema::table( 'pools' ) . ' p ON p.id = m.pool_id LEFT JOIN ' . $this->db->users . ' u ON u.ID = m.actor_id WHERE p.name LIKE %s OR m.type LIKE %s OR m.source_type LIKE %s OR m.reason LIKE %s OR u.display_name LIKE %s OR u.user_login LIKE %s',
-				$like,
-				$like,
-				$like,
-				$like,
-				$like,
-				$like
-			)
-		);
-	}
 
 	/** Summarize sales consumption for forecasting modules.
 	 *

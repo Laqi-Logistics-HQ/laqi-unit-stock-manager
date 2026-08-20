@@ -59,4 +59,60 @@ class Test_Pool_Policy_Store extends WP_UnitTestCase {
 		$this->expectException( InvalidArgumentException::class );
 		$this->container->pool_policy_store()->configured_ids( 'Forecast Settings' );
 	}
+
+	/** Configured pools are found through a keyed index, not a JSON scan. */
+	public function test_lists_configured_pools_from_the_index(): void {
+		global $wpdb;
+		$store = $this->container->pool_policy_store();
+		$store->put( $this->pool_id, 'reorder', array( 'safety_stock_base' => 5 ) );
+
+		$this->assertContains( $this->pool_id, $store->configured_ids( 'reorder' ) );
+		$this->assertNotContains( $this->pool_id, $store->configured_ids( 'alerts' ) );
+		$this->assertSame(
+			'1',
+			$wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . Schema::table( 'pool_policies' ) . ' WHERE pool_id = %d AND policy_key = %s', $this->pool_id, 'reorder' ) ),
+			'Saving a policy indexes it exactly once.'
+		);
+
+		$store->put( $this->pool_id, 'reorder', array( 'safety_stock_base' => 9 ) );
+		$this->assertSame(
+			'1',
+			$wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . Schema::table( 'pool_policies' ) . ' WHERE pool_id = %d AND policy_key = %s', $this->pool_id, 'reorder' ) ),
+			'Replacing a policy does not duplicate its index row.'
+		);
+	}
+
+	/** Configured pools can be counted and paged without loading every policy. */
+	public function test_counts_and_pages_configured_pools(): void {
+		$store   = $this->container->pool_policy_store();
+		$pools   = $this->container->pool_repository();
+		$key     = 'reorder';
+		$extra   = $pools->create( 'Policy API pool ' . wp_generate_uuid4(), new Quantity( 'count', 10 ), 'unit', 'unit' )->id();
+		$store->put( $this->pool_id, $key, array( 'safety_stock_base' => 5 ) );
+		$store->put( $extra, $key, array( 'safety_stock_base' => 7 ) );
+
+		$this->assertGreaterThanOrEqual( 2, $store->count_configured( $key ) );
+		$this->assertSame( $store->count_configured( $key ), count( $store->configured_ids( $key ) ) );
+
+		$first = $store->configured_ids_page( $key, 1, 0 );
+		$this->assertCount( 1, $first, 'One ID per page, taken in SQL.' );
+		$this->assertNotSame( $first, $store->configured_ids_page( $key, 1, 1 ) );
+
+		global $wpdb;
+		$wpdb->delete( Schema::table( 'pool_policies' ), array( 'pool_id' => $extra ), array( '%d' ) );
+		$wpdb->delete( Schema::table( 'pools' ), array( 'id' => $extra ), array( '%d' ) );
+	}
+
+	/** Policies stored before the index existed are backfilled on upgrade. */
+	public function test_backfills_policies_stored_before_the_index(): void {
+		global $wpdb;
+		$store = $this->container->pool_policy_store();
+		$store->put( $this->pool_id, 'forecast', array( 'window_days' => 30 ) );
+		$wpdb->delete( Schema::table( 'pool_policies' ), array( 'pool_id' => $this->pool_id ), array( '%d' ) );
+		$this->assertNotContains( $this->pool_id, $store->configured_ids( 'forecast' ) );
+
+		Schema::install();
+
+		$this->assertContains( $this->pool_id, $store->configured_ids( 'forecast' ), 'Installing the schema rebuilds the index from the stored envelopes.' );
+	}
 }

@@ -22,7 +22,7 @@ class Test_Plugin extends WP_UnitTestCase {
 	 */
 	public function test_version_constant_defined(): void {
 		$this->assertTrue( defined( 'LAQI_LUSM_VERSION' ) );
-		$this->assertSame( '1.0', LAQI_LUSM_API_VERSION );
+		$this->assertSame( '1.1', LAQI_LUSM_API_VERSION );
 	}
 
 	/**
@@ -65,9 +65,10 @@ class Test_Plugin extends WP_UnitTestCase {
 	public function test_extension_api_compatibility_range(): void {
 		$compatibility = \LaqiUnitStockManager\Extension\ApiCompatibility::class;
 
-		$this->assertTrue( $compatibility::supports( '1.0', '2.0' ) );
-		$this->assertFalse( $compatibility::supports( '1.1', '2.0' ) );
-		$this->assertFalse( $compatibility::supports( '0.1', '1.0' ) );
+		$this->assertTrue( $compatibility::supports( '1.0', '2.0' ), 'An add-on written for 1.0 still runs against 1.1.' );
+		$this->assertTrue( $compatibility::supports( '1.1', '2.0' ), 'Shared dataset filtering is available from 1.1.' );
+		$this->assertFalse( $compatibility::supports( '1.2', '2.0' ), 'An add-on needing a later API than this one is refused.' );
+		$this->assertFalse( $compatibility::supports( '0.1', '1.0' ), 'An add-on capped below this API is refused.' );
 	}
 
 	/**
