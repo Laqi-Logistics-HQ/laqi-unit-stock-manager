@@ -141,6 +141,7 @@ This plugin ships human-readable PHP, JavaScript, and CSS without minified or ge
 * Added extension API 1.1: pool policies can be counted and paged by namespace, and movement reads accept categorical filters.
 * Changed movement reads to run through one filtered query rather than three near-identical pairs.
 * Fixed filtering the Activity ledger losing the product it was scoped to and silently widening to every pool.
+* Added an extension API check for whether one pool owns a policy namespace.
 * Changed how pools owning an extension policy are found, from decoding every stored policy in PHP to a keyed index. Existing policies are indexed automatically on upgrade.
 
 = 1.0.3 =

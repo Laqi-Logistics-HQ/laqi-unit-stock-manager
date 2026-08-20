@@ -62,6 +62,27 @@ final class PoolPolicyStore {
 	}
 
 	/**
+	 * Whether one pool owns an extension policy namespace.
+	 *
+	 * Answered from the index, so an unknown pool is simply not configured
+	 * rather than an error. `get()` deliberately rejects an unknown pool, which
+	 * makes it the wrong way to ask this question.
+	 *
+	 * @param string $key     Stable namespace key.
+	 * @param int    $pool_id Pool ID.
+	 * @return bool
+	 * @throws InvalidArgumentException When the namespace is invalid.
+	 */
+	public function has_configured( string $key, int $pool_id ): bool {
+		$this->assert_key( $key );
+		if ( $pool_id < 1 ) {
+			return false;
+		}
+
+		return (bool) $this->db->get_var( $this->db->prepare( 'SELECT 1 FROM ' . Schema::table( 'pool_policies' ) . ' WHERE policy_key = %s AND pool_id = %d', $key, $pool_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Keyed index read.
+	}
+
+	/**
 	 * Count the pools that have an extension-owned policy namespace.
 	 *
 	 * @param string $key Stable namespace key.

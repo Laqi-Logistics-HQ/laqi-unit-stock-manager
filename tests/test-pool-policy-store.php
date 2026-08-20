@@ -115,4 +115,15 @@ class Test_Pool_Policy_Store extends WP_UnitTestCase {
 
 		$this->assertContains( $this->pool_id, $store->configured_ids( 'forecast' ), 'Installing the schema rebuilds the index from the stored envelopes.' );
 	}
+
+	/** Membership is answered from the index, so an unknown pool is not an error. */
+	public function test_reports_whether_one_pool_owns_a_policy(): void {
+		$store = $this->container->pool_policy_store();
+		$store->put( $this->pool_id, 'reorder', array( 'safety_stock_base' => 5 ) );
+
+		$this->assertTrue( $store->has_configured( 'reorder', $this->pool_id ) );
+		$this->assertFalse( $store->has_configured( 'alerts', $this->pool_id ) );
+		$this->assertFalse( $store->has_configured( 'reorder', 999999 ), 'An unknown pool is simply not configured.' );
+		$this->assertFalse( $store->has_configured( 'reorder', 0 ) );
+	}
 }
