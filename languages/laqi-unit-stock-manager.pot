@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-17T23:41:08+00:00\n"
+"POT-Creation-Date: 2026-08-20T09:57:53+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -46,30 +46,39 @@ msgstr ""
 msgid "Two editions of Laqi Unit Stock Manager are active. Only one is running. Deactivate the edition you are not using, then reload this page. Both editions share the same inventory pools and settings, so removing the one you no longer need keeps them."
 msgstr ""
 
-#: src/Admin/ActivitySection.php:63
+#: src/Admin/ActivitySection.php:83
 msgid "Activity"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:77
+#: src/Admin/ActivitySection.php:109
 msgid "The latest pooled-stock changes are shown below. These records are append-only."
 msgstr ""
 
-#: src/Admin/ActivitySection.php:79
+#: src/Admin/ActivitySection.php:111
 msgid "Filtered to the pools used by the selected product."
 msgstr ""
 
-#: src/Admin/ActivitySection.php:79
+#: src/Admin/ActivitySection.php:111
 msgid "Show all activity"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:84
-#: src/Admin/ActivitySection.php:98
+#: src/Admin/ActivitySection.php:113
+msgid "Filter stock movements"
+msgstr ""
+
+#: src/Admin/ActivitySection.php:115
+msgid "No stock movements recorded yet."
+msgstr ""
+
+#: src/Admin/ActivitySection.php:120
+#: src/Admin/ActivitySection.php:131
 #: src/Privacy.php:108
 msgid "Date"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:85
-#: src/Admin/ActivitySection.php:99
+#: src/Admin/ActivitySection.php:121
+#: src/Admin/ActivitySection.php:132
+#: src/Admin/ActivitySection.php:182
 #: src/Admin/PoolStockSection.php:129
 #: src/Admin/PoolStockSection.php:140
 #: src/Admin/ProductEditor.php:222
@@ -77,49 +86,118 @@ msgstr ""
 msgid "Inventory pool"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:86
-#: src/Admin/ActivitySection.php:100
+#: src/Admin/ActivitySection.php:122
+#: src/Admin/ActivitySection.php:133
+#: src/Admin/ActivitySection.php:187
 msgid "Movement"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:87
-#: src/Admin/ActivitySection.php:101
+#: src/Admin/ActivitySection.php:123
+#: src/Admin/ActivitySection.php:134
 msgid "Change"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:88
-#: src/Admin/ActivitySection.php:102
+#: src/Admin/ActivitySection.php:124
+#: src/Admin/ActivitySection.php:135
 msgid "Balance"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:89
-#: src/Admin/ActivitySection.php:103
+#: src/Admin/ActivitySection.php:125
+#: src/Admin/ActivitySection.php:136
+#: src/Admin/ActivitySection.php:193
 msgid "Source"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:90
-#: src/Admin/ActivitySection.php:104
+#: src/Admin/ActivitySection.php:126
+#: src/Admin/ActivitySection.php:137
+#: src/Admin/ActivitySection.php:215
 #: src/Admin/PoolStockSection.php:285
 #: src/Privacy.php:128
 msgid "Reason"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:94
-msgid "No stock movements recorded yet."
-msgstr ""
-
 #. translators: 1: first visible movement number, 2: last visible movement number, 3: total movements.
-#: src/Admin/ActivitySection.php:113
+#: src/Admin/ActivitySection.php:145
 #, php-format
 msgid "Showing %1$d-%2$d of %3$d stock movements."
 msgstr ""
 
-#: src/Admin/ActivitySection.php:116
+#: src/Admin/ActivitySection.php:146
 msgid "Stock movement pages"
 msgstr ""
 
-#: src/Admin/ActivitySection.php:163
+#: src/Admin/ActivitySection.php:162
+msgid "All movements"
+msgstr ""
+
+#: src/Admin/ActivitySection.php:166
+msgid "All sources"
+msgstr ""
+
+#: src/Admin/ActivitySection.php:171
+msgid "Anyone"
+msgstr ""
+
+#: src/Admin/ActivitySection.php:172
+#: src/Admin/ActivitySection.php:268
 msgid "System"
+msgstr ""
+
+#. translators: %d: user ID.
+#: src/Admin/ActivitySection.php:175
+#, php-format
+msgid "User #%d"
+msgstr ""
+
+#: src/Admin/ActivitySection.php:199
+msgid "Actor"
+msgstr ""
+
+#: src/Admin/ActivitySection.php:205
+msgid "From"
+msgstr ""
+
+#: src/Admin/ActivitySection.php:210
+msgid "To"
+msgstr ""
+
+#: src/Admin/ActivitySection.php:216
+msgid "Text recorded with the change"
+msgstr ""
+
+#. translators: %d: inventory pool ID.
+#: src/Admin/ActivitySection.php:233
+#, php-format
+msgid "Pool #%d"
+msgstr ""
+
+#. translators: 1: filter name, 2: filter value.
+#: src/Admin/DatasetFilters.php:148
+#, php-format
+msgid "%1$s: %2$s"
+msgstr ""
+
+#: src/Admin/DatasetRenderer.php:64
+msgid "Filter"
+msgstr ""
+
+#: src/Admin/DatasetRenderer.php:66
+#: src/Admin/DatasetRenderer.php:94
+msgid "Clear filters"
+msgstr ""
+
+#: src/Admin/DatasetRenderer.php:88
+msgid "Nothing matches the filters you have applied."
+msgstr ""
+
+#: src/Admin/DatasetRenderer.php:133
+#: src/Admin/PoolStockSection.php:123
+#: src/Admin/SetupSection.php:358
+msgid "Search inventory pools"
+msgstr ""
+
+#: src/Admin/DatasetRenderer.php:134
+msgid "All inventory pools"
 msgstr ""
 
 #: src/Admin/OrderStockMetaBox.php:63
@@ -196,11 +274,6 @@ msgstr ""
 
 #: src/Admin/PoolStockSection.php:107
 msgid "Stock"
-msgstr ""
-
-#: src/Admin/PoolStockSection.php:123
-#: src/Admin/SetupSection.php:358
-msgid "Search inventory pools"
 msgstr ""
 
 #: src/Admin/PoolStockSection.php:124

@@ -50,39 +50,46 @@ final class PoolPolicyStore {
 	/**
 	 * List pool IDs that have an extension-owned policy namespace.
 	 *
-	 * The shared JSON envelope and table scan remain internal to Free. Add-ons can
-	 * combine these IDs with the public pool repository when they need scheduled
-	 * evaluation or an administration index.
-	 *
 	 * @param string $key Stable namespace key.
 	 * @return int[]
 	 * @throws InvalidArgumentException When the namespace is invalid.
 	 */
 	public function configured_ids( string $key ): array {
 		$this->assert_key( $key );
-		$ids    = array();
-		$offset = 0;
-		do {
-			$rows = $this->db->get_results(
-				$this->db->prepare(
-					'SELECT id, policy_json FROM ' . Schema::table( 'pools' ) . " WHERE policy_json IS NOT NULL AND policy_json != '' ORDER BY id ASC LIMIT %d OFFSET %d",
-					500,
-					$offset
-				),
-				ARRAY_A
-			);
-			$rows = is_array( $rows ) ? $rows : array();
-			foreach ( $rows as $row ) {
-				$envelope = json_decode( (string) $row['policy_json'], true );
-				if ( is_array( $envelope ) && isset( $envelope[ $key ] ) && is_array( $envelope[ $key ] ) ) {
-					$ids[] = (int) $row['id'];
-				}
-			}
-			$batch_size = count( $rows );
-			$offset    += $batch_size;
-		} while ( 500 === $batch_size );
-		return $ids;
+		$ids = $this->db->get_col( $this->db->prepare( 'SELECT pool_id FROM ' . Schema::table( 'pool_policies' ) . ' WHERE policy_key = %s ORDER BY pool_id ASC', $key ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Keyed index read.
+
+		return is_array( $ids ) ? array_map( 'intval', $ids ) : array();
 	}
+
+	/**
+	 * Count the pools that have an extension-owned policy namespace.
+	 *
+	 * @param string $key Stable namespace key.
+	 * @return int
+	 * @throws InvalidArgumentException When the namespace is invalid.
+	 */
+	public function count_configured( string $key ): int {
+		$this->assert_key( $key );
+
+		return (int) $this->db->get_var( $this->db->prepare( 'SELECT COUNT(*) FROM ' . Schema::table( 'pool_policies' ) . ' WHERE policy_key = %s', $key ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Keyed index read.
+	}
+
+	/**
+	 * Read one page of pool IDs that have an extension-owned policy namespace.
+	 *
+	 * @param string $key    Stable namespace key.
+	 * @param int    $limit  Maximum rows.
+	 * @param int    $offset Row offset.
+	 * @return int[]
+	 * @throws InvalidArgumentException When the namespace is invalid.
+	 */
+	public function configured_ids_page( string $key, int $limit, int $offset = 0 ): array {
+		$this->assert_key( $key );
+		$ids = $this->db->get_col( $this->db->prepare( 'SELECT pool_id FROM ' . Schema::table( 'pool_policies' ) . ' WHERE policy_key = %s ORDER BY pool_id ASC LIMIT %d OFFSET %d', $key, max( 1, min( 500, $limit ) ), max( 0, $offset ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Keyed index read.
+
+		return is_array( $ids ) ? array_map( 'intval', $ids ) : array();
+	}
+
 
 	/**
 	 * Replace one extension-owned policy namespace atomically.
@@ -121,6 +128,7 @@ final class PoolPolicyStore {
 			if ( false === $updated ) {
 				throw new RuntimeException( 'Could not save the pool policy.' );
 			}
+			$this->db->query( $this->db->prepare( 'INSERT IGNORE INTO ' . Schema::table( 'pool_policies' ) . ' (pool_id, policy_key) VALUES (%d, %s)', $pool_id, $key ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Index maintained inside the policy transaction.
 			$this->db->query( 'COMMIT' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		} catch ( Throwable $error ) {
 			$this->db->query( 'ROLLBACK' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery

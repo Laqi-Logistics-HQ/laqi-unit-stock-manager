@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Schema {
 
-	const VERSION        = 1;
+	const VERSION        = 2;
 	const VERSION_OPTION = 'laqi_lusm_schema_version';
 
 	/**
@@ -130,7 +130,55 @@ final class Schema {
 			) {$charset};"
 		);
 
+		$policies = self::table( 'pool_policies' );
+		dbDelta(
+			"CREATE TABLE {$policies} (
+				pool_id bigint(20) unsigned NOT NULL,
+				policy_key varchar(50) NOT NULL,
+				PRIMARY KEY  (pool_id,policy_key),
+				KEY policy_key (policy_key)
+			) {$charset};"
+		);
+
+		self::backfill_pool_policies();
+
 		update_option( self::VERSION_OPTION, self::VERSION, false );
+	}
+
+	/**
+	 * Populate the policy index from any pool policies stored before it existed.
+	 *
+	 * Pool policies live in one JSON envelope per pool, so listing the pools
+	 * that carry a given extension key used to mean scanning and decoding every
+	 * policy in PHP. The index makes that a keyed lookup; this fills it in for
+	 * sites upgrading from a schema that predates it.
+	 *
+	 * @return void
+	 */
+	private static function backfill_pool_policies(): void {
+		global $wpdb;
+
+		$pools  = self::table( 'pools' );
+		$index  = self::table( 'pool_policies' );
+		$offset = 0;
+		do {
+			$rows = $wpdb->get_results( $wpdb->prepare( "SELECT id, policy_json FROM {$pools} WHERE policy_json IS NOT NULL AND policy_json != '' ORDER BY id ASC LIMIT %d OFFSET %d", 500, $offset ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema installation reads its own tables.
+			$rows = is_array( $rows ) ? $rows : array();
+			foreach ( $rows as $row ) {
+				$envelope = json_decode( (string) $row['policy_json'], true );
+				if ( ! is_array( $envelope ) ) {
+					continue;
+				}
+				foreach ( $envelope as $key => $policy ) {
+					if ( ! is_array( $policy ) ) {
+						continue;
+					}
+					$wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO {$index} (pool_id, policy_key) VALUES (%d, %s)", (int) $row['id'], substr( (string) $key, 0, 50 ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema installation writes its own tables.
+				}
+			}
+			$batch   = count( $rows );
+			$offset += $batch;
+		} while ( 500 === $batch );
 	}
 
 	/**
