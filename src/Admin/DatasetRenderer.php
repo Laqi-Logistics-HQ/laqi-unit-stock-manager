@@ -42,19 +42,19 @@ final class DatasetRenderer {
 	 * @return void
 	 */
 	public function filters( DatasetView $view, string $legend ): void {
+		$fields = $view->filters()->fields();
 		$hidden = $view->link_args();
-		unset( $hidden['post_type'] );
+		foreach ( $fields as $field ) {
+			unset( $hidden[ $field['arg'] ] );
+		}
 		?>
 		<form class="laqi-lusm-dataset-filters" method="get" action="<?php echo esc_url( $view->form_action() ); ?>">
-			<input type="hidden" name="post_type" value="product" />
-			<?php foreach ( array( 'page', 'section' ) as $carried ) : ?>
-				<?php if ( isset( $hidden[ $carried ] ) ) : ?>
-					<input type="hidden" name="<?php echo esc_attr( $carried ); ?>" value="<?php echo esc_attr( (string) $hidden[ $carried ] ); ?>" />
-				<?php endif; ?>
+			<?php foreach ( $hidden as $name => $value ) : ?>
+				<input type="hidden" name="<?php echo esc_attr( (string) $name ); ?>" value="<?php echo esc_attr( (string) $value ); ?>" />
 			<?php endforeach; ?>
 			<fieldset>
 				<legend class="screen-reader-text"><?php echo esc_html( $legend ); ?></legend>
-				<?php foreach ( $view->filters()->fields() as $field ) : ?>
+				<?php foreach ( $fields as $field ) : ?>
 					<div class="laqi-lusm-dataset-filter">
 						<label for="<?php echo esc_attr( $field['id'] ); ?>"><?php echo esc_html( $field['label'] ); ?></label>
 						<?php $this->control( $field ); ?>
