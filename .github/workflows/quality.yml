@@ -2,18 +2,24 @@ name: quality
 
 on:
   workflow_call:
-  # There is deliberately no `pull_request:` trigger. It fired on every push to a
-  # PR, which made iterating on a branch the largest single consumer of our
-  # Actions minutes. CI runs on a real merge to main, on demand via
-  # workflow_dispatch, or as the release gate below.
+  # No `pull_request:` trigger and no `push:` trigger, both deliberately.
   #
-  # This is not a loss of coverage at release time: release.yml calls this
-  # workflow through `workflow_call`, so a release still has to pass it.
+  # A PR trigger fired on every push to a branch, which made iterating - the
+  # normal way work happens - the largest single consumer of our Actions
+  # minutes. Removing it left `push` to main as the next largest: every merge
+  # started the whole matrix, the wp-env Plugin Check and the Playwright run,
+  # several times on a busy day, to re-check work that was already verified
+  # locally before the PR was opened.
   #
-  # Verify before pushing instead — phpcs and phpunit in the wordpress_localhost
-  # stack, plus `npm run lint:js` and `npm run lint:css`.
-  push:
-    branches: [main]
+  # So CI now runs in exactly two places: on demand, and as the release gate.
+  # release.yml calls this workflow through `workflow_call`, so nothing is ever
+  # published without it passing.
+  #
+  # The trade-off is real and worth stating: main carries no automated
+  # verification between merges, and a break can sit there until someone cuts a
+  # release or dispatches a run. That is why local verification before a PR is
+  # not optional - phpcs and phpunit in the wordpress_localhost stack, plus
+  # `npm run lint:js` and `npm run lint:css`.
   workflow_dispatch:
 
 permissions:
