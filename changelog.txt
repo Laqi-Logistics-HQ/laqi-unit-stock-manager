@@ -10,7 +10,7 @@
 
 2026-08-21 - version 1.0.3
 * Tweak - Declare compatibility with WordPress 7.1, tested against the 7.1 test suite.
-* Dev - Read every per-file array Plugin Check emits in CI. One greedy match spanned two files and failed the gate with a JSON parse error instead of reporting the one real error it had been handed.
+* Tweak - Broadened the shared-pool example so it spans milligram to kilogram packages rather than grams alone.
 
 2026-08-21 - version 1.0.2
 * Fix - The "WooCommerce is required" and "two editions are active" notices now appear only on the Plugins screen, where they can be acted on, and are dismissible. They no longer render on every wp-admin page.
