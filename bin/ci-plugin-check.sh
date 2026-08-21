@@ -146,7 +146,14 @@ import json, os, re, sys
 label = os.environ["LABEL"]
 raw = sys.stdin.read().strip()
 
-# wp-env prefixes WP-CLI output with its own status lines; keep the JSON array.
+# wp-env prefixes WP-CLI output with its own status lines; keep the JSON.
+#
+# Plugin Check emits ONE array PER FILE, each behind its own "FILE: ..." line,
+# so a single greedy r"\[.*\]" spans from the opening bracket of the first array
+# to the closing bracket of the last, and json.loads dies on "Extra data".
+# That is not hypothetical: it failed the 1.0.2 release, where readme.txt and
+# Schema.php both had findings, and it reported a parse error instead of the
+# one real error it had just been handed. Decode every array and concatenate.
 #
 # Unrecognised output means the check did not run: wp-env failed, the plugin
 # would not activate, WP-CLI errored. Treat that as a failure. Reporting
@@ -156,21 +163,34 @@ raw = sys.stdin.read().strip()
 # A clean run is the exception: WP-CLI prints its success sentinel INSTEAD of an
 # empty array, even under --format=json. That is a real result, so match it
 # explicitly rather than loosening the rule above and letting anything through.
-match = re.search(r"\[.*\]", raw, re.S)
+decoder = json.JSONDecoder()
+items = []
+decoded_any = False
+position = 0
 
-if match:
+while True:
+    start = raw.find("[", position)
+    if start == -1:
+        break
     try:
-        items = json.loads(match.group(0))
-    except json.JSONDecodeError as exc:
-        print("::error::{}: could not parse Plugin Check output: {}".format(label, exc))
-        print(raw[:2000])
+        chunk, end = decoder.raw_decode(raw, start)
+    except json.JSONDecodeError:
+        # Not the start of a JSON array - a "[warning]" prefix in a status
+        # line, say. Step over that bracket and keep looking.
+        position = start + 1
+        continue
+    if isinstance(chunk, list):
+        items.extend(chunk)
+        decoded_any = True
+    position = end
+
+if not decoded_any:
+    if re.search(r"Success: Checks complete\.", raw):
+        items = []
+    else:
+        print("::error::{}: Plugin Check returned no parsable result, so it did not run".format(label))
+        print(raw[:2000] if raw else "(no output at all)")
         sys.exit(1)
-elif re.search(r"Success: Checks complete\.", raw):
-    items = []
-else:
-    print("::error::{}: Plugin Check returned no parsable result, so it did not run".format(label))
-    print(raw[:2000] if raw else "(no output at all)")
-    sys.exit(1)
 
 errors = [i for i in items if str(i.get("type", "")).upper() == "ERROR"]
 warnings = [i for i in items if str(i.get("type", "")).upper() == "WARNING"]

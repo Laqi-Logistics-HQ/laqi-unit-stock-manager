@@ -2,9 +2,9 @@
 Contributors: laqilogistics
 Tags: woocommerce, inventory, stock management, variable products, units
 Requires at least: 6.8
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.1
+Stable tag: 1.1.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 7.1
@@ -16,7 +16,7 @@ Manage one bulk stock quantity shared by simple products and variations sold in 
 
 Laqi Unit Stock Manager gives WooCommerce stores one authoritative quantity for products packaged from the same physical stock.
 
-For example, keep 10 kg of an ingredient in one inventory pool and link 0.1 g, 0.25 g, 1 g, 2 g, 5 g, and 10 g variations to it. Every sale consumes the exact package quantity from that shared pool. The plugin calculates with normalized integers rather than floating-point values, so small decimal packages do not accumulate rounding drift.
+For example, keep 10 kg of an ingredient in one inventory pool and link 250 mg, 0.2 g, 1 g, 50 g, 500 g, and 2 kg packages to it. Enter each package in whichever unit and precision suit it, whole or decimal and 250 mg or 0.25 g alike, and the mapping converts it into the pool's unit for you. Every sale then draws that exact quantity from the shared pool, calculated with normalized integers rather than floating-point values, so fractional packages sharing a balance with kilogram ones never accumulate rounding drift.
 
 **Shared inventory without package-level guesswork**
 
@@ -91,7 +91,7 @@ Back up the database before transferring established WooCommerce stock. The tran
 
 = Can several variations consume the same stock? =
 
-Yes. Map each variation to the same inventory pool and specify its exact consumption per sold item. A 0.25 g variation consumes 0.25 g while a 2 g variation consumes 2 g from the same balance.
+Yes. Map each variation to the same inventory pool and specify its exact consumption per sold item, in whichever unit of that pool's measurement family suits the package. A 0.25 g variation consumes 0.25 g while a 2 kg variation consumes 2 kg from the same balance.
 
 = Can I use my own units? =
 
@@ -142,7 +142,13 @@ This plugin ships human-readable PHP, JavaScript, and CSS without minified or ge
 * Changed movement reads to run through one filtered query rather than three near-identical pairs.
 * Fixed filtering the Activity ledger losing the product it was scoped to and silently widening to every pool.
 * Changed how pools owning an extension policy are found, from decoding every stored policy in PHP to a keyed index. Existing policies are indexed automatically on upgrade.
-* Changed the "WooCommerce is required" and "two editions are active" notices to appear only on the Plugins screen, where you can act on them, and made them dismissible.
+
+= 1.0.3 =
+* Declared compatibility with WordPress 7.1.
+* Broadened the shared-pool example so it spans milligram to kilogram packages and decimal quantities, rather than whole grams alone.
+
+= 1.0.2 =
+* Fixed the "WooCommerce is required" and "two editions are active" notices rendering on every wp-admin page. They now appear only on the Plugins screen, where you can act on them, and are dismissible.
 
 = 1.0.1 =
 * Improved the plugin description shown on the Plugins screen.
