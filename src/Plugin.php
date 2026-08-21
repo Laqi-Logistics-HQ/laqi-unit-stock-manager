@@ -128,14 +128,22 @@ final class Plugin {
 	/**
 	 * Admin notice shown when WooCommerce (a hard dependency) is missing.
 	 *
+	 * Limited to the Plugins screen, the one place where the missing dependency
+	 * can be installed or activated. Everywhere else in wp-admin the message
+	 * would be noise the reader cannot act on.
+	 *
 	 * @return void
 	 */
 	public function render_missing_woocommerce_notice(): void {
 		if ( ! current_user_can( 'activate_plugins' ) ) {
 			return;
 		}
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen || 'plugins' !== $screen->id ) {
+			return;
+		}
 		printf(
-			'<div class="notice notice-error"><p>%s</p></div>',
+			'<div class="notice notice-error is-dismissible"><p>%s</p></div>',
 			esc_html__( 'Laqi Unit Stock Manager for WooCommerce requires WooCommerce to be installed and active.', 'laqi-unit-stock-manager' )
 		);
 	}
