@@ -1,13 +1,15 @@
 *** Laqi Unit Stock Manager for WooCommerce Changelog ***
 
-unreleased - version 1.1.0
+2026-08-21 - version 1.1.0
 * Add - Filter the Activity ledger by inventory pool, movement, source, actor, date range, and recorded reason, with page links that keep the filters and an empty state that names them.
 * Add - Shared dataset components (DatasetPage, DatasetFilters, DatasetView, DatasetRenderer, FilteredQuery) so Free and registered Pro tabs paginate and filter growing tables the same way.
 * Add - Extension API 1.1: pool policies can be counted and paged by namespace, and movement reads accept categorical filters.
 * Change - Movement reads run through one filtered query instead of three near-identical pairs. Existing reads keep working and now always carry the actor name.
 * Fix - Filtering the Activity ledger keeps the product it was scoped to, instead of silently widening to every pool.
 * Change - Pools that own an extension policy are found through a keyed index instead of decoding every stored policy in PHP. Existing policies are indexed automatically on upgrade.
-* Change - The "WooCommerce is required" and "two editions are active" notices now appear only on the Plugins screen, where they can be acted on, and are dismissible. They no longer render on every wp-admin page.
+
+2026-08-21 - version 1.0.2
+* Fix - The "WooCommerce is required" and "two editions are active" notices now appear only on the Plugins screen, where they can be acted on, and are dismissible. They no longer render on every wp-admin page.
 
 2026-08-18 - version 1.0.1
 * Update - Improved the plugin description shown on the Plugins screen.

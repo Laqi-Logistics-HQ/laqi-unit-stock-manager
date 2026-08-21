@@ -4,7 +4,7 @@ Tags: woocommerce, inventory, stock management, variable products, units
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.1
+Stable tag: 1.1.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 7.1
@@ -142,7 +142,9 @@ This plugin ships human-readable PHP, JavaScript, and CSS without minified or ge
 * Changed movement reads to run through one filtered query rather than three near-identical pairs.
 * Fixed filtering the Activity ledger losing the product it was scoped to and silently widening to every pool.
 * Changed how pools owning an extension policy are found, from decoding every stored policy in PHP to a keyed index. Existing policies are indexed automatically on upgrade.
-* Changed the "WooCommerce is required" and "two editions are active" notices to appear only on the Plugins screen, where you can act on them, and made them dismissible.
+
+= 1.0.2 =
+* Fixed the "WooCommerce is required" and "two editions are active" notices rendering on every wp-admin page. They now appear only on the Plugins screen, where you can act on them, and are dismissible.
 
 = 1.0.1 =
 * Improved the plugin description shown on the Plugins screen.
