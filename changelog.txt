@@ -6,6 +6,7 @@
 * Add - Extension API 1.1: pool policies can be counted and paged by namespace, and movement reads accept categorical filters.
 * Change - Movement reads run through one filtered query instead of three near-identical pairs. Existing reads keep working and now always carry the actor name.
 * Fix - Filtering the Activity ledger keeps the product it was scoped to, instead of silently widening to every pool.
+* Add - Extension API: ask whether one pool owns a policy namespace without loading the list, and without an unknown pool being an error.
 * Change - Pools that own an extension policy are found through a keyed index instead of decoding every stored policy in PHP. Existing policies are indexed automatically on upgrade.
 
 2026-08-21 - version 1.0.3
