@@ -10,7 +10,7 @@
 
 2026-08-21 - version 1.0.3
 * Tweak - Declare compatibility with WordPress 7.1, tested against the 7.1 test suite.
-* Tweak - Broadened the shared-pool example so it spans milligram to kilogram packages rather than grams alone.
+* Tweak - Broadened the shared-pool example so it spans milligram to kilogram packages and decimal quantities, rather than whole grams alone.
 
 2026-08-21 - version 1.0.2
 * Fix - The "WooCommerce is required" and "two editions are active" notices now appear only on the Plugins screen, where they can be acted on, and are dismissible. They no longer render on every wp-admin page.

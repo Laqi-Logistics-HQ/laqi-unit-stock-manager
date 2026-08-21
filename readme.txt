@@ -16,7 +16,7 @@ Manage one bulk stock quantity shared by simple products and variations sold in 
 
 Laqi Unit Stock Manager gives WooCommerce stores one authoritative quantity for products packaged from the same physical stock.
 
-For example, keep 10 kg of an ingredient in one inventory pool and link 250 mg, 1 g, 50 g, 500 g, and 2 kg packages to it. Enter each package in the unit it is actually sold in and the mapping converts it into the pool's unit for you. Every sale then draws that exact quantity from the shared pool, calculated with normalized integers rather than floating-point values, so milligram and kilogram packages sharing one balance never accumulate rounding drift.
+For example, keep 10 kg of an ingredient in one inventory pool and link 250 mg, 0.2 g, 1 g, 50 g, 500 g, and 2 kg packages to it. Enter each package in whichever unit and precision suit it, whole or decimal and 250 mg or 0.25 g alike, and the mapping converts it into the pool's unit for you. Every sale then draws that exact quantity from the shared pool, calculated with normalized integers rather than floating-point values, so fractional packages sharing a balance with kilogram ones never accumulate rounding drift.
 
 **Shared inventory without package-level guesswork**
 
@@ -91,7 +91,7 @@ Back up the database before transferring established WooCommerce stock. The tran
 
 = Can several variations consume the same stock? =
 
-Yes. Map each variation to the same inventory pool and specify its exact consumption per sold item, in whichever unit of that pool's measurement family suits the package. A 250 mg variation consumes 250 mg while a 2 kg variation consumes 2 kg from the same balance.
+Yes. Map each variation to the same inventory pool and specify its exact consumption per sold item, in whichever unit of that pool's measurement family suits the package. A 0.25 g variation consumes 0.25 g while a 2 kg variation consumes 2 kg from the same balance.
 
 = Can I use my own units? =
 
@@ -145,7 +145,7 @@ This plugin ships human-readable PHP, JavaScript, and CSS without minified or ge
 
 = 1.0.3 =
 * Declared compatibility with WordPress 7.1.
-* Broadened the shared-pool example so it spans milligram to kilogram packages rather than grams alone.
+* Broadened the shared-pool example so it spans milligram to kilogram packages and decimal quantities, rather than whole grams alone.
 
 = 1.0.2 =
 * Fixed the "WooCommerce is required" and "two editions are active" notices rendering on every wp-admin page. They now appear only on the Plugins screen, where you can act on them, and are dismissible.
