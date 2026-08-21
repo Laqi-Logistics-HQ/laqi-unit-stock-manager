@@ -111,6 +111,25 @@ final class ActivitySection implements ScreenSectionInterface {
 			<p class="laqi-lusm-context-filter"><strong><?php esc_html_e( 'Filtered to the pools used by the selected product.', 'laqi-unit-stock-manager' ); ?></strong> <a href="<?php echo esc_url( $this->activity_url() ); ?>"><?php esc_html_e( 'Show all activity', 'laqi-unit-stock-manager' ); ?></a></p>
 		<?php endif; ?>
 		<?php $this->tables->filters( $view, __( 'Filter stock movements', 'laqi-unit-stock-manager' ) ); ?>
+		<?php
+		/**
+		 * Render actions beside the Activity filter bar.
+		 *
+		 * Extensions echo their own controls - an export button, for example.
+		 * The active filters and the paging state are passed so an action can
+		 * operate on exactly the rows the merchant is looking at rather than
+		 * the whole ledger.
+		 *
+		 * Output is the listener's responsibility to escape.
+		 *
+		 * @since Extension API 1.2
+		 *
+		 * @param DatasetFilters $filters  Active filters.
+		 * @param array<int>     $pool_ids Pools the screen is scoped to, empty for all.
+		 * @param int            $total    Movements matching the filters.
+		 */
+		do_action( 'laqi_lusm_activity_actions', $filters, $pool_ids, $page->total() );
+		?>
 		<?php if ( array() === $rows ) : ?>
 			<?php $this->tables->empty_state( $view, __( 'No stock movements recorded yet.', 'laqi-unit-stock-manager' ) ); ?>
 		<?php else : ?>
@@ -123,6 +142,7 @@ final class ActivitySection implements ScreenSectionInterface {
 				<th scope="col"><?php esc_html_e( 'Change', 'laqi-unit-stock-manager' ); ?></th>
 				<th scope="col"><?php esc_html_e( 'Balance', 'laqi-unit-stock-manager' ); ?></th>
 				<th scope="col"><?php esc_html_e( 'Source', 'laqi-unit-stock-manager' ); ?></th>
+				<th scope="col"><?php esc_html_e( 'Actor', 'laqi-unit-stock-manager' ); ?></th>
 				<th scope="col"><?php esc_html_e( 'Reason', 'laqi-unit-stock-manager' ); ?></th>
 			</tr></thead>
 			<tbody>
@@ -134,6 +154,7 @@ final class ActivitySection implements ScreenSectionInterface {
 					<td data-label="<?php esc_attr_e( 'Change', 'laqi-unit-stock-manager' ); ?>"><?php echo esc_html( $row['delta_display'] ); ?></td>
 					<td data-label="<?php esc_attr_e( 'Balance', 'laqi-unit-stock-manager' ); ?>"><?php echo esc_html( $row['balance_display'] ); ?></td>
 					<td data-label="<?php esc_attr_e( 'Source', 'laqi-unit-stock-manager' ); ?>"><?php echo esc_html( $this->source_label( $row ) ); ?></td>
+					<td data-label="<?php esc_attr_e( 'Actor', 'laqi-unit-stock-manager' ); ?>"><?php echo esc_html( $this->actor_label( $row ) ); ?></td>
 					<td data-label="<?php esc_attr_e( 'Reason', 'laqi-unit-stock-manager' ); ?>"><?php echo esc_html( $row['reason'] ); ?></td>
 				</tr>
 			<?php endforeach; ?>
@@ -215,6 +236,12 @@ final class ActivitySection implements ScreenSectionInterface {
 				'label'       => __( 'Reason', 'laqi-unit-stock-manager' ),
 				'placeholder' => __( 'Text recorded with the change', 'laqi-unit-stock-manager' ),
 			),
+			'activity_search' => array(
+				'control'     => 'search',
+				'filter'      => 'search',
+				'label'       => __( 'Search', 'laqi-unit-stock-manager' ),
+				'placeholder' => __( 'Pool, movement, source, reason, or actor', 'laqi-unit-stock-manager' ),
+			),
 		);
 	}
 
@@ -256,15 +283,28 @@ final class ActivitySection implements ScreenSectionInterface {
 	 * @param array<string, mixed> $row Presented row.
 	 * @return string */
 	private function source_label( array $row ): string {
-		if ( $row['actor_id'] > 0 ) {
-			$user = get_userdata( $row['actor_id'] );
-			if ( $user ) {
-				return $user->display_name;
-			}
-		}
 		if ( '' !== $row['source_type'] ) {
 			return $row['source_id'] > 0 ? $row['source_type'] . ' #' . $row['source_id'] : $row['source_type'];
 		}
 		return __( 'System', 'laqi-unit-stock-manager' );
+	}
+
+	/**
+	 * Human-readable actor.
+	 *
+	 * Split out of source_label(), which used to return the acting user's name
+	 * when there was one. That conflated two different questions - what caused
+	 * the movement, and who performed it - and made a manual adjustment read as
+	 * though a person were its source. With an Actor column present it would
+	 * also have printed the same name in two adjacent cells.
+	 *
+	 * The name is already on the row: MovementPresenter sets actor_name, and the
+	 * filter bar has always listed actors by name.
+	 *
+	 * @param array<string, mixed> $row Presented movement.
+	 * @return string
+	 */
+	private function actor_label( array $row ): string {
+		return '' !== $row['actor_name'] ? $row['actor_name'] : __( 'System or deleted user', 'laqi-unit-stock-manager' );
 	}
 }
