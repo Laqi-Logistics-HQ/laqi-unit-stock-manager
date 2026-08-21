@@ -136,13 +136,15 @@ This plugin ships human-readable PHP, JavaScript, and CSS without minified or ge
 == Changelog ==
 
 = 1.1.0 =
-* Declared compatibility with WordPress 7.1.
 * Added filters to the Activity ledger: inventory pool, movement, source, actor, date range, and recorded reason. Page links keep the filters, and the empty state names the ones hiding your rows.
 * Added shared dataset components so Free and registered add-on tabs paginate and filter growing tables the same way.
 * Added extension API 1.1: pool policies can be counted and paged by namespace, and movement reads accept categorical filters.
 * Changed movement reads to run through one filtered query rather than three near-identical pairs.
 * Fixed filtering the Activity ledger losing the product it was scoped to and silently widening to every pool.
 * Changed how pools owning an extension policy are found, from decoding every stored policy in PHP to a keyed index. Existing policies are indexed automatically on upgrade.
+
+= 1.0.3 =
+* Declared compatibility with WordPress 7.1.
 
 = 1.0.2 =
 * Fixed the "WooCommerce is required" and "two editions are active" notices rendering on every wp-admin page. They now appear only on the Plugins screen, where you can act on them, and are dismissible.
