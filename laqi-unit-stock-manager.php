@@ -28,14 +28,22 @@ if ( defined( 'LAQI_LUSM_VERSION' ) ) {
 		/**
 		 * Tell administrators that only the first-loaded edition is running.
 		 *
+		 * Shown only where the reader can act on it - the Plugins screen, where
+		 * an edition is deactivated - so the message never follows them around
+		 * the dashboard.
+		 *
 		 * @return void
 		 */
 		function laqi_lusm_render_duplicate_edition_notice(): void {
 			if ( ! current_user_can( 'activate_plugins' ) ) {
 				return;
 			}
+			$laqi_lusm_screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+			if ( ! $laqi_lusm_screen || 'plugins' !== $laqi_lusm_screen->id ) {
+				return;
+			}
 			printf(
-				'<div class="notice notice-warning"><p>%s</p></div>',
+				'<div class="notice notice-warning is-dismissible"><p>%s</p></div>',
 				esc_html__( 'Two editions of Laqi Unit Stock Manager are active. Only one is running. Deactivate the edition you are not using, then reload this page. Both editions share the same inventory pools and settings, so removing the one you no longer need keeps them.', 'laqi-unit-stock-manager' )
 			);
 		}
