@@ -1,6 +1,8 @@
 *** Laqi Unit Stock Manager for WooCommerce Changelog ***
 
 2026-08-21 - version 1.1.0
+* Tweak - Declare compatibility with WordPress 7.1, tested against the 7.1 test suite.
+* Dev - Read every per-file array Plugin Check emits in CI. One greedy match spanned two files and failed the gate with a JSON parse error instead of reporting the one real error it had been handed.
 * Add - Filter the Activity ledger by inventory pool, movement, source, actor, date range, and recorded reason, with page links that keep the filters and an empty state that names them.
 * Add - Shared dataset components (DatasetPage, DatasetFilters, DatasetView, DatasetRenderer, FilteredQuery) so Free and registered Pro tabs paginate and filter growing tables the same way.
 * Add - Extension API 1.1: pool policies can be counted and paged by namespace, and movement reads accept categorical filters.

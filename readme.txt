@@ -2,7 +2,7 @@
 Contributors: laqilogistics
 Tags: woocommerce, inventory, stock management, variable products, units
 Requires at least: 6.8
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
 Stable tag: 1.1.0
 License: GPL-2.0-or-later
@@ -136,6 +136,7 @@ This plugin ships human-readable PHP, JavaScript, and CSS without minified or ge
 == Changelog ==
 
 = 1.1.0 =
+* Declared compatibility with WordPress 7.1.
 * Added filters to the Activity ledger: inventory pool, movement, source, actor, date range, and recorded reason. Page links keep the filters, and the empty state names the ones hiding your rows.
 * Added shared dataset components so Free and registered add-on tabs paginate and filter growing tables the same way.
 * Added extension API 1.1: pool policies can be counted and paged by namespace, and movement reads accept categorical filters.
