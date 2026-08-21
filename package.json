@@ -1,6 +1,6 @@
 {
   "name": "laqi-unit-stock-manager",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "description": "Asset linting for Laqi Unit Stock Manager for WooCommerce. Plain admin CSS is enqueued directly and needs no build. Adding blocks/React/SCSS? Create assets/src/index.js and add back the build/start scripts — see buildScriptsComment.",
   "buildScriptsComment": "There are deliberately no build/start scripts. Both CI workflows key off the mere presence of scripts.build — quality.yml runs `npm run build --if-present` and release.yml runs it when the script exists — so shipping `wp-scripts build assets/src/index.js` with no assets/src fails both on a freshly scaffolded plugin. Add these back the same day you add a real entry point: \"build\": \"wp-scripts build assets/src/index.js --output-path=build\", \"start\": \"wp-scripts start assets/src/index.js --output-path=build\".",
