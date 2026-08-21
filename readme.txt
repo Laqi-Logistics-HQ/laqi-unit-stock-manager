@@ -135,6 +135,11 @@ This plugin ships human-readable PHP, JavaScript, and CSS without minified or ge
 
 == Changelog ==
 
+= 1.2.0 =
+* Added an Actor column to the Activity ledger, so you can see who made each change, and a search box matching pool, movement, source, reason, or actor.
+* Changed the Source column to stop showing the acting user's name. Source now answers what caused a movement and Actor answers who performed it.
+* Added extension API 1.2, letting an add-on render actions beside the Activity filter bar.
+
 = 1.1.0 =
 * Added filters to the Activity ledger: inventory pool, movement, source, actor, date range, and recorded reason. Page links keep the filters, and the empty state names the ones hiding your rows.
 * Added shared dataset components so Free and registered add-on tabs paginate and filter growing tables the same way.

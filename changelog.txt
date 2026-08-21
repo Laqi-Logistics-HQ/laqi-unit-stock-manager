@@ -1,5 +1,10 @@
 *** Laqi Unit Stock Manager for WooCommerce Changelog ***
 
+unreleased - version 1.2.0
+* Add - The Activity ledger shows who made each change in a new Actor column, and a search box matching pool, movement, source, reason, or actor. Both were previously only in the Pro Ledger tab.
+* Change - The Source column no longer shows the acting user's name. Source now answers what caused a movement and Actor answers who performed it; a manual adjustment used to read as though a person were its source.
+* Add - Extension API 1.2: `laqi_lusm_activity_actions` lets an add-on render actions beside the Activity filter bar, receiving the active filters, the pools in scope, and the matching total.
+
 2026-08-21 - version 1.1.0
 * Add - Filter the Activity ledger by inventory pool, movement, source, actor, date range, and recorded reason, with page links that keep the filters and an empty state that names them.
 * Add - Shared dataset components (DatasetPage, DatasetFilters, DatasetView, DatasetRenderer, FilteredQuery) so Free and registered Pro tabs paginate and filter growing tables the same way.
