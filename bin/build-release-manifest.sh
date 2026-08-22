@@ -57,8 +57,8 @@ slug, version, wp_min, wp_tested, php_min, wc_min, wc_tested, hpos, blocks = sys
 
 # The full release history, parsed from the changelog.txt that ships in the
 # package. It goes in the manifest so the website can render a release history
-# without a checkout of this (private) repository — the same reason version and
-# compatibility are here rather than typed into the site.
+# without a checkout of this (private) repository. That is the same reason
+# version and compatibility are here rather than typed into the site.
 #
 # The whole history every time, not a recent slice: this file is rewritten on
 # every release, so a complete list keeps the reader stateless and stops the
