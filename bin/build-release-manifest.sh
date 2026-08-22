@@ -51,9 +51,50 @@ python3 - "$SLUG" "$VERSION" \
 	"$(header 'Requires PHP')" \
 	"$(header 'WC requires at least')" "$(header 'WC tested up to')" \
 	"$(has custom_order_tables)" "$(has cart_checkout_blocks)" <<'PY'
-import json, sys, datetime
+import json, os, re, sys, datetime
 
 slug, version, wp_min, wp_tested, php_min, wc_min, wc_tested, hpos, blocks = sys.argv[1:10]
+
+# The full release history, parsed from the changelog.txt that ships in the
+# package. It goes in the manifest so the website can render a release history
+# without a checkout of this (private) repository — the same reason version and
+# compatibility are here rather than typed into the site.
+#
+# The whole history every time, not a recent slice: this file is rewritten on
+# every release, so a complete list keeps the reader stateless and stops the
+# site having to merge what it fetched with what it already had.
+TYPES = "Add|Fix|Change|Tweak|Dev|Enhancement|Security|Remove|Update"
+
+
+def changelog(path="changelog.txt"):
+    if not os.path.isfile(path):
+        return []
+    releases, release, entry = [], None, None
+    with open(path, encoding="utf-8") as handle:
+        for raw in handle:
+            line = raw.strip()
+            if not line or line.startswith("***"):
+                continue
+            header = re.match(r"^(\d{4}-\d{2}-\d{2})\s+-\s+version\s+(\S+)$", line, re.I)
+            if header:
+                release = {"version": header.group(2), "date": header.group(1), "changes": []}
+                releases.append(release)
+                entry = None
+                continue
+            if release is None:
+                continue
+            bullet = re.match(r"^\*\s+(?:(" + TYPES + r")\s+-\s+)?(.+)$", line, re.I)
+            if bullet:
+                kind = bullet.group(1).capitalize() if bullet.group(1) else "Change"
+                entry = {"type": kind, "text": bullet.group(2).strip()}
+                release["changes"].append(entry)
+                continue
+            # A wrapped bullet continues the entry above it, so its tail is not
+            # silently dropped.
+            if entry is not None:
+                entry["text"] += " " + line
+    return [r for r in releases if r["changes"]]
+
 
 print(json.dumps({
     "slug": slug,
@@ -68,5 +109,6 @@ print(json.dumps({
         "hpos": hpos == "true",
         "checkoutBlocks": blocks == "true",
     },
+    "changelog": changelog(),
 }, indent=2))
 PY
