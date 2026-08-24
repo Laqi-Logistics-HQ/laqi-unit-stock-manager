@@ -196,10 +196,28 @@ final class MovementRepository {
 			->from( 'm.created_at', self::utc_boundary( (string) ( $filters['from'] ?? '' ), '00:00:00' ) )
 			->to( 'm.created_at', self::utc_boundary( (string) ( $filters['to'] ?? '' ), '23:59:59' ) )
 			->search( array( 'm.reason' ), $filters['reason'] ?? '' )
-			->search( array( 'p.name', 'm.type', 'm.source_type', 'm.reason', 'u.display_name', 'u.user_login' ), $filters['search'] ?? '' );
+			->search( self::search_columns( (string) ( $filters['search_in'] ?? '' ) ), $filters['search'] ?? '' );
 		$actor    = (string) ( $filters['actor'] ?? '' );
 
 		return '' === $actor ? $query : $query->raw( 'm.actor_id = %d', array( (int) $actor ) );
+	}
+
+	/**
+	 * Columns the broad search runs against.
+	 *
+	 * The screen offers one search box and a scope beside it. Everything the
+	 * search covers except the reason has its own dedicated filter, so the only
+	 * scope worth narrowing to is the reason a person typed.
+	 *
+	 * @param string $scope Requested scope, empty for every searchable column.
+	 * @return array<int, string>
+	 */
+	private static function search_columns( string $scope ): array {
+		if ( 'reason' === $scope ) {
+			return array( 'm.reason' );
+		}
+
+		return array( 'p.name', 'm.type', 'm.source_type', 'm.reason', 'u.display_name', 'u.user_login' );
 	}
 
 	/**
