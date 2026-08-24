@@ -1,6 +1,6 @@
 *** Laqi Unit Stock Manager for WooCommerce Changelog ***
 
-unreleased - version 1.2.1
+2026-08-25 - version 1.2.1
 * Change - The Activity ledger had two free-text boxes. The Search box already matched the reason as well as the pool, movement, source and actor, so the separate Reason box could never find anything Search would miss. There is now one search box.
 * Change - The search filter starts its own row, so every filter bar reads the same way whether four narrowing filters precede it or six.
 * Change - An add-on's action, such as the Pro CSV export, renders beside Filter in the filter bar rather than on its own line above the table.
