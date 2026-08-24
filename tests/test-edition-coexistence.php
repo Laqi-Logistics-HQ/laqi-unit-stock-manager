@@ -19,6 +19,6 @@ class Test_Edition_Coexistence extends WP_UnitTestCase {
 
 		$this->assertSame( $before, has_action( 'plugins_loaded' ) );
 		$this->assertNotFalse( has_action( 'admin_notices', 'laqi_lusm_render_duplicate_edition_notice' ) );
-		$this->assertSame( '1.2.0', LAQI_LUSM_VERSION );
+		$this->assertSame( '1.2.1', LAQI_LUSM_VERSION );
 	}
 }
