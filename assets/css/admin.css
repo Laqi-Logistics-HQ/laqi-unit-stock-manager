@@ -148,6 +148,16 @@
 	max-width: 16rem;
 }
 
+/*
+ * Search filters carry a placeholder naming every field they match, which is
+ * a good deal longer than a select's label. At the shared width the longest
+ * ones were cut mid-word, so they get their own, wider range.
+ */
+.laqi-lusm-dataset-filter input[type="search"] {
+	min-width: min(21rem, 70vw);
+	max-width: 28rem;
+}
+
 .laqi-lusm-dataset-filter-actions {
 	display: flex;
 	gap: 0.75rem;

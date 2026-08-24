@@ -135,6 +135,9 @@ This plugin ships human-readable PHP, JavaScript, and CSS without minified or ge
 
 == Changelog ==
 
+= 1.2.1 =
+* Fixed search filters cutting their placeholder text off mid-word.
+
 = 1.2.0 =
 * Added an Actor column to the Activity ledger, so you can see who made each change, and a search box matching pool, movement, source, reason, or actor.
 * Changed the Source column to stop showing the acting user's name. Source now answers what caused a movement and Actor answers who performed it.
