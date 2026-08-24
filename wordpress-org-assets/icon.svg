@@ -11,7 +11,7 @@
 	<ellipse cx="80" cy="30" rx="38" ry="15" fill="#eef0f5"/>
 	<ellipse cx="80" cy="30" rx="29" ry="8" fill="#8a93a8"/>
 	<text x="80" y="60" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="16" font-weight="700">10 kg</text>
-	<text x="80" y="73" text-anchor="middle" fill="#8a93a8" font-family="Arial, sans-serif" font-size="7" font-weight="700" letter-spacing="1">POOL</text>
+	<text x="80" y="72" text-anchor="middle" fill="#8a93a8" font-family="Arial, sans-serif" font-size="7" font-weight="700" letter-spacing="1">POOL</text>
 
 	<!-- Linked products consume different exact quantities from that pool. -->
 	<rect x="8" y="106" width="42" height="34" rx="7" fill="#ffffff"/>
