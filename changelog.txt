@@ -1,6 +1,7 @@
 *** Laqi Unit Stock Manager for WooCommerce Changelog ***
 
 unreleased - version 1.2.1
+* Change - The Activity ledger had two free-text boxes. The Search box already matched the reason as well as the pool, movement, source and actor, so the separate Reason box could never find anything Search would miss. There is now one search box with a Search in scope beside it, set to all fields or the reason alone.
 * Fix - Search filters in the Activity ledger and the Pro tables cut their placeholder text off mid-word. A search filter now takes whatever space its row has left over instead of a fixed width, so the placeholder reads in full without pushing the Filter button onto a row of its own.
 
 2026-08-21 - version 1.2.0

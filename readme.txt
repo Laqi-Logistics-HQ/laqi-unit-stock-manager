@@ -136,6 +136,7 @@ This plugin ships human-readable PHP, JavaScript, and CSS without minified or ge
 == Changelog ==
 
 = 1.2.1 =
+* Changed the Activity ledger's two free-text boxes into one search box with a Search in scope, since the Search box already covered everything the Reason box did.
 * Fixed search filters cutting their placeholder text off mid-word; a search filter now fills the space its row has left over.
 
 = 1.2.0 =

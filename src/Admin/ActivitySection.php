@@ -197,46 +197,49 @@ final class ActivitySection implements ScreenSectionInterface {
 		}
 
 		return array(
-			'activity_pool'   => array(
+			'activity_pool'      => array(
 				'control' => 'pool',
 				'filter'  => 'pool_id',
 				'label'   => __( 'Inventory pool', 'laqi-unit-stock-manager' ),
 			),
-			'activity_type'   => array(
+			'activity_type'      => array(
 				'control' => 'select',
 				'filter'  => 'type',
 				'label'   => __( 'Movement', 'laqi-unit-stock-manager' ),
 				'choices' => $types,
 			),
-			'activity_source' => array(
+			'activity_source'    => array(
 				'control' => 'select',
 				'filter'  => 'source_type',
 				'label'   => __( 'Source', 'laqi-unit-stock-manager' ),
 				'choices' => $sources,
 			),
-			'activity_actor'  => array(
+			'activity_actor'     => array(
 				'control' => 'select',
 				'filter'  => 'actor',
 				'label'   => __( 'Actor', 'laqi-unit-stock-manager' ),
 				'choices' => $actors,
 			),
-			'activity_from'   => array(
+			'activity_from'      => array(
 				'control' => 'date',
 				'filter'  => 'from',
 				'label'   => __( 'From', 'laqi-unit-stock-manager' ),
 			),
-			'activity_to'     => array(
+			'activity_to'        => array(
 				'control' => 'date',
 				'filter'  => 'to',
 				'label'   => __( 'To', 'laqi-unit-stock-manager' ),
 			),
-			'activity_reason' => array(
-				'control'     => 'search',
-				'filter'      => 'reason',
-				'label'       => __( 'Reason', 'laqi-unit-stock-manager' ),
-				'placeholder' => __( 'Text recorded with the change', 'laqi-unit-stock-manager' ),
+			'activity_search_in' => array(
+				'control' => 'select',
+				'filter'  => 'search_in',
+				'label'   => __( 'Search in', 'laqi-unit-stock-manager' ),
+				'choices' => array(
+					''       => __( 'All fields', 'laqi-unit-stock-manager' ),
+					'reason' => __( 'Reason only', 'laqi-unit-stock-manager' ),
+				),
 			),
-			'activity_search' => array(
+			'activity_search'    => array(
 				'control'     => 'search',
 				'filter'      => 'search',
 				'label'       => __( 'Search', 'laqi-unit-stock-manager' ),

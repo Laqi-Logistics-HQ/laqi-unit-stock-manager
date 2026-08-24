@@ -147,6 +147,53 @@ class Test_Movement_Filtering extends WP_UnitTestCase {
 		);
 	}
 
+	/** The search scope narrows the broad search to the reason column. */
+	public function test_search_scope_limits_the_broad_search(): void {
+		$this->assertSame(
+			2,
+			$this->movements->count(
+				array(
+					'pool_id' => $this->flour_id,
+					'search'  => 'flour',
+				)
+			),
+			'An unscoped search matches the pool name as well as the reason.'
+		);
+		$this->assertSame(
+			0,
+			$this->movements->count(
+				array(
+					'pool_id'   => $this->flour_id,
+					'search'    => 'flour',
+					'search_in' => 'reason',
+				)
+			),
+			'Scoped to the reason, the same term must not match the pool name.'
+		);
+		$this->assertSame(
+			1,
+			$this->movements->count(
+				array(
+					'pool_id'   => $this->flour_id,
+					'search'    => 'shelf',
+					'search_in' => 'reason',
+				)
+			),
+			'Scoped to the reason, a word from the reason still matches.'
+		);
+		$this->assertSame(
+			2,
+			$this->movements->count(
+				array(
+					'pool_id'   => $this->flour_id,
+					'search'    => 'flour',
+					'search_in' => 'nonsense',
+				)
+			),
+			'An unknown scope falls back to searching every column.'
+		);
+	}
+
 	/** Filters combine, and the page carries pool and actor context. */
 	public function test_reads_a_filtered_page(): void {
 		$rows = $this->movements->page(
