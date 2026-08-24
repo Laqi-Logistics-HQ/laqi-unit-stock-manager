@@ -149,14 +149,16 @@
 }
 
 /*
- * Search filters carry a placeholder naming every field they match, which is
- * a good deal longer than a select's label. Rather than pick one width that
- * suits every bar, the search takes whatever its row has left over: enough to
- * read the placeholder, without pushing the Filter button onto a row of its
- * own when the row had room to spare.
+ * The search always starts its own row, so every filter bar reads the same way
+ * whether it has four narrowing filters above it or six. Left to wrap on its
+ * own it landed on row one in some panels and row two in others, purely
+ * because of how many selects happened to precede it.
+ *
+ * It then takes the width that row has spare, which is more than enough for a
+ * placeholder naming every field it matches, and leaves Filter beside it.
  */
 .laqi-lusm-dataset-filter--search {
-	flex: 1 1 min(16rem, 70vw);
+	flex: 1 1 100%;
 	max-width: 34rem;
 }
 
