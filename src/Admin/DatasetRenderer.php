@@ -55,7 +55,7 @@ final class DatasetRenderer {
 			<fieldset>
 				<legend class="screen-reader-text"><?php echo esc_html( $legend ); ?></legend>
 				<?php foreach ( $fields as $field ) : ?>
-					<div class="laqi-lusm-dataset-filter">
+					<div class="laqi-lusm-dataset-filter<?php echo 'search' === $field['control'] ? ' laqi-lusm-dataset-filter--search' : ''; ?>">
 						<label for="<?php echo esc_attr( $field['id'] ); ?>"><?php echo esc_html( $field['label'] ); ?></label>
 						<?php $this->control( $field ); ?>
 					</div>
