@@ -37,11 +37,15 @@ final class DatasetRenderer {
 	/**
 	 * Render a dataset's filter form.
 	 *
-	 * @param DatasetView $view   Dataset URL state.
-	 * @param string      $legend Localized fieldset legend.
+	 * @param DatasetView   $view    Dataset URL state.
+	 * @param string        $legend  Localized fieldset legend.
+	 * @param callable|null $actions Optional extra controls, rendered beside
+	 *                               Filter so an add-on's action sits with the
+	 *                               button it relates to rather than adrift
+	 *                               above the table.
 	 * @return void
 	 */
-	public function filters( DatasetView $view, string $legend ): void {
+	public function filters( DatasetView $view, string $legend, ?callable $actions = null ): void {
 		$fields = $view->filters()->fields();
 		$hidden = $view->link_args();
 		foreach ( $fields as $field ) {
@@ -65,6 +69,10 @@ final class DatasetRenderer {
 					<?php if ( $view->filters()->is_active() ) : ?>
 						<a class="button-link" href="<?php echo esc_url( $view->reset_url() ); ?>"><?php esc_html_e( 'Clear filters', 'laqi-unit-stock-manager' ); ?></a>
 					<?php endif; ?>
+					<?php
+					if ( null !== $actions ) {
+						$actions(); }
+					?>
 				</div>
 			</fieldset>
 		</form>

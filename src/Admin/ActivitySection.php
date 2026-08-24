@@ -110,7 +110,6 @@ final class ActivitySection implements ScreenSectionInterface {
 		<?php if ( array() !== $pool_ids ) : ?>
 			<p class="laqi-lusm-context-filter"><strong><?php esc_html_e( 'Filtered to the pools used by the selected product.', 'laqi-unit-stock-manager' ); ?></strong> <a href="<?php echo esc_url( $this->activity_url() ); ?>"><?php esc_html_e( 'Show all activity', 'laqi-unit-stock-manager' ); ?></a></p>
 		<?php endif; ?>
-		<?php $this->tables->filters( $view, __( 'Filter stock movements', 'laqi-unit-stock-manager' ) ); ?>
 		<?php
 		/**
 		 * Render actions beside the Activity filter bar.
@@ -118,7 +117,8 @@ final class ActivitySection implements ScreenSectionInterface {
 		 * Extensions echo their own controls - an export button, for example.
 		 * The active filters and the paging state are passed so an action can
 		 * operate on exactly the rows the merchant is looking at rather than
-		 * the whole ledger.
+		 * the whole ledger. The controls render inside the filter bar's own
+		 * actions, beside Filter, rather than adrift above the table.
 		 *
 		 * Output is the listener's responsibility to escape.
 		 *
@@ -128,7 +128,10 @@ final class ActivitySection implements ScreenSectionInterface {
 		 * @param array<int>     $pool_ids Pools the screen is scoped to, empty for all.
 		 * @param int            $total    Movements matching the filters.
 		 */
-		do_action( 'laqi_lusm_activity_actions', $filters, $pool_ids, $page->total() );
+		$laqi_lusm_actions = static function () use ( $filters, $pool_ids, $page ) {
+			do_action( 'laqi_lusm_activity_actions', $filters, $pool_ids, $page->total() );
+		};
+		$this->tables->filters( $view, __( 'Filter stock movements', 'laqi-unit-stock-manager' ), $laqi_lusm_actions );
 		?>
 		<?php if ( array() === $rows ) : ?>
 			<?php $this->tables->empty_state( $view, __( 'No stock movements recorded yet.', 'laqi-unit-stock-manager' ) ); ?>
@@ -197,49 +200,40 @@ final class ActivitySection implements ScreenSectionInterface {
 		}
 
 		return array(
-			'activity_pool'      => array(
+			'activity_pool'   => array(
 				'control' => 'pool',
 				'filter'  => 'pool_id',
 				'label'   => __( 'Inventory pool', 'laqi-unit-stock-manager' ),
 			),
-			'activity_type'      => array(
+			'activity_type'   => array(
 				'control' => 'select',
 				'filter'  => 'type',
 				'label'   => __( 'Movement', 'laqi-unit-stock-manager' ),
 				'choices' => $types,
 			),
-			'activity_source'    => array(
+			'activity_source' => array(
 				'control' => 'select',
 				'filter'  => 'source_type',
 				'label'   => __( 'Source', 'laqi-unit-stock-manager' ),
 				'choices' => $sources,
 			),
-			'activity_actor'     => array(
+			'activity_actor'  => array(
 				'control' => 'select',
 				'filter'  => 'actor',
 				'label'   => __( 'Actor', 'laqi-unit-stock-manager' ),
 				'choices' => $actors,
 			),
-			'activity_from'      => array(
+			'activity_from'   => array(
 				'control' => 'date',
 				'filter'  => 'from',
 				'label'   => __( 'From', 'laqi-unit-stock-manager' ),
 			),
-			'activity_to'        => array(
+			'activity_to'     => array(
 				'control' => 'date',
 				'filter'  => 'to',
 				'label'   => __( 'To', 'laqi-unit-stock-manager' ),
 			),
-			'activity_search_in' => array(
-				'control' => 'select',
-				'filter'  => 'search_in',
-				'label'   => __( 'Search in', 'laqi-unit-stock-manager' ),
-				'choices' => array(
-					''       => __( 'All fields', 'laqi-unit-stock-manager' ),
-					'reason' => __( 'Reason only', 'laqi-unit-stock-manager' ),
-				),
-			),
-			'activity_search'    => array(
+			'activity_search' => array(
 				'control'     => 'search',
 				'filter'      => 'search',
 				'label'       => __( 'Search', 'laqi-unit-stock-manager' ),
