@@ -1,5 +1,8 @@
 *** Laqi Unit Stock Manager for WooCommerce Changelog ***
 
+unreleased - version 1.2.1
+* Fix - Search filters in the Activity ledger and the Pro tables cut their placeholder text off mid-word. Search controls now get a wider range than the selects they sit beside.
+
 2026-08-21 - version 1.2.0
 * Add - The Activity ledger shows who made each change in a new Actor column, and a search box matching pool, movement, source, reason, or actor. Both were previously only in the Pro Ledger tab.
 * Change - The Source column no longer shows the acting user's name. Source now answers what caused a movement and Actor answers who performed it; a manual adjustment used to read as though a person were its source.
