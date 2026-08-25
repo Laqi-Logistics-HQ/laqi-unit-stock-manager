@@ -16,7 +16,7 @@ Manage one bulk stock quantity shared by simple products and variations sold in 
 
 Laqi Unit Stock Manager gives WooCommerce stores one authoritative quantity for products packaged from the same physical stock.
 
-For example, keep 10 kg of an ingredient in one inventory pool and link 250 mg, 0.2 g, 1 g, 50 g, 500 g, and 2 kg packages to it. Enter each package in whichever unit and precision suit it, whole or decimal and 250 mg or 0.25 g alike, and the mapping converts it into the pool's unit for you. Every sale then draws that exact quantity from the shared pool, calculated with normalized integers rather than floating-point values, so fractional packages sharing a balance with kilogram ones never accumulate rounding drift.
+For example, keep 10 kg of an ingredient in one inventory pool and link 250 mg, 0.2 g, 1 g, 50 g, 500 g, and 2 kg packages to it. Enter each package in whatever unit suits it, whole or decimal, and the mapping converts it into the pool's unit for you. Every sale then draws that exact quantity from the shared pool. Quantities are held as whole numbers rather than floating-point values, so milligram packages sharing a balance with kilogram ones never accumulate rounding drift.
 
 **Shared inventory without package-level guesswork**
 
@@ -55,11 +55,18 @@ Products > Unit Stock keeps cross-product inventory work under one menu item. Pr
 
 **Laqi Unit Stock Manager Pro**
 
-The separately installed Pro add-on adds suppliers and purchasing packs, receiving, incoming deliveries, traceable batches, FEFO and explicit dispatch priority, holds and quarantine, recalls, losses, alerts, forecasting, reorder planning, purchase-order drafts and supplier transmission, reports, scenario planning, recipes and material costs, mobile stocktaking, integrations, and a searchable exportable ledger. Free remains the authoritative inventory engine and is fully functional without an account or licence.
+Pro is a separate add-on installed alongside this plugin rather than a replacement for it. It adds:
+
+* Suppliers, purchasing packs, receiving, and incoming deliveries.
+* Traceable batches with FEFO or explicit dispatch priority, holds, quarantine, recalls, and recorded losses.
+* Alerts, forecasting, reorder planning, purchase-order drafts, and transmission to suppliers.
+* Reports, scenario planning, recipes and material costs, mobile stocktaking, integrations, and a searchable exportable ledger.
+
+The free plugin remains the authoritative inventory engine and is fully functional without an account or licence.
 
 Compare editions at [laqi-logistics.com](https://laqi-logistics.com/plugins/laqi-unit-stock-manager/).
 
-= Privacy and external services =
+**Privacy and external services**
 
 The plugin stores inventory pools, product mappings, operational order references, and stock movements in your WordPress database. Manual adjustments record the acting WordPress user ID for accountability. The WordPress privacy exporter reports those attributed movements, and erasure anonymizes the user association while retaining the inventory ledger.
 
@@ -115,19 +122,19 @@ Yes. The plugin declares High-Performance Order Storage and Cart and Checkout Bl
 
 = Does the plugin allow backorders? =
 
-The storage model supports pool-level backorder policy. The current setup screen creates pools with backorders disabled, so pooled stock cannot become negative.
+No. Every pool is created with backorders disabled, so pooled stock cannot fall below zero.
 
 = Does the free edition require an account or licence? =
 
 No. The WordPress.org edition contains no licensing SDK, requires no account or licence, and does not contact Laqi Logistics.
 
-= What is the difference between Free and Pro? =
+= What is the difference between the free plugin and Pro? =
 
-Free is the complete shared-stock engine: pools, exact units, product and variation mappings, checkout validation, order reductions and restorations, stock adjustments, diagnostics, and activity history. Pro is a separate add-on for receiving, suppliers, batches, supply controls, forecasting, purchasing, alerts, reporting, recipes, costing, mobile counts, and external operations.
+The free plugin is the complete shared-stock engine: pools, exact units, product and variation mappings, checkout validation, order reductions and restorations, stock adjustments, diagnostics, and activity history. Pro is a separate add-on for receiving, suppliers, batches, supply controls, forecasting, purchasing, alerts, reporting, recipes, costing, mobile counts, and external operations.
 
 = What happens when I delete the plugin? =
 
-Deleting the final installed edition removes the plugin's custom inventory tables and schema option. If another edition remains installed, shared inventory data is preserved.
+Deleting the last installed edition removes the plugin's inventory tables and its stored schema version. If Pro is still installed, your shared inventory data is kept.
 
 == Source Code ==
 
