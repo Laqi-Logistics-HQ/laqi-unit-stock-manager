@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
 	<title id="title">Laqi Unit Stock Manager icon</title>
-	<desc id="desc">One shared 10 kilogram inventory pool with three signed stock movements: minus 250 grams, plus 1 kilogram and plus 2 kilograms.</desc>
+	<desc id="desc">One shared 10 kilogram inventory pool with three signed stock movements: an order of minus 250 grams, a return of plus 1 kilogram and a restock of plus 2 kilograms.</desc>
 	<rect width="160" height="160" rx="24" fill="#1b2540"/>
 
 	<!-- One continuous relationship network, painted behind every object. -->
@@ -17,7 +17,10 @@
 	<rect x="8" y="106" width="42" height="34" rx="7" fill="#ffffff"/>
 	<rect x="59" y="106" width="42" height="34" rx="7" fill="#ffffff"/>
 	<rect x="110" y="106" width="42" height="34" rx="7" fill="#ffffff"/>
-	<text x="29" y="127" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="9" font-weight="700">−250 g</text>
-	<text x="80" y="127" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="10" font-weight="700">+1 kg</text>
-	<text x="131" y="127" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="10" font-weight="700">+2 kg</text>
+	<text x="29" y="118" text-anchor="middle" fill="#5f6b85" font-family="Arial, sans-serif" font-size="6" font-weight="700" letter-spacing="0.4">ORDER</text>
+	<text x="80" y="118" text-anchor="middle" fill="#5f6b85" font-family="Arial, sans-serif" font-size="6" font-weight="700" letter-spacing="0.4">RETURN</text>
+	<text x="131" y="118" text-anchor="middle" fill="#5f6b85" font-family="Arial, sans-serif" font-size="6" font-weight="700" letter-spacing="0.4">RESTOCK</text>
+	<text x="29" y="133" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="9" font-weight="700">−250 g</text>
+	<text x="80" y="133" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="10" font-weight="700">+1 kg</text>
+	<text x="131" y="133" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="10" font-weight="700">+2 kg</text>
 </svg>
