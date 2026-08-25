@@ -1,10 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
 	<title id="title">Laqi Unit Stock Manager icon</title>
-	<desc id="desc">One shared 10 kilogram inventory pool connected to three linked products with different consumption quantities.</desc>
+	<desc id="desc">One shared 10 kilogram inventory pool with three signed stock movements: an order of minus 250 grams, a return of plus 1 kilogram and a restock of plus 2 kilograms.</desc>
 	<rect width="160" height="160" rx="24" fill="#1b2540"/>
 
-	<!-- One continuous relationship network, painted behind every object. -->
-	<path d="M80 68v24M29 92h102M29 92v14M80 92v14M131 92v14" fill="none" stroke="#e2641e" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+	<!-- One line per movement, split like the banner and painted behind every object. -->
+	<g fill="none" stroke="#e2641e" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+		<path d="M60 76V94H29v12"/>
+		<path d="M80 106V78"/>
+		<path d="M131 106V94H100V76"/>
+	</g>
 
 	<!-- Shared inventory pool, matching the banner illustration. -->
 	<path d="M42 30c0-9 17-15 38-15s38 6 38 15v34c0 9-17 15-38 15s-38-6-38-15z" fill="#ffffff"/>
@@ -13,11 +17,14 @@
 	<text x="80" y="60" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="16" font-weight="700">10 kg</text>
 	<text x="80" y="72" text-anchor="middle" fill="#8a93a8" font-family="Arial, sans-serif" font-size="7" font-weight="700" letter-spacing="1">POOL</text>
 
-	<!-- Linked products consume different exact quantities from that pool. -->
+	<!-- Exact quantities moving out of and back into that pool. -->
 	<rect x="8" y="106" width="42" height="34" rx="7" fill="#ffffff"/>
 	<rect x="59" y="106" width="42" height="34" rx="7" fill="#ffffff"/>
 	<rect x="110" y="106" width="42" height="34" rx="7" fill="#ffffff"/>
-	<text x="29" y="127" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="9" font-weight="700">250 g</text>
-	<text x="80" y="127" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="10" font-weight="700">1 kg</text>
-	<text x="131" y="127" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="10" font-weight="700">2 kg</text>
+	<text x="29" y="118" text-anchor="middle" fill="#5f6b85" font-family="Arial, sans-serif" font-size="6" font-weight="700" letter-spacing="0.4">ORDER</text>
+	<text x="80" y="118" text-anchor="middle" fill="#5f6b85" font-family="Arial, sans-serif" font-size="6" font-weight="700" letter-spacing="0.4">RETURN</text>
+	<text x="131" y="118" text-anchor="middle" fill="#5f6b85" font-family="Arial, sans-serif" font-size="6" font-weight="700" letter-spacing="0.4">RESTOCK</text>
+	<text x="29" y="131" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="9" font-weight="700">−250 g</text>
+	<text x="80" y="131" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="10" font-weight="700">+1 kg</text>
+	<text x="131" y="131" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="10" font-weight="700">+2 kg</text>
 </svg>
