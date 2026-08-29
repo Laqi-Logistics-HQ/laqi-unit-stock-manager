@@ -17,6 +17,13 @@ final class UnitStockPage {
 	const SLUG = 'laqi-unit-stock-manager';
 
 	/**
+	 * The start-to-finish walkthrough on our documentation site.
+	 *
+	 * @var string
+	 */
+	const DOCUMENTATION_URL = 'https://laqi-logistics.com/documentation/laqi-unit-stock-manager/start-to-finish-demo/';
+
+	/**
 	 * Screen extensions.
 	 *
 	 * @var ScreenSectionCatalog
@@ -62,7 +69,25 @@ final class UnitStockPage {
 		}
 		?>
 		<div class="wrap laqi-lusm-wrap">
-			<h1><?php esc_html_e( 'Unit Stock', 'laqi-unit-stock-manager' ); ?></h1>
+			<h1 class="wp-heading-inline"><?php esc_html_e( 'Unit Stock', 'laqi-unit-stock-manager' ); ?></h1>
+			<?php
+			/*
+			 * The walkthrough, in WordPress's own page-title-action slot so it sits
+			 * where a merchant already looks for one, on every screen here rather
+			 * than only on an empty one. Opens in a new tab so a half-finished pool
+			 * or adjustment on this screen is not lost.
+			 */
+			?>
+			<a
+				class="page-title-action"
+				href="<?php echo esc_url( self::DOCUMENTATION_URL ); ?>"
+				target="_blank"
+				rel="noreferrer noopener"
+			>
+				<?php esc_html_e( 'Documentation', 'laqi-unit-stock-manager' ); ?>
+				<span class="screen-reader-text"><?php esc_html_e( '(opens in a new tab)', 'laqi-unit-stock-manager' ); ?></span>
+			</a>
+			<hr class="wp-header-end" />
 			<?php $this->render_notice(); ?>
 			<?php if ( count( $sections ) > 1 ) : ?>
 				<?php $this->render_navigation( $sections, $active ); ?>
