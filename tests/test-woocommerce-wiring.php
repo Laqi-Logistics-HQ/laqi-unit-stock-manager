@@ -1,0 +1,77 @@
+<?php
+/**
+ * WooCommerce adapter wiring tests.
+ *
+ * @package LaqiUnitStockManager
+ */
+
+use LaqiUnitStockManager\WooCommerce\OrderItemSnapshotter;
+use LaqiUnitStockManager\WooCommerce\OrderStockLifecycle;
+
+/**
+ * Verifies classic, Store API, and checkout snapshot hooks are active.
+ */
+class Test_WooCommerce_Wiring extends WP_UnitTestCase {
+
+	/**
+	 * Pooled stock hooks are registered after plugin boot.
+	 */
+	public function test_cart_and_snapshot_hooks_are_registered(): void {
+		$this->assertNotFalse( has_action( 'woocommerce_check_cart_items' ) );
+		$this->assertNotFalse( has_action( 'woocommerce_store_api_cart_errors' ) );
+		$this->assertNotFalse( has_action( 'woocommerce_checkout_create_order_line_item' ) );
+		$this->assertNotFalse( has_action( 'woocommerce_reduce_order_stock' ) );
+		$this->assertNotFalse( has_action( 'woocommerce_restore_order_stock' ) );
+		$this->assertNotFalse( has_filter( 'woocommerce_can_restock_refunded_items' ) );
+		$this->assertNotFalse( has_action( 'add_meta_boxes' ) );
+		$this->assertNotFalse( has_filter( 'woocommerce_hidden_order_itemmeta' ) );
+		$hidden_item_meta = apply_filters( 'woocommerce_hidden_order_itemmeta', array() );
+		$this->assertContains( OrderItemSnapshotter::META_KEY, $hidden_item_meta );
+		$this->assertContains( OrderStockLifecycle::RESTOCKED_QUANTITY_META, $hidden_item_meta );
+		$this->assertNotFalse( has_action( 'admin_menu' ) );
+		$this->assertNotFalse( has_filter( 'woocommerce_product_data_tabs' ) );
+		$this->assertNotFalse( has_action( 'woocommerce_product_data_panels' ) );
+		$this->assertNotFalse( has_action( 'woocommerce_product_after_variable_attributes' ) );
+		$this->assertNotFalse( has_action( 'woocommerce_save_product_variation' ) );
+		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_adjust_stock' ) );
+		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_create_pool' ) );
+		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_save_mapping' ) );
+		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_unlink_mapping' ) );
+		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_update_mapping' ) );
+		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_retire_unit' ) );
+		$this->assertNotFalse( has_action( 'wp_ajax_laqi_lusm_search_pools' ) );
+		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_update_pool' ) );
+		$this->assertNotFalse( has_action( 'admin_post_laqi_lusm_create_unit' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_save_low_stock_alert' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_save_forecast' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_save_stock_report' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_send_stock_report' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_create_supplier' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_create_supplier_pack' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_receive_supplier_pack' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_schedule_incoming_stock' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_receive_incoming_stock' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_save_reorder_policy' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_export_operations' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_import_operations' ) );
+		$this->assertNotFalse( has_action( 'laqi_lusm_stock_mutated' ) );
+		$this->assertFalse( has_action( 'laqi_lusm_stock_movement_applying' ) );
+		$this->assertFalse( has_filter( 'laqi_lusm_pool_available_quantity' ) );
+		$this->assertNotFalse( has_action( 'woocommerce_checkout_order_created' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_place_stock_hold' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_release_stock_hold' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_write_off_stock_hold' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_save_safety_stock' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_batch_quarantine' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_batch_release' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_batch_write_off' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_batch_stocktake' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_batch_recall' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_batch_transfer' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_batch_expiry_write_off' ) );
+		$this->assertFalse( has_action( 'admin_post_laqi_lusm_save_batch_expiry' ) );
+		$this->assertNotFalse( has_action( 'laqi_lusm_mapping_changed' ) );
+		$this->assertNotFalse( has_action( 'rest_api_init' ) );
+		$this->assertSame( '_laqi_lusm_stock_snapshot', OrderItemSnapshotter::META_KEY );
+	}
+}

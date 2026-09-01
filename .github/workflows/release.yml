@@ -1,0 +1,218 @@
+# Build distributable zips when a GitHub Release is published.
+#
+# TURNED OFF BY DEFAULT: the build job is gated on the `RELEASE_BUILDS_ENABLED`
+# repository variable. It does nothing until you enable it:
+#   Repo -> Settings -> Secrets and variables -> Actions -> Variables ->
+#   New variable: RELEASE_BUILDS_ENABLED = true
+# (or: `gh variable set RELEASE_BUILDS_ENABLED --body true`)
+#
+# Produces the complete Free archive:
+#   laqi-unit-stock-manager-<version>-wordpressorg.zip
+name: release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to build (no leading v), e.g. 1.2.0"
+        required: true
+
+permissions:
+  contents: write # needed to upload assets onto the release.
+
+jobs:
+  quality:
+    if: ${{ vars.RELEASE_BUILDS_ENABLED == 'true' }}
+    uses: ./.github/workflows/quality.yml
+
+  build:
+    # Master off-switch — see header. Remove this line (or set the variable) to enable.
+    if: ${{ vars.RELEASE_BUILDS_ENABLED == 'true' }}
+    needs: [quality]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up PHP 7.4
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2 = 2.37.2
+        with:
+          php-version: "7.4"
+          tools: composer
+
+      - name: Build optional production assets
+        # The lockfile also supports browser QA, so its presence alone no longer
+        # means that the release has frontend assets to compile.
+        run: |
+          if node -e "const p=require('./package.json'); process.exit(p.scripts?.build ? 0 : 1)"; then
+            npm ci
+            npm run build
+          fi
+
+      - name: Resolve version
+        id: ver
+        run: |
+          if [ -n "${{ github.event.release.tag_name }}" ]; then
+            echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build the WordPress.org zip
+        run: bash bin/build.sh --channel wordpressorg --version "${{ steps.ver.outputs.version }}"
+
+      # NOTE: quality.yml carries an equivalent archive check. Keep the two in
+      # step. On laqi-order-status-workflows a rule was corrected in one and
+      # not the other, so a release passed every quality job and then failed on
+      # the identical assertion one step later.
+      - name: Verify channel archive
+        shell: bash
+        run: |
+          archive="dist/laqi-unit-stock-manager-${{ steps.ver.outputs.version }}-wordpressorg.zip"
+          contents="$(unzip -Z1 "$archive")"
+
+          for forbidden in .wp-env.json playwright.config.js docs/ wordpress-org-assets/ tests/ test-results/ .github/ package.json package-lock.json README.md phpunit.integration.xml.dist vendor/ freemius/; do
+            if grep -q "^laqi-unit-stock-manager/${forbidden}" <<< "$contents"; then
+              echo "::error::Release archive contains development-only path: $forbidden"
+              exit 1
+            fi
+          done
+
+          if grep -Eq '(^|/)\.[^/]+(/|$)|\.(zip|tar|tgz|phar)(~|$)|~$' <<< "$contents"; then
+            echo "::error::Release archive contains a hidden path, archive, or backup file."
+            exit 1
+          fi
+
+          for required in \
+            laqi-unit-stock-manager/readme.txt \
+            laqi-unit-stock-manager/changelog.txt \
+            laqi-unit-stock-manager/languages/laqi-unit-stock-manager.pot; do
+            if ! grep -qx "$required" <<< "$contents"; then
+              echo "::error::Missing required release file: $required"
+              exit 1
+            fi
+          done
+
+          if ! unzip -p "$archive" laqi-unit-stock-manager/laqi-unit-stock-manager.php | grep -Fx ' * Plugin Name:       Laqi Unit Stock Manager for WooCommerce' > /dev/null; then
+            echo "::error::Archive is missing the Free plugin name."
+            exit 1
+          fi
+
+          if node -e "const p=require('./package.json'); process.exit(p.scripts?.build ? 0 : 1)"; then
+            for required_asset in \
+              laqi-unit-stock-manager/build/index.js \
+              laqi-unit-stock-manager/build/index.asset.php; do
+              if ! grep -qx "$required_asset" <<< "$contents"; then
+                echo "::error::Missing required built asset: $required_asset"
+                exit 1
+              fi
+            done
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: "laqi-unit-stock-manager-wordpressorg"
+          path: dist/*.zip
+
+      - name: Attach to release
+        if: ${{ github.event_name == 'release' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${GITHUB_REF_NAME}" dist/*.zip --clobber
+
+      # Publish this release to the public R2 bucket the website reads.
+      #
+      # Before this existed, the site kept its own copy of every plugin's
+      # version, its supported WordPress and WooCommerce ranges, and — where a
+      # free edition exists — the downloadable zip itself. All of it was typed
+      # or copied by hand into another repository, and all of it drifted: a site
+      # advertising a version two releases behind, offering a download from the
+      # release before that, and claiming a "tested up to" the plugin never
+      # declared. Nothing noticed, because a number in one repo has no
+      # relationship to the release it claims to describe.
+      #
+      # Requires, per repo:
+      #   variable  R2_PUBLISH_ENABLED = true
+      #   secrets   R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_ENDPOINT
+      #
+      # The credential must be an R2 token scoped to the bucket, NOT a Workers
+      # token: those cannot be scoped to a single Worker, so one leaking would
+      # let someone replace the live company website.
+      - name: Publish the release manifest to R2
+        if: ${{ github.event_name == 'release' && vars.R2_PUBLISH_ENABLED == 'true' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          set -euo pipefail
+          bash bin/build-release-manifest.sh > manifest.json
+          cat manifest.json
+
+          # One file per plugin, never a shared one: two releases running at
+          # once would otherwise race on a read-modify-write and lose a version.
+          # Short TTL: this path changes every release, and R2's default of four
+          # hours had the edge serving a superseded object long after a correct
+          # upload.
+          aws s3 cp manifest.json \
+            "s3://laqi-releases/versions/laqi-unit-stock-manager.json" \
+            --endpoint-url "$R2_ENDPOINT" --content-type application/json \
+            --cache-control "public, max-age=60, must-revalidate"
+
+          # Publishing silently is the failure this replaces, so read it back —
+          # but through the edge, with a cache-buster and a few attempts. Reading
+          # the instant after an upload can be answered from an edge cache still
+          # holding the previous object, which would let this pass while proving
+          # nothing.
+          served=""
+          for attempt in 1 2 3 4 5 6; do
+            served="$(curl -fsSL -H 'Cache-Control: no-cache' \
+              "https://files.laqi-logistics.com/versions/laqi-unit-stock-manager.json?cb=${GITHUB_RUN_ID}-${attempt}" \
+              | jq -r .version || true)"
+            [ "$served" = "$VERSION" ] && break
+            sleep 10
+          done
+
+          if [ "$served" != "$VERSION" ]; then
+            echo "::error::R2 serves version ${served:-<unreachable>}, expected $VERSION"
+            exit 1
+          fi
+          echo "Published laqi-unit-stock-manager $served to files.laqi-logistics.com" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish the free build to R2
+        if: ${{ github.event_name == 'release' && vars.R2_PUBLISH_ENABLED == 'true' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          set -euo pipefail
+          zip="dist/laqi-unit-stock-manager-${VERSION}-wordpressorg.zip"
+          [ -f "$zip" ] || { echo "::error::free build missing: $zip"; exit 1; }
+
+          # A stable path the site links to, and an immutable versioned copy so a
+          # release stays fetchable after the next one overwrites the former.
+          # Short TTL on the stable path: it is what the website links to and it
+          # changes every release. Left at the default, the edge served the
+          # previous zip for hours after a correct upload, so customers
+          # downloaded the version the release had just fixed.
+          aws s3 cp "$zip" "s3://laqi-releases/downloads/laqi-unit-stock-manager.zip" \
+            --endpoint-url "$R2_ENDPOINT" --content-type application/zip \
+            --cache-control "public, max-age=60, must-revalidate"
+          # The versioned copy never changes, so it can be cached hard.
+          aws s3 cp "$zip" "s3://laqi-releases/downloads/laqi-unit-stock-manager-${VERSION}.zip" \
+            --endpoint-url "$R2_ENDPOINT" --content-type application/zip \
+            --cache-control "public, max-age=31536000, immutable"
+
+          # A ranged GET, not HEAD: a HEAD to this domain from a runner is liable
+          # to be challenged and answered 403.
+          size="$(curl -fsSL -o /dev/null -w '%{size_download}' -r 0-0 \
+            "https://files.laqi-logistics.com/downloads/laqi-unit-stock-manager.zip?cb=${GITHUB_RUN_ID}")"
+          [ "$size" = "1" ] || { echo "::error::free build not readable from the edge"; exit 1; }
+          echo "Published the laqi-unit-stock-manager free build" >> "$GITHUB_STEP_SUMMARY"

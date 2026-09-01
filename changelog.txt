@@ -1,0 +1,45 @@
+*** Laqi Unit Stock Manager for WooCommerce Changelog ***
+
+2026-09-01 - version 1.2.2
+* Add - A link to the documentation walkthrough sits beside the Unit Stock heading, on every screen in the section, so how to set up a pool and map packages to it is one click from where the question comes up.
+* Dev - Refresh the WordPress.org listing text and artwork. The listing reads as a page rather than a specification, the icon names and signs each stock movement, and two screenshots no longer show an empty pool or the capture script's own test rows.
+
+2026-08-25 - version 1.2.1
+* Change - The Activity ledger had two free-text boxes. The Search box already matched the reason as well as the pool, movement, source and actor, so the separate Reason box could never find anything Search would miss. There is now one search box.
+* Change - The search filter starts its own row, so every filter bar reads the same way whether four narrowing filters precede it or six.
+* Change - An add-on's action, such as the Pro CSV export, renders beside Filter in the filter bar rather than on its own line above the table.
+* Fix - Search filters in the Activity ledger and the Pro tables cut their placeholder text off mid-word. The search filter now takes the width its row has spare, so the placeholder reads in full.
+
+2026-08-21 - version 1.2.0
+* Add - The Activity ledger shows who made each change in a new Actor column, and a search box matching pool, movement, source, reason, or actor. Both were previously only in the Pro Ledger tab.
+* Change - The Source column no longer shows the acting user's name. Source now answers what caused a movement and Actor answers who performed it; a manual adjustment used to read as though a person were its source.
+* Add - Extension API 1.2: `laqi_lusm_activity_actions` lets an add-on render actions beside the Activity filter bar, receiving the active filters, the pools in scope, and the matching total.
+
+2026-08-21 - version 1.1.0
+* Add - Filter the Activity ledger by inventory pool, movement, source, actor, date range, and recorded reason, with page links that keep the filters and an empty state that names them.
+* Add - Shared dataset components (DatasetPage, DatasetFilters, DatasetView, DatasetRenderer, FilteredQuery) so Free and registered Pro tabs paginate and filter growing tables the same way.
+* Add - Extension API 1.1: pool policies can be counted and paged by namespace, and movement reads accept categorical filters.
+* Change - Movement reads run through one filtered query instead of three near-identical pairs. Existing reads keep working and now always carry the actor name.
+* Fix - Filtering the Activity ledger keeps the product it was scoped to, instead of silently widening to every pool.
+* Add - Extension API: ask whether one pool owns a policy namespace without loading the list, and without an unknown pool being an error.
+* Change - Pools that own an extension policy are found through a keyed index instead of decoding every stored policy in PHP. Existing policies are indexed automatically on upgrade.
+
+2026-08-21 - version 1.0.3
+* Tweak - Declare compatibility with WordPress 7.1, tested against the 7.1 test suite.
+* Tweak - Broadened the shared-pool example so it spans milligram to kilogram packages and decimal quantities, rather than whole grams alone.
+
+2026-08-21 - version 1.0.2
+* Fix - The "WooCommerce is required" and "two editions are active" notices now appear only on the Plugins screen, where they can be acted on, and are dismissible. They no longer render on every wp-admin page.
+
+2026-08-18 - version 1.0.1
+* Update - Improved the plugin description shown on the Plugins screen.
+
+2026-08-17 - version 1.0.0
+* Add - Initial WordPress.org release of the complete Free shared-stock engine.
+* Add - Exact inventory pools shared by simple products and individual variations, with mass, volume, length, count, and custom merchant units.
+* Add - Combined-cart availability checks for classic checkout and the Store API used by Cart and Checkout Blocks.
+* Add - Immutable order-item mapping snapshots and idempotent reductions, restorations, refunds, and admin order-edit reconciliation.
+* Add - Native simple-product and variation mapping controls, Products-list mapping coverage and filters, stock diagnostics, and synchronized stock status.
+* Add - Searchable pool management, inline stock corrections, explicit existing-stock migration choices, and safe custom-unit conversion and retirement.
+* Add - Paginated product-link and append-only activity views plus detailed pooled-stock audits on WooCommerce orders.
+* Add - Privacy export and erasure support, uninstall cleanup, versioned REST endpoints, HPOS compatibility, and a stable extension API for the separate Pro add-on.

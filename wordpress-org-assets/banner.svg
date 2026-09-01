@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1544 500" role="img" aria-labelledby="title desc">
+	<title id="title">Laqi Unit Stock Manager for WooCommerce</title>
+	<desc id="desc">A shared 10 kilogram stock pool reconciles an order, a goods return, and a restock to 9 kilograms.</desc>
+	<rect width="1544" height="500" fill="#1b2540"/>
+	<circle cx="1390" cy="64" r="250" fill="#25314f"/>
+	<circle cx="116" cy="470" r="235" fill="#222e4a"/>
+	<g transform="translate(110 92)">
+		<text x="0" y="58" fill="#e2641e" font-family="Arial, sans-serif" font-size="31" font-weight="700" letter-spacing="4">LAQI LOGISTICS</text>
+		<text x="0" y="147" fill="#ffffff" font-family="Arial, sans-serif" font-size="66" font-weight="700">Unit Stock Manager</text>
+		<text x="0" y="207" fill="#d9deea" font-family="Arial, sans-serif" font-size="32">One stock pool shared by every linked product.</text>
+		<rect x="0" y="252" width="440" height="58" rx="29" fill="#e2641e"/>
+		<text x="220" y="281" text-anchor="middle" dominant-baseline="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="25" font-weight="700">Orders, returns and restocks</text>
+	</g>
+	<g transform="translate(1045 40)">
+		<path d="M170 157v28H62v30M50 202l12 14 12-14" fill="none" stroke="#e2641e" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+		<path d="M220 216v-56M208 174l12-14 12 14" fill="none" stroke="#e2641e" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+		<path d="M378 216v-31H270v-25M258 174l12-14 12 14" fill="none" stroke="#e2641e" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+		<path d="M128 44c0-16 41-29 92-29s92 13 92 29v84c0 16-41 29-92 29s-92-13-92-29z" fill="#ffffff"/>
+		<ellipse cx="220" cy="44" rx="92" ry="29" fill="#eef0f5"/>
+		<ellipse cx="220" cy="44" rx="70" ry="17" fill="#8a93a8"/>
+		<text x="220" y="99" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="31" font-weight="700">10 kg</text>
+		<text x="220" y="126" text-anchor="middle" fill="#8a93a8" font-family="Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="2">STARTING POOL</text>
+		<g transform="translate(0 222)">
+			<rect width="124" height="104" rx="16" fill="#ffffff"/>
+			<text x="62" y="27" text-anchor="middle" fill="#8a93a8" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="1.5">ORDER</text>
+			<path d="M25 42h74M25 56h48" fill="none" stroke="#8a93a8" stroke-width="7" stroke-linecap="round"/>
+			<text x="62" y="88" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="23" font-weight="700">−2 kg</text>
+		</g>
+		<g transform="translate(158 222)">
+			<rect width="124" height="104" rx="16" fill="#ffffff"/>
+			<text x="62" y="27" text-anchor="middle" fill="#8a93a8" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="1.5">RETURN</text>
+			<path d="M25 42h74M25 56h48" fill="none" stroke="#8a93a8" stroke-width="7" stroke-linecap="round"/>
+			<text x="62" y="88" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="23" font-weight="700">+750 g</text>
+		</g>
+		<g transform="translate(316 222)">
+			<rect width="124" height="104" rx="16" fill="#ffffff"/>
+			<text x="62" y="27" text-anchor="middle" fill="#8a93a8" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="1.5">RESTOCK</text>
+			<path d="M25 42h74M25 56h48" fill="none" stroke="#8a93a8" stroke-width="7" stroke-linecap="round"/>
+			<text x="62" y="88" text-anchor="middle" fill="#1b2540" font-family="Arial, sans-serif" font-size="23" font-weight="700">+250 g</text>
+		</g>
+		<rect x="145" y="344" width="150" height="48" rx="24" fill="#e2641e"/>
+		<text x="220" y="376" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="23" font-weight="700">9 kg now</text>
+	</g>
+</svg>
