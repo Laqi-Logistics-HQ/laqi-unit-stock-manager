@@ -117,7 +117,7 @@ jobs:
 
       # The PHP floor, not the newest: this is the version clients actually run,
       # so it is the one whose failure would matter most.
-      - uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2 = 2.37.2
         with:
           php-version: "7.4"
           tools: composer
