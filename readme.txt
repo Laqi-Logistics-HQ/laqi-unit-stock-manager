@@ -4,7 +4,7 @@ Tags: woocommerce, inventory, stock management, variable products, units
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 7.1
@@ -141,6 +141,9 @@ Deleting the last installed edition removes the plugin's inventory tables and it
 This plugin ships human-readable PHP, JavaScript, and CSS without minified or generated runtime assets. No separate compilation step is required to inspect or reproduce the distributed code.
 
 == Changelog ==
+
+= 1.2.2 =
+* Added a link to the documentation walkthrough beside the Unit Stock heading, so setting up a pool and mapping packages to it is one click away from every screen in the section.
 
 = 1.2.1 =
 * Changed the Activity ledger's two free-text boxes into one search box, since the Search box already covered everything the Reason box did.

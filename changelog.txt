@@ -1,5 +1,9 @@
 *** Laqi Unit Stock Manager for WooCommerce Changelog ***
 
+2026-09-01 - version 1.2.2
+* Add - A link to the documentation walkthrough sits beside the Unit Stock heading, on every screen in the section, so how to set up a pool and map packages to it is one click from where the question comes up.
+* Dev - Refresh the WordPress.org listing text and artwork. The listing reads as a page rather than a specification, the icon names and signs each stock movement, and two screenshots no longer show an empty pool or the capture script's own test rows.
+
 2026-08-25 - version 1.2.1
 * Change - The Activity ledger had two free-text boxes. The Search box already matched the reason as well as the pool, movement, source and actor, so the separate Reason box could never find anything Search would miss. There is now one search box.
 * Change - The search filter starts its own row, so every filter bar reads the same way whether four narrowing filters precede it or six.
