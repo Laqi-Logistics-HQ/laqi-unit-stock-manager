@@ -136,10 +136,6 @@ The free plugin is the complete shared-stock engine: pools, exact units, product
 
 Deleting the last installed edition removes the plugin's inventory tables and its stored schema version. If Pro is still installed, your shared inventory data is kept.
 
-== Source Code ==
-
-This plugin ships human-readable PHP, JavaScript, and CSS without minified or generated runtime assets. No separate compilation step is required to inspect or reproduce the distributed code.
-
 == Changelog ==
 
 = 1.2.2 =
