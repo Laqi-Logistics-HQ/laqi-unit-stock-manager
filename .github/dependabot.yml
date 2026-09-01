@@ -40,8 +40,8 @@ updates:
         update-types:
           - "minor"
           - "patch"
-    # Majors stay outside the group deliberately, one PR each. A wp-scripts
-    # major carries a new ESLint, and ESLint 9 silently ignores .eslintrc
-    # rather than failing on it, so a major that lands unread can disable
-    # linting without anything going red. These are the ones to actually look
-    # at.
+    # Majors stay outside the group deliberately, one PR each. An ESLint major
+    # can change how config is discovered, and ESLint 9 already silently
+    # ignores .eslintrc rather than failing on it, so a major that lands unread
+    # can disable linting without anything going red. These are the ones to
+    # actually look at.

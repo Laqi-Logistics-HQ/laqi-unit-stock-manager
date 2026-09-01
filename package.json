@@ -5,16 +5,22 @@
   "description": "Asset linting for Laqi Unit Stock Manager for WooCommerce. Plain admin CSS is enqueued directly and needs no build. Adding blocks/React/SCSS? Create assets/src/index.js and add back the build/start scripts — see buildScriptsComment.",
   "buildScriptsComment": "There are deliberately no build/start scripts. Both CI workflows key off the mere presence of scripts.build — quality.yml runs `npm run build --if-present` and release.yml runs it when the script exists — so shipping `wp-scripts build assets/src/index.js` with no assets/src fails both on a freshly scaffolded plugin. Add these back the same day you add a real entry point: \"build\": \"wp-scripts build assets/src/index.js --output-path=build\", \"start\": \"wp-scripts start assets/src/index.js --output-path=build\".",
   "scripts": {
-    "lint:js": "wp-scripts lint-js assets",
-    "lint:css": "wp-scripts lint-style 'assets/**/*.css'",
+    "lint:js": "eslint assets",
+    "lint:css": "stylelint 'assets/**/*.css'",
     "wp-env": "wp-env",
     "test:admin-quality": "playwright test"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",
     "@playwright/test": "^1.62.0",
+    "@wordpress/babel-preset-default": "^8.29.0",
     "@wordpress/env": "^11.14.0",
-    "@wordpress/scripts": "^34.2.0"
+    "@wordpress/eslint-plugin": "^25.10.0",
+    "@wordpress/prettier-config": "^4.54.0",
+    "@wordpress/stylelint-config": "^24.3.0",
+    "eslint": "^9.39.0",
+    "prettier": "npm:wp-prettier@^3.0.3",
+    "stylelint": "^16.26.0"
   },
   "overridesComment": "There is no TypeScript in a scaffolded plugin. typescript is pulled in by the ESLint chain, and every consumer declares an open-ended peer range (>=4, >=4.2.0), so npm resolves the newest major. TypeScript 7 removed the TypeFlags export ts-api-utils reads, so the @typescript-eslint plugin throws while the config loads and `npm run lint:js` dies before reading a file — reporting nothing about the code rather than no problems. Pinned to the 5.x line @typescript-eslint 6 supports.",
   "overrides": {

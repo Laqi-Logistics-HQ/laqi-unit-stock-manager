@@ -20,9 +20,10 @@ $WORK phpcbf               # auto-fix
 # Tests (run `make test-install` once first)
 make test p=laqi-unit-stock-manager
 
-# Build assets only if you adopt a wp-scripts build (blocks/React/SCSS).
+# JS and CSS linting (eslint and stylelint directly, no wp-scripts).
 make npm p=laqi-unit-stock-manager c="install"
-make npm p=laqi-unit-stock-manager c="run build"
+make npm p=laqi-unit-stock-manager c="run lint:js"
+make npm p=laqi-unit-stock-manager c="run lint:css"
 ```
 
 See [Contributor extension recipes](docs/contributor-extension-recipes.md) for
