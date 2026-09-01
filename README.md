@@ -75,7 +75,13 @@ Order Storage and Cart & Checkout Blocks.
 ## Installation
 
 Install from [WordPress.org](https://wordpress.org/plugins/laqi-unit-stock-manager/),
-or drop this repository into `wp-content/plugins/` and activate it.
+which is the easiest route and keeps the plugin updated from your dashboard. For
+a manual install, download the zip attached to the
+[latest release](https://github.com/Laqi-Logistics-HQ/laqi-unit-stock-manager/releases/latest)
+and upload it under **Plugins → Add New → Upload Plugin**.
+
+Dropping this repository into `wp-content/plugins/` also works: this plugin ships
+plain PHP, JavaScript and CSS with no build step.
 
 1. Create an inventory pool under **Products → Unit Stock → Setup**, with its stock
    unit and opening balance.
