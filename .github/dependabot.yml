@@ -12,3 +12,36 @@ updates:
     open-pull-requests-limit: 2
     commit-message:
       prefix: "chore"
+
+  # npm was unwatched, and that is where every open Dependabot alert on this
+  # repository came from: package-lock.json, all of it development scope,
+  # behind @wordpress/scripts. package.json has no runtime dependencies, so
+  # none of it reaches the shipped zip, but @wordpress/scripts was left seven
+  # majors behind and the transitive tree aged with it.
+  #
+  # Alerts tell you a version is vulnerable after the fact. Version updates are
+  # what stop the lag rebuilding, which is the actual failure here.
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:30"
+      timezone: "Europe/Amsterdam"
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore"
+    groups:
+      # One PR a week for the routine drift, rather than four. Everything here
+      # is dev tooling, so there is nothing worth reviewing package by package.
+      dev-tooling:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    # Majors stay outside the group deliberately, one PR each. A wp-scripts
+    # major carries a new ESLint, and ESLint 9 silently ignores .eslintrc
+    # rather than failing on it, so a major that lands unread can disable
+    # linting without anything going red. These are the ones to actually look
+    # at.
