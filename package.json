@@ -13,8 +13,8 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",
     "@playwright/test": "^1.62.0",
-    "@wordpress/env": "^11.11.0",
-    "@wordpress/scripts": "^27"
+    "@wordpress/env": "^11.14.0",
+    "@wordpress/scripts": "^34.2.0"
   },
   "overridesComment": "There is no TypeScript in a scaffolded plugin. typescript is pulled in by the ESLint chain, and every consumer declares an open-ended peer range (>=4, >=4.2.0), so npm resolves the newest major. TypeScript 7 removed the TypeFlags export ts-api-utils reads, so the @typescript-eslint plugin throws while the config loads and `npm run lint:js` dies before reading a file — reporting nothing about the code rather than no problems. Pinned to the 5.x line @typescript-eslint 6 supports.",
   "overrides": {
