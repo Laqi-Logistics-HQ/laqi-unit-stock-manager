@@ -109,8 +109,9 @@ product, variation, and inventory-pool search. Active links are reviewed in a
 compact directory that routes ongoing edits back to the owning product, and can
 be soft-unlinked there; historical mapping components remain available
 for immutable order restoration. The plugin has no frontend UI and registers no
-one screen-scoped plugin script; it registers no storefront assets. The native
-Products list bulk-loads a Unit Stock status projection for its current page and
+storefront assets. Its one admin script, `laqi-unit-stock-manager-admin`, is
+scoped to the same screens as the styles. The native Products list bulk-loads a
+Unit Stock status projection for its current page and
 offers linked, unlinked, incomplete/warning, and recipe filters without per-row
 mapping queries. Context links lead to the exact variation, relevant pool search,
 or Activity view filtered to the mapping's pools.
