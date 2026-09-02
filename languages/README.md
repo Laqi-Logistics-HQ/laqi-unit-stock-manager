@@ -27,6 +27,13 @@ $WORK wp i18n make-mo   languages                 # .po -> .mo  (PHP strings)
 $WORK wp i18n make-json languages --no-purge      # .po -> .json (JS strings)
 ```
 
-JS strings are only translatable if the script is registered and you call
-`Plugin::set_script_translations( $handle )` (which wraps
-`wp_set_script_translations`) after enqueuing it.
+The plugin's own JavaScript carries no translatable strings today.
+`assets/js/admin.js` receives its interface text already translated, in the
+`i18n` array of the `wp_localize_script()` call in `src/Assets.php`, so those
+strings are extracted from the PHP like any other.
+
+The `make-json` step above therefore produces nothing yet. It matters the moment
+any script calls `wp.i18n.__()` directly: that script's registered handle then
+also needs `wp_set_script_translations( $handle, 'laqi-unit-stock-manager',
+LAQI_LUSM_PATH . 'languages' )` after it is enqueued, or the compiled `.json`
+never loads.
