@@ -20,11 +20,18 @@ to the same address and say which edition you mean.
 
 ## Reporting a vulnerability
 
-Email **support@laqi-logistics.com** with `Security` in the subject line.
+Use either route. Both are private and both reach the same person.
 
-Please do not open a GitHub issue and do not post in the WordPress.org support
-forum. Both are public, and an unpatched report there puts every install at risk
-before a fix exists.
+- **GitHub**, through the Security tab of this repository:
+  [report a vulnerability](https://github.com/Laqi-Logistics-HQ/laqi-unit-stock-manager/security/advisories/new).
+  That opens a draft advisory only we can see, and keeps the report, the
+  discussion and the fix together in one place.
+- **Email** **support@laqi-logistics.com** with `Security` in the subject line,
+  if you would rather not use GitHub or do not have an account.
+
+Please do not open an ordinary GitHub issue, and do not post in the WordPress.org
+support forum. Both are public, and an unpatched report in either puts every
+install at risk before a fix exists.
 
 Useful things to include, as far as you have them:
 
