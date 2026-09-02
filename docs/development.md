@@ -6,7 +6,7 @@ Maintainer and contributor notes for this plugin. If you are here to use it, the
 Clone this repository into any WordPress install's `wp-content/plugins/` and it
 runs. Ours is bind-mounted into a Docker stack at
 `wp-content/plugins/laqi-unit-stock-manager`, so the running site serves the checkout
-directly and Xdebug attaches to it — but nothing here depends on that setup.
+directly and Xdebug attaches to it, but nothing here depends on that setup.
 
 ```bash
 cd /path/to/wordpress_localhost
@@ -40,7 +40,7 @@ src/Plugin.php        # main class (PSR-4 namespace LaqiUnitStockManager); WC gu
 src/Privacy.php       # exporter, eraser, and privacy-policy integration points
 src/Assets.php        # scopes Unit Stock admin styles
 assets/css/           # admin.css (Unit Stock screen only, version-busted)
-languages/            # .pot / .po / .mo / .json — see languages/README.md
+languages/            # .pot / .po / .mo / .json, see languages/README.md
 bin/build.sh          # build the complete WordPress.org Free zip
 bin/install-wp-tests.sh # provision pinned WordPress test suites for CI
 .github/workflows/    # quality.yml + gated Free release.yml
