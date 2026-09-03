@@ -141,7 +141,7 @@ final class SetupSection implements ScreenSectionInterface {
 			<?php elseif ( 'products' === $active ) : ?>
 			<section class="card">
 				<h2><?php esc_html_e( 'Link a product or variation', 'laqi-unit-stock-manager' ); ?></h2>
-				<p><?php esc_html_e( 'Choose exactly how much pooled stock one sold item consumes. Labels are never parsed automatically.', 'laqi-unit-stock-manager' ); ?></p>
+				<p><?php esc_html_e( 'Choose exactly how much pooled stock one sold item consumes. Pool and unit names are for your own bookkeeping — no quantity is ever read from a name.', 'laqi-unit-stock-manager' ); ?></p>
 				<?php $this->render_mapping_form(); ?>
 			</section>
 			<section class="card laqi-lusm-setup-wide">
@@ -226,7 +226,7 @@ final class SetupSection implements ScreenSectionInterface {
 						<?php if ( 'single_pool' !== $mapping->calculator_type() ) : ?>
 							<?php
 							/* translators: 1: mapping calculator type, 2: component count. */
-							echo esc_html( sprintf( __( '%1$s mapping with %2$d components. Use its dedicated section to edit it.', 'laqi-unit-stock-manager' ), $mapping->calculator_type(), count( $mapping->components() ) ) );
+							echo esc_html( sprintf( __( '%1$s link with %2$d components. Use its dedicated section to edit it.', 'laqi-unit-stock-manager' ), $mapping->calculator_type(), count( $mapping->components() ) ) );
 							?>
 						<?php else : ?>
 							<strong><?php echo esc_html( $pool ? $pool->name() : __( 'Unavailable inventory pool', 'laqi-unit-stock-manager' ) ); ?></strong>
@@ -366,7 +366,7 @@ final class SetupSection implements ScreenSectionInterface {
 				<option value="keep"><?php esc_html_e( 'Keep native quantity management unchanged', 'laqi-unit-stock-manager' ); ?></option>
 			</select>
 			<p class="description laqi-lusm-form-description"><?php esc_html_e( 'Transferring multiplies the current native item count by the consumption per item and adds that exact quantity to the pool once.', 'laqi-unit-stock-manager' ); ?></p>
-			<?php submit_button( __( 'Save mapping', 'laqi-unit-stock-manager' ) ); ?>
+			<?php submit_button( __( 'Save link', 'laqi-unit-stock-manager' ) ); ?>
 		</form>
 		<?php
 	}
