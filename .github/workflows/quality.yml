@@ -219,3 +219,24 @@ jobs:
               exit 1
             fi
           done
+
+          # The package ROOT is an allowlist, because bin/build.sh is not: it
+          # selects by rsync exclusion, so a new file in the plugin root ships
+          # unless somebody remembers to exclude it. CONTRIBUTING.md, SECURITY.md
+          # and eslint.config.cjs all slipped in that way, and were only noticed
+          # in an SVN dry-run that listed them as additions. Fail here instead.
+          #
+          # Project docs belong on GitHub, which surfaces them; a download does
+          # not. LICENSE is the exception and stays: the plugin is GPL. This
+          # plugin has no compiled admin, so unlike the rule engine it ships no
+          # package.json or webpack.config.js and needs no readable-source
+          # guarantee.
+          expected_root="$(printf '%s\n' \
+            LICENSE changelog.txt laqi-unit-stock-manager.php readme.txt uninstall.php | sort)"
+          actual_root="$(grep -E '^laqi-unit-stock-manager/[^/]+$' <<< "$free_contents" \
+            | sed 's|^laqi-unit-stock-manager/||' | sort)"
+          if [ "$expected_root" != "$actual_root" ]; then
+            echo "::error::the package root changed; update this list or exclude the file in bin/build.sh"
+            diff <(echo "$expected_root") <(echo "$actual_root") || true
+            exit 1
+          fi

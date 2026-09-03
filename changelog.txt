@@ -1,3 +1,7 @@
+2026-09-03 - version 1.2.4
+* Tweak - The download no longer carries CONTRIBUTING.md, SECURITY.md or eslint.config.cjs. They are project files that GitHub surfaces on its own; a plugin download has no use for them. LICENSE stays, because the plugin is GPL.
+* Dev - Assert the package root against an allowlist. bin/build.sh selects release contents by exclusion, so a new file in the plugin root shipped unless somebody remembered to exclude it.
+
 *** Laqi Unit Stock Manager for WooCommerce Changelog ***
 
 2026-09-03 - version 1.2.3
