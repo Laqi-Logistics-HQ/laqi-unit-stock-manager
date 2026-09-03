@@ -253,7 +253,7 @@ final class UnitStockPage {
 			wp_admin_notice( __( 'Inventory pool details could not be updated.', 'laqi-unit-stock-manager' ), array( 'type' => 'error' ) );
 		} elseif ( 'mapping_saved' === $result ) {
 			wp_admin_notice(
-				__( 'Product stock mapping saved.', 'laqi-unit-stock-manager' ),
+				__( 'Product link saved.', 'laqi-unit-stock-manager' ),
 				array(
 					'type'        => 'success',
 					'dismissible' => true,
@@ -261,7 +261,7 @@ final class UnitStockPage {
 			);
 		} elseif ( 'mapping_unlinked' === $result ) {
 			wp_admin_notice(
-				__( 'Product stock mapping unlinked.', 'laqi-unit-stock-manager' ),
+				__( 'Product link removed.', 'laqi-unit-stock-manager' ),
 				array(
 					'type'        => 'success',
 					'dismissible' => true,
@@ -269,7 +269,7 @@ final class UnitStockPage {
 			);
 		} elseif ( 'mapping_updated' === $result ) {
 			wp_admin_notice(
-				__( 'Product stock mapping updated.', 'laqi-unit-stock-manager' ),
+				__( 'Product link updated.', 'laqi-unit-stock-manager' ),
 				array(
 					'type'        => 'success',
 					'dismissible' => true,

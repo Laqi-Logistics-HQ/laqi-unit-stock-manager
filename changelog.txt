@@ -1,5 +1,9 @@
 *** Laqi Unit Stock Manager for WooCommerce Changelog ***
 
+unreleased - version 1.2.3
+* Tweak - The setup screen called one thing by two names. Linking a product to a pool was a "link" in every heading and list but a "mapping" on the button that saves it and in the notices that confirm it. It is a link everywhere now.
+* Tweak - Reword the note under the product linking form. It said "Labels are never parsed automatically", which named nothing on that screen. It now says what it means: pool and unit names are your own bookkeeping, and no quantity is ever read from a name.
+
 2026-09-01 - version 1.2.2
 * Add - A link to the documentation walkthrough sits beside the Unit Stock heading, on every screen in the section, so how to set up a pool and map packages to it is one click from where the question comes up.
 * Dev - Refresh the WordPress.org listing text and artwork. The listing reads as a page rather than a specification, the icon names and signs each stock movement, and two screenshots no longer show an empty pool or the capture script's own test rows.

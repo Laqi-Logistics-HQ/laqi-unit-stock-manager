@@ -149,7 +149,7 @@ final class ProductList {
 			<option value="linked" <?php selected( 'linked', $current ); ?>><?php esc_html_e( 'Linked', 'laqi-unit-stock-manager' ); ?></option>
 			<option value="unlinked" <?php selected( 'unlinked', $current ); ?>><?php esc_html_e( 'Not linked', 'laqi-unit-stock-manager' ); ?></option>
 			<option value="attention" <?php selected( 'attention', $current ); ?>><?php esc_html_e( 'Incomplete or warning', 'laqi-unit-stock-manager' ); ?></option>
-			<option value="recipe" <?php selected( 'recipe', $current ); ?>><?php esc_html_e( 'Recipe mapping', 'laqi-unit-stock-manager' ); ?></option>
+			<option value="recipe" <?php selected( 'recipe', $current ); ?>><?php esc_html_e( 'Recipe link', 'laqi-unit-stock-manager' ); ?></option>
 		</select>
 		<?php
 	}

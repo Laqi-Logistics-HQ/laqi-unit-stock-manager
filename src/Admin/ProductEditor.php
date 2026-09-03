@@ -155,7 +155,7 @@ final class ProductEditor {
 	private function render_variable_summary( int $configured, int $total ): void {
 		?>
 		<section class="laqi-lusm-product-mapping laqi-lusm-variable-summary">
-			<h4><?php esc_html_e( 'Variation mappings', 'laqi-unit-stock-manager' ); ?></h4>
+			<h4><?php esc_html_e( 'Variation links', 'laqi-unit-stock-manager' ); ?></h4>
 			<p>
 			<?php
 			printf(

@@ -138,6 +138,10 @@ Deleting the last installed edition removes the plugin's inventory tables and it
 
 == Changelog ==
 
+= 1.2.3 =
+* Linking a product to a pool is now called a link everywhere, instead of a link in some places and a mapping in others.
+* Reworded the note under the product linking form to say what it means: pool and unit names are for your own bookkeeping, and no quantity is ever read from a name.
+
 = 1.2.2 =
 * Added a link to the documentation walkthrough beside the Unit Stock heading, so setting up a pool and mapping packages to it is one click away from every screen in the section.
 
