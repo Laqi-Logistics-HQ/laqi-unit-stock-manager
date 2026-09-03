@@ -95,6 +95,9 @@ rsync -a --no-owner --no-group --delete \
   --exclude 'package.json' \
   --exclude 'package-lock.json' \
   --exclude 'README.md' \
+  --exclude 'CONTRIBUTING.md' \
+  --exclude 'SECURITY.md' \
+  --exclude 'eslint.config.cjs' \
   --exclude 'vendor' \
   --exclude 'freemius' \
   ./ "$DEST/"
