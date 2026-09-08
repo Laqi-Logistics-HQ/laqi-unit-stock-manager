@@ -61,9 +61,21 @@ echo "Plugin Check will run against WordPress $WP_VERSION"
 # ---------------------------------------------------------------------------
 # Environment.
 # ---------------------------------------------------------------------------
-# Written at the working directory, not inside the package, so nothing is added
-# to the tree being checked. testsEnvironment is off because Plugin Check only
-# needs the development environment, and starting both doubles the time.
+# Written in a scratch directory, NOT the working directory. wp-env reads
+# `.wp-env.json` from the current directory, and this repository has a tracked
+# one describing the real dev environment on port 8888. Writing here would
+# silently overwrite it — harmless on a throwaway CI checkout, destructive when
+# this script is run locally, where the clobbered file then gets committed by a
+# `git add -A` and takes admin-quality down on the next release because wp-env
+# comes up on the wrong port with the wrong plugins. That happened once in
+# laqi-product-data-checks; hence the scratch directory.
+#
+# testsEnvironment is off because Plugin Check only needs the development
+# environment, and starting both doubles the time.
+WORKDIR="$(mktemp -d)"
+trap 'rm -rf "$WORKDIR"' EXIT
+cd "$WORKDIR"
+
 SLUG="$SLUG" PLUGIN_DIR="$PLUGIN_DIR" WP_ZIP="$WP_ZIP" python3 - > .wp-env.json <<'PY'
 import json, os
 
