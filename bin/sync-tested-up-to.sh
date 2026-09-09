@@ -1,16 +1,39 @@
 #!/usr/bin/env bash
-# Keep readme.txt's "Tested up to" header in step with the current WordPress
-# release.
+# Keep the "Tested up to" headers in step with the current WordPress and
+# WooCommerce releases.
 #
 # Usage:
-#   bin/sync-tested-up-to.sh            # report, as key=value lines
-#   bin/sync-tested-up-to.sh --apply    # rewrite readme.txt to the current release
+#   bin/sync-tested-up-to.sh                            # WordPress, report
+#   bin/sync-tested-up-to.sh --apply                    # WordPress, rewrite
+#   bin/sync-tested-up-to.sh --component woocommerce    # WooCommerce, report
+#   bin/sync-tested-up-to.sh --component woocommerce --apply
 #
 # Reporting mode prints GitHub-Actions-style output lines:
 #
 #   current=7.0
 #   latest=7.1
+#   latest-full=7.1
 #   needs-bump=1
+#
+# WHY WOOCOMMERCE IS HERE TOO
+#
+# It was not, and the header drifted: the readme declared "WC tested up to:
+# 10.9" while WooCommerce had reached 11.0.1. That header was not a lie - the
+# phpunit matrix pins WooCommerce 10.9.0, so 10.9 was exactly what had been
+# tested - but nothing ever moved the pin, so the tested version and the claim
+# aged together and silently. WooCommerce shows merchants "has not been tested
+# with your version" on anything newer, which on a new listing is the first
+# thing a shopper of plugins sees.
+#
+# So the pin and the two headers move together, in one commit, and only after
+# the suite has run against that WooCommerce. Three files carry it:
+#
+#   readme.txt                      WC tested up to:
+#   <slug>.php                      WC tested up to:
+#   .github/workflows/quality.yml   the pinned woocommerce.<version>.zip
+#
+# The headers take major.minor, which is what WooCommerce compares; the pin
+# takes the full version, because that is what the download URL needs.
 #
 # WHY THIS EXISTS, AND WHY IT DOES NOT JUST REWRITE THE HEADER AT PACKAGE TIME
 #
@@ -38,10 +61,19 @@
 set -euo pipefail
 
 APPLY=0
-case "${1:-}" in
-  --apply) APPLY=1 ;;
-  "") ;;
-  *) echo "usage: bin/sync-tested-up-to.sh [--apply]" >&2; exit 1 ;;
+COMPONENT="wordpress"
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --apply) APPLY=1; shift ;;
+    --component) COMPONENT="${2:-}"; shift 2 ;;
+    *) echo "usage: bin/sync-tested-up-to.sh [--component wordpress|woocommerce] [--apply]" >&2; exit 1 ;;
+  esac
+done
+
+case "$COMPONENT" in
+  wordpress|woocommerce) ;;
+  *) echo "unknown component: $COMPONENT" >&2; exit 1 ;;
 esac
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -52,32 +84,62 @@ README="readme.txt"
 
 # A missing or unparsable answer must fail loudly. Reporting "no bump needed"
 # because the network was down is how this quietly stops working.
-RESPONSE="$(curl -sf --max-time 30 https://api.wordpress.org/core/version-check/1.7/ || true)"
-[ -n "$RESPONSE" ] || { echo "could not reach api.wordpress.org" >&2; exit 1; }
+if [ "$COMPONENT" = "woocommerce" ]; then
+  API="https://api.wordpress.org/plugins/info/1.0/woocommerce.json"
+  HEADER="WC tested up to"
+else
+  API="https://api.wordpress.org/core/version-check/1.7/"
+  HEADER="Tested up to"
+fi
 
-LATEST="$(RESPONSE="$RESPONSE" python3 - <<'PY'
-import json, os, re, sys
+# To a file rather than a variable: WooCommerce's plugin-info payload carries
+# its whole changelog and runs to megabytes, which overflows the environment
+# and fails with "Argument list too long" rather than anything self-explanatory.
+RESPONSE_FILE="$(mktemp)"
+trap 'rm -f "$RESPONSE_FILE"' EXIT
+
+curl -sf --max-time 30 "$API" -o "$RESPONSE_FILE" || true
+[ -s "$RESPONSE_FILE" ] || { echo "could not reach $API" >&2; exit 1; }
+
+# Two values come back: the full version, which the WooCommerce pin needs for
+# its download URL, and major.minor, which is what both headers carry and what
+# Plugin Check and WooCommerce each compare against.
+RESOLVED="$(RESPONSE_FILE="$RESPONSE_FILE" COMPONENT="$COMPONENT" python3 - <<'PY'
+import io, json, os, re, sys
+
+component = os.environ["COMPONENT"]
 
 try:
-    offers = json.loads(os.environ["RESPONSE"]).get("offers") or []
-except json.JSONDecodeError:
-    sys.exit("version-check API did not return JSON")
+    with io.open(os.environ["RESPONSE_FILE"], encoding="utf-8") as handle:
+        payload = json.load(handle)
+except ValueError:
+    sys.exit("the version API did not return JSON")
 
-if not offers:
-    sys.exit("version-check API returned no offers")
+if component == "woocommerce":
+    full = str(payload.get("version") or "")
+    if not full:
+        sys.exit("the plugins API returned no version for woocommerce")
+else:
+    offers = payload.get("offers") or []
+    if not offers:
+        sys.exit("version-check API returned no offers")
+    # Same reading as plugin-check Version_Utils::get_wordpress_stable_version().
+    full = str(offers[0].get("current") or "").split("-")[0]
 
-# Same reading as plugin-check Version_Utils::get_wordpress_stable_version().
-version = str(offers[0].get("current") or "").split("-")[0]
-match = re.match(r"^\d+\.\d", version)
+match = re.match(r"^\d+\.\d+", full)
 if not match:
-    sys.exit("could not read a version from the first offer: " + repr(version))
+    sys.exit("could not read a version from: " + repr(full))
 
 print(match.group(0))
+print(full)
 PY
 )"
 
-CURRENT_RAW="$(grep -ioP '^Tested up to:\s*\K\S+' "$README" | head -n1 || true)"
-[ -n "$CURRENT_RAW" ] || { echo "no 'Tested up to:' header in $README" >&2; exit 1; }
+LATEST="$(printf '%s\n' "$RESOLVED" | sed -n 1p)"
+LATEST_FULL="$(printf '%s\n' "$RESOLVED" | sed -n 2p)"
+
+CURRENT_RAW="$(grep -ioP "^${HEADER}:\s*\K\S+" "$README" | head -n1 || true)"
+[ -n "$CURRENT_RAW" ] || { echo "no '${HEADER}:' header in $README" >&2; exit 1; }
 
 # Truncate the declared value the same way, so 7.0.2 and 7.0 compare alike.
 CURRENT="$(CURRENT_RAW="$CURRENT_RAW" python3 - <<'PY'
@@ -102,7 +164,8 @@ PY
 )"
 
 if [ "$APPLY" -eq 0 ]; then
-  printf 'current=%s\nlatest=%s\nneeds-bump=%s\n' "$CURRENT" "$LATEST" "$NEEDS_BUMP"
+  printf 'current=%s\nlatest=%s\nlatest-full=%s\nneeds-bump=%s\n' \
+    "$CURRENT" "$LATEST" "$LATEST_FULL" "$NEEDS_BUMP"
   exit 0
 fi
 
@@ -111,24 +174,101 @@ if [ "$NEEDS_BUMP" != "1" ]; then
   exit 0
 fi
 
-# Replace only the value, so a readme that pads its headers keeps its alignment.
-LATEST="$LATEST" README="$README" python3 - <<'PY'
+# Replace only the value, so a file that pads its headers keeps its alignment.
+# For WooCommerce this is three files rather than one: the claim lives in the
+# readme and the plugin header, and the version it is a claim ABOUT is the pin
+# in the phpunit matrix. Moving any of them alone is how the last drift began.
+LATEST="$LATEST" LATEST_FULL="$LATEST_FULL" README="$README" \
+HEADER="$HEADER" COMPONENT="$COMPONENT" python3 - <<'PY'
 import io, os, re
 
-path = os.environ["README"]
 latest = os.environ["LATEST"]
-text = io.open(path, encoding="utf-8").read()
+latest_full = os.environ["LATEST_FULL"]
+header = os.environ["HEADER"]
+component = os.environ["COMPONENT"]
 
-updated, count = re.subn(
-    r"(?im)^(Tested up to:[ \t]*)\S+",
+def rewrite(path, pattern, replacement, required=True):
+    text = io.open(path, encoding="utf-8").read()
+    updated, count = re.subn(pattern, replacement, text, count=1)
+    if count != 1:
+        if not required:
+            return False
+        raise SystemExit("could not rewrite %s in %s" % (header, path))
+    io.open(path, "w", encoding="utf-8", newline="").write(updated)
+    return True
+
+# The readme carries the header on its own line.
+rewrite(
+    os.environ["README"],
+    r"(?im)^(" + re.escape(header) + r":[ \t]*)\S+",
     lambda m: m.group(1) + latest,
-    text,
-    count=1,
 )
-if count != 1:
-    raise SystemExit("could not rewrite the Tested up to header")
 
-io.open(path, "w", encoding="utf-8", newline="").write(updated)
+if component == "woocommerce":
+    # The plugin header, where the same claim sits behind a docblock asterisk.
+    plugin_file = next(
+        name for name in sorted(os.listdir("."))
+        if name.endswith(".php") and "Plugin Name:" in io.open(name, encoding="utf-8").read(4000)
+    )
+    rewrite(
+        plugin_file,
+        r"(?im)^([ \t]*\*[ \t]*" + re.escape(header) + r":[ \t]*)\S+",
+        lambda m: m.group(1) + latest,
+    )
+
+    # And the version the suite actually runs against. A header raised without
+    # this would be the claim moving while the test behind it stayed put.
+    #
+    # Three shapes are in use across these repos and all of them are legitimate:
+    #
+    #   woocommerce.10.9.0.zip              a literal download URL
+    #   woocommerce: "11.0.0"               a phpunit matrix leg
+    #   WOOCOMMERCE_VERSION: "10.9.4"       an env value the URL interpolates
+    #
+    # Only the HIGHEST version found is moved. A matrix that deliberately keeps
+    # an older WooCommerce leg for regression cover must keep it; raising every
+    # version it mentions would quietly drop that coverage while looking like a
+    # version bump.
+    workflow = ".github/workflows/quality.yml"
+    text = io.open(workflow, encoding="utf-8").read()
+
+    pins = [
+        (r"woocommerce\.(\d+\.\d+\.\d+)\.zip", "woocommerce.%s.zip"),
+        (r"woocommerce:\s*\"(\d+\.\d+\.\d+)\"", 'woocommerce: "%s"'),
+        (r"WOOCOMMERCE_VERSION:\s*\"(\d+\.\d+\.\d+)\"", 'WOOCOMMERCE_VERSION: "%s"'),
+    ]
+
+    def as_key(value):
+        return [int(part) for part in value.split(".")]
+
+    moved = False
+    for pattern, template in pins:
+        found = re.findall(pattern, text)
+        if not found:
+            continue
+        highest = max(found, key=as_key)
+        # EVERY occurrence of the highest version, not the first. A matrix
+        # usually pairs each PHP version with the same WooCommerce, so moving
+        # one leg leaves the others behind and the run silently stops testing
+        # one combination it claims to cover.
+        text = re.sub(
+            pattern.replace(r"(\d+\.\d+\.\d+)", re.escape(highest)),
+            (template % latest_full).replace("\\", "\\\\"),
+            text,
+        )
+        moved = True
+
+    if not moved:
+        raise SystemExit(
+            "no WooCommerce version pin found in %s - the header would be a claim "
+            "with no test behind it" % workflow
+        )
+
+    io.open(workflow, "w", encoding="utf-8", newline="").write(text)
 PY
 
-echo "readme.txt now declares Tested up to: $LATEST (was $CURRENT)"
+if [ "$COMPONENT" = "woocommerce" ]; then
+  echo "readme.txt and the plugin header now declare $HEADER: $LATEST (was $CURRENT); quality.yml pins woocommerce.$LATEST_FULL.zip"
+else
+  echo "readme.txt now declares $HEADER: $LATEST (was $CURRENT)"
+fi
