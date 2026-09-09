@@ -1,105 +1,67 @@
-# Keep "Tested up to" in step with WordPress, WITHOUT ever claiming something
-# untested.
-#
-# Plugin Check errors on any lag at all (Plugin_Readme_Check compares the readme
-# value to the current release with version_compare "<"), so the morning a
-# WordPress major ships, every release build in this repo starts failing on a
-# header. That failure arrives at release time, which is the worst moment to
-# find it.
-#
-# The fix is NOT to stamp the current version into the archive during the build.
-# "Tested up to" is a claim that the plugin was RUN against that version, and a
-# build-time rewrite asserts something no test ever checked, hides a real
-# incompatibility behind a green header, and makes the published readme disagree
-# with git.
-#
-# So: this runs the suite against the new WordPress first, and opens a pull
-# request only when it passes. A human merges a bump that has a green test run
-# attached. If the suite fails, that is a real compatibility problem and it
-# opens an issue instead - weeks before a release rather than during one.
-#
-# ACTIONS BUDGET: the weekly probe is one API call and a grep. It ends in
-# seconds and does nothing else unless WordPress has actually moved, which is
-# about three times a year. It also stops early when a bump PR is already open,
-# so an unreviewed PR does not re-run the suite every week.
-name: tested-up-to
-
-on:
-  schedule:
-    # Mondays, early. Off the hour to avoid the scheduling stampede.
-    - cron: "17 6 * * 1"
-  workflow_dispatch:
-
-permissions:
-  contents: write
-  pull-requests: write
-  issues: write
-
 jobs:
   check:
     runs-on: ubuntu-latest
     outputs:
-      proceed: ${{ steps.decide.outputs.proceed }}
-      latest: ${{ steps.probe.outputs.latest }}
-      current: ${{ steps.probe.outputs.current }}
-      branch: ${{ steps.decide.outputs.branch }}
+      components: ${{ steps.decide.outputs.components }}
     steps:
       - uses: actions/checkout@v5
 
-      - name: Compare readme.txt against the current WordPress
-        id: probe
-        run: bash bin/sync-tested-up-to.sh >> "$GITHUB_OUTPUT"
-
-      - name: Decide whether there is anything to do
+      - name: Decide which components need a verified bump
         id: decide
         env:
           GH_TOKEN: ${{ github.token }}
-          NEEDS_BUMP: ${{ steps.probe.outputs.needs-bump }}
-          LATEST: ${{ steps.probe.outputs.latest }}
-          CURRENT: ${{ steps.probe.outputs.current }}
         run: |
           set -euo pipefail
-          branch="chore/tested-up-to-${LATEST}"
-          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+          needed=""
 
-          if [ "$NEEDS_BUMP" != "1" ]; then
-            echo "readme.txt declares $CURRENT and WordPress is $LATEST; nothing to do."
-            echo "proceed=0" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+          for component in wordpress woocommerce; do
+            probe="$(bash bin/sync-tested-up-to.sh --component "$component")"
+            current="$(sed -n 's/^current=//p' <<<"$probe")"
+            latest="$(sed -n 's/^latest=//p' <<<"$probe")"
+            latest_full="$(sed -n 's/^latest-full=//p' <<<"$probe")"
+            needs_bump="$(sed -n 's/^needs-bump=//p' <<<"$probe")"
+            branch="chore/tested-up-to-${component}-${latest}"
 
-          # An open PR means the work is already done and waiting on a human.
-          # Re-running the suite every Monday until they merge is pure waste.
-          if [ -n "$(gh pr list --head "$branch" --state open --json number --jq '.[].number')" ]; then
-            echo "A bump PR for $LATEST is already open."
-            echo "proceed=0" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+            if [ "$needs_bump" != "1" ]; then
+              echo "$component: declared $current, current release $latest; nothing to do."
+              continue
+            fi
 
-          # A branch with no open PR means someone closed it deliberately.
-          # Recreating it would reopen an argument that was already settled.
-          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
-            echo "Branch $branch exists with no open PR; leaving it alone."
-            echo "proceed=0" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+            # An open PR means the work is done and waiting on a human. Re-running
+            # the suite every Monday until they merge is pure waste.
+            if [ -n "$(gh pr list --head "$branch" --state open --json number --jq '.[].number')" ]; then
+              echo "$component: a bump PR for $latest is already open."
+              continue
+            fi
 
-          # Before the first failure the label does not exist yet and gh errors;
-          # that means "nothing open", so it must not take the job down.
-          open_issues="$(gh issue list --state open --label tested-up-to --json number --jq '.[].number' 2>/dev/null || true)"
-          if [ -n "$open_issues" ]; then
-            echo "An open tested-up-to issue is already reporting this."
-            echo "proceed=0" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+            # A branch with no open PR means someone closed it deliberately.
+            # Recreating it would reopen an argument that was already settled.
+            if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+              echo "$component: branch $branch exists with no open PR; leaving it alone."
+              continue
+            fi
 
-          echo "WordPress is $LATEST, readme.txt says $CURRENT; verifying."
-          echo "proceed=1" >> "$GITHUB_OUTPUT"
+            # Before the first failure the label does not exist and gh errors;
+            # that means "nothing open", so it must not take the job down.
+            if [ -n "$(gh issue list --state open --label "tested-up-to-${component}" --json number --jq '.[].number' 2>/dev/null || true)" ]; then
+              echo "$component: an open issue is already reporting this."
+              continue
+            fi
+
+            echo "$component: $latest is out and the readme says $current; verifying."
+            needed="${needed}${needed:+,}{\"component\":\"${component}\",\"latest\":\"${latest}\",\"latestFull\":\"${latest_full}\",\"current\":\"${current}\",\"branch\":\"${branch}\"}"
+          done
+
+          echo "components=[${needed}]" >> "$GITHUB_OUTPUT"
 
   verify-and-propose:
     needs: check
-    if: needs.check.outputs.proceed == '1'
+    if: needs.check.outputs.components != '[]'
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(needs.check.outputs.components) }}
     services:
       mysql:
         image: mysql:8.0
@@ -117,7 +79,7 @@ jobs:
 
       # The PHP floor, not the newest: this is the version clients actually run,
       # so it is the one whose failure would matter most.
-      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2 = 2.37.2
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
         with:
           php-version: "7.4"
           tools: composer
@@ -125,23 +87,47 @@ jobs:
 
       - run: composer install --no-interaction --prefer-dist
 
-      - name: Install the current WooCommerce
+      # For a WooCommerce bump this must be the EXACT version being claimed, not
+      # whatever "latest" resolves to by the time the job runs. Claiming 11.1
+      # on the strength of a run against something else is the whole failure
+      # this workflow exists to prevent.
+      - name: Install WooCommerce
+        env:
+          COMPONENT: ${{ matrix.target.component }}
+          LATEST_FULL: ${{ matrix.target.latestFull }}
         run: |
-          curl --fail --location --silent --show-error \
-            https://downloads.wordpress.org/plugin/woocommerce.zip \
-            --output /tmp/woocommerce.zip
+          set -euo pipefail
+          if [ "$COMPONENT" = "woocommerce" ]; then
+            url="https://downloads.wordpress.org/plugin/woocommerce.${LATEST_FULL}.zip"
+          else
+            url="https://downloads.wordpress.org/plugin/woocommerce.zip"
+          fi
+          echo "Installing $url"
+          curl --fail --location --silent --show-error "$url" --output /tmp/woocommerce.zip
           unzip -q /tmp/woocommerce.zip -d ..
 
-      - name: Install the WordPress ${{ needs.check.outputs.latest }} test suite
+      # Likewise: a WordPress bump installs the version being claimed, and a
+      # WooCommerce bump installs the WordPress already declared, so exactly one
+      # variable moves per run.
+      - name: Install the WordPress test suite
+        env:
+          COMPONENT: ${{ matrix.target.component }}
+          LATEST: ${{ matrix.target.latest }}
         run: |
+          set -euo pipefail
+          if [ "$COMPONENT" = "wordpress" ]; then
+            wp_version="$LATEST"
+          else
+            wp_version="$(grep -ioP '^Tested up to:\s*\K\S+' readme.txt | head -n1)"
+          fi
+          echo "Installing the WordPress $wp_version test suite"
           bash bin/install-wp-tests.sh \
-            wordpress_test root root 127.0.0.1:3306 \
-            "${{ needs.check.outputs.latest }}" \
+            wordpress_test root root 127.0.0.1:3306 "$wp_version" \
             >> "$GITHUB_ENV"
 
       # Not a gate: a failure here is the finding, and the reporting step below
       # is what turns it into an issue.
-      - name: Run the suite against WordPress ${{ needs.check.outputs.latest }}
+      - name: Run the suite against ${{ matrix.target.component }} ${{ matrix.target.latest }}
         id: tests
         continue-on-error: true
         run: composer test
@@ -150,33 +136,46 @@ jobs:
         if: steps.tests.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
-          BRANCH: ${{ needs.check.outputs.branch }}
-          LATEST: ${{ needs.check.outputs.latest }}
-          CURRENT: ${{ needs.check.outputs.current }}
+          COMPONENT: ${{ matrix.target.component }}
+          BRANCH: ${{ matrix.target.branch }}
+          LATEST: ${{ matrix.target.latest }}
+          LATEST_FULL: ${{ matrix.target.latestFull }}
+          CURRENT: ${{ matrix.target.current }}
         run: |
           set -euo pipefail
-          bash bin/sync-tested-up-to.sh --apply
+          bash bin/sync-tested-up-to.sh --component "$COMPONENT" --apply
+
+          if [ "$COMPONENT" = "woocommerce" ]; then
+            name="WooCommerce"
+            # The pin moves with the claim, so the suite keeps running against
+            # the version the header names.
+            files=(readme.txt "$(ls *.php | head -n1)" .github/workflows/quality.yml)
+            extra="The phpunit matrix pin moves with it, from the previous WooCommerce to **${LATEST_FULL}**, so the suite keeps running against the version the header names."
+          else
+            name="WordPress"
+            files=(readme.txt)
+            extra="Plugin Check treats any lag as an error, so this would otherwise fail the next release build."
+          fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "$BRANCH"
-          git add readme.txt
-          git commit -m "Declare compatibility with WordPress ${LATEST}
+          git add "${files[@]}"
+          git commit -m "Declare compatibility with ${name} ${LATEST}
 
-          The suite passed against WordPress ${LATEST} on PHP 7.4 with the
-          current WooCommerce in run ${GITHUB_RUN_ID}, so the header is raised
-          from ${CURRENT} to match. Verified before the claim changed, not
-          stamped at package time."
+          The suite passed against ${name} ${LATEST} on PHP 7.4 in run
+          ${GITHUB_RUN_ID}, so the header is raised from ${CURRENT} to match.
+          Verified before the claim changed, not stamped at package time."
           git push origin "$BRANCH"
 
           gh pr create \
             --head "$BRANCH" \
-            --title "Declare compatibility with WordPress ${LATEST}" \
-            --body "WordPress **${LATEST}** is out and \`readme.txt\` still declares **${CURRENT}**. Plugin Check treats any lag as an error, so this would fail the next release build.
+            --title "Declare compatibility with ${name} ${LATEST}" \
+            --body "${name} **${LATEST}** is out and the readme still declares **${CURRENT}**. ${extra}
 
-          The suite was run against WordPress ${LATEST} on PHP 7.4 with the current WooCommerce **before** this header changed, and it passed: [run](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}).
+          The suite was run against ${name} **${LATEST}** on PHP 7.4 **before** this header changed, and it passed: [run](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}).
 
-          Add the changelog line when you cut the release - this PR deliberately touches only the header, so it stays a one-line diff you can read at a glance.
+          Add the changelog line when you cut the release - this PR deliberately touches only the version it claims, so it stays a diff you can read at a glance.
 
           Opened by \`.github/workflows/tested-up-to.yml\`."
 
@@ -184,23 +183,22 @@ jobs:
         if: steps.tests.outcome != 'success'
         env:
           GH_TOKEN: ${{ github.token }}
-          LATEST: ${{ needs.check.outputs.latest }}
-          CURRENT: ${{ needs.check.outputs.current }}
+          COMPONENT: ${{ matrix.target.component }}
+          LATEST: ${{ matrix.target.latest }}
+          CURRENT: ${{ matrix.target.current }}
         run: |
           set -euo pipefail
           # gh refuses to file against a label the repo does not have, so make
           # sure it exists. --force keeps this idempotent across runs.
-          gh label create tested-up-to \
-            --description "Raised by the weekly WordPress compatibility check" \
+          gh label create "tested-up-to-${COMPONENT}" \
+            --description "Raised by the weekly ${COMPONENT} compatibility check" \
             --color D93F0B --force
 
           gh issue create \
-            --title "Test suite fails against WordPress ${LATEST}" \
-            --label tested-up-to \
-            --body "WordPress **${LATEST}** is out. The suite was run against it on PHP 7.4 with the current WooCommerce and **failed**, so \`readme.txt\` still declares **${CURRENT}** and no bump PR was opened.
+            --title "Test suite fails against ${COMPONENT} ${LATEST}" \
+            --label "tested-up-to-${COMPONENT}" \
+            --body "**${COMPONENT} ${LATEST}** is out. The suite was run against it on PHP 7.4 and **failed**, so the readme still declares **${CURRENT}** and no bump PR was opened.
 
-          This is a real compatibility problem, not a paperwork one. Plugin Check treats the lagging header as an error, so releases will fail until it is resolved - but raising the header without fixing the cause would ship a claim that is not true.
+          This is a real compatibility problem rather than a stale header, and it is worth fixing before a release needs it: [run](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}).
 
-          Failing run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
-
-          Opened by \`.github/workflows/tested-up-to.yml\`. Close this issue once resolved, or the weekly check will stay quiet to avoid duplicates."
+          Opened by \`.github/workflows/tested-up-to.yml\`."
