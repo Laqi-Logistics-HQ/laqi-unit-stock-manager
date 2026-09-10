@@ -1,3 +1,49 @@
+# Keep "Tested up to" and "WC tested up to" in step with WordPress and
+# WooCommerce, WITHOUT ever claiming something untested.
+#
+# Plugin Check errors on any lag at all (Plugin_Readme_Check compares the readme
+# value to the current release with version_compare "<"), so the morning a
+# WordPress major ships, every release build in this repo starts failing on a
+# header. That failure arrives at release time, which is the worst moment to
+# find it.
+#
+# The fix is NOT to stamp the current version into the archive during the build.
+# "Tested up to" is a claim that the plugin was RUN against that version, and a
+# build-time rewrite asserts something no test ever checked, hides a real
+# incompatibility behind a green header, and makes the published readme disagree
+# with git.
+#
+# So: this runs the suite against the new release first, and opens a pull
+# request only when it passes. A human merges a bump that has a green test run
+# attached. If the suite fails, that is a real compatibility problem and it
+# opens an issue instead - weeks before a release rather than during one.
+#
+# Both components are probed independently, so WordPress moving does not hold up
+# a WooCommerce bump or the other way round.
+#
+# ACTIONS BUDGET: the weekly probe is one API call and a grep per component. It
+# ends in seconds and does nothing else unless a release has actually moved. It
+# also stops early when a bump PR is already open, so an unreviewed PR does not
+# re-run the suite every week.
+#
+# THIS HEADER IS LOAD-BEARING. A workflow with no `on:` is not a workflow that
+# never fires, it is a file GitHub rejects at startup: every push reports a
+# failed run with no logs, and the schedule never runs. It was lost once, in
+# wordpress_ai_dev d6d0ee2, and took the weekly check down in three plugins for
+# a day before anyone noticed.
+name: tested-up-to
+
+on:
+  schedule:
+    # Mondays, early. Off the hour to avoid the scheduling stampede.
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
 jobs:
   check:
     runs-on: ubuntu-latest
