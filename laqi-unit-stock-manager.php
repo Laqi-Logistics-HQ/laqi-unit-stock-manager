@@ -3,7 +3,7 @@
  * Plugin Name:       Laqi Unit Stock Manager for WooCommerce
  * Plugin URI:        https://laqi-logistics.com/plugins/laqi-unit-stock-manager/
  * Description:       Manage one bulk stock quantity shared by simple products and variations sold in different package sizes.
- * Version:           1.2.4
+ * Version:           1.2.5
  * Author:            Laqi Logistics
  * Author URI:        https://laqi-logistics.com
  * Developer:         Laqi Logistics
@@ -16,7 +16,7 @@
  * Requires at least: 6.8
  * Requires Plugins:  woocommerce
  * WC requires at least: 7.1
- * WC tested up to:   11.0
+ * WC tested up to:   11.1
  *
  * @package LaqiUnitStockManager
  */
@@ -52,7 +52,7 @@ if ( defined( 'LAQI_LUSM_VERSION' ) ) {
 	return;
 }
 
-define( 'LAQI_LUSM_VERSION', '1.2.4' );
+define( 'LAQI_LUSM_VERSION', '1.2.5' );
 define( 'LAQI_LUSM_API_VERSION', '1.2' );
 define( 'LAQI_LUSM_FILE', __FILE__ );
 define( 'LAQI_LUSM_PATH', plugin_dir_path( __FILE__ ) );
