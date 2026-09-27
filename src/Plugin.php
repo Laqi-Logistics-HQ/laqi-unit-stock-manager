@@ -56,6 +56,7 @@ final class Plugin {
 	 * @return void
 	 */
 	public function boot(): void {
+		( new Admin\PluginLinks() )->register();
 
 		// Translations load themselves. WordPress reads the Text Domain and Domain
 		// Path headers and loads the .mo file when a string is first translated,

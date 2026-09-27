@@ -4,7 +4,7 @@ Tags: woocommerce, inventory, stock management, variable products, units
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.5
+Stable tag: 1.2.6
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 7.1
@@ -96,6 +96,10 @@ Back up the database before transferring established WooCommerce stock. The tran
 
 == Frequently Asked Questions ==
 
+= Where can I see Pro features and pricing? =
+
+On **Plugins > Installed Plugins**, select **Get PRO** beneath this plugin's name to open its product page. Select **Pricing** there to view the plans. The link is shown while the free plugin is active and its Pro add-on is inactive.
+
 = Can several variations consume the same stock? =
 
 Yes. Map each variation to the same inventory pool and specify its exact consumption per sold item, in whichever unit of that pool's measurement family suits the package. A 0.25 g variation consumes 0.25 g while a 2 kg variation consumes 2 kg from the same balance.
@@ -137,6 +141,10 @@ The free plugin is the complete shared-stock engine: pools, exact units, product
 Deleting the last installed edition removes the plugin's inventory tables and its stored schema version. If Pro is still installed, your shared inventory data is kept.
 
 == Changelog ==
+
+= 1.2.6 =
+* Tweak - Verified compatibility with WordPress 7.1.2 and WooCommerce 11.1.2 on PHP 7.4.33 and PHP 8.5.11.
+* Add - Get PRO link on the Installed Plugins screen opens the product overview, where you can view Pro features and pricing. The link is hidden while the Pro add-on is active.
 
 = 1.2.5 =
 * Tweak - Declare compatibility with WooCommerce 11.1 after testing on WordPress 7.1 and PHP 7.4.33.
