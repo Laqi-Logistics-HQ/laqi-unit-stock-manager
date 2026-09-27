@@ -1,3 +1,7 @@
+2026-09-27 - version 1.2.6
+* Tweak - Verified compatibility with WordPress 7.1.2 and WooCommerce 11.1.2 on PHP 7.4.33 and PHP 8.5.11.
+* Add - Get PRO link on the Installed Plugins screen opens the product overview, where you can view Pro features and pricing. The link is hidden while the Pro add-on is active.
+
 2026-09-15 - version 1.2.5
 * Tweak - Declare compatibility with WooCommerce 11.1 after testing on WordPress 7.1 and PHP 7.4.33.
 

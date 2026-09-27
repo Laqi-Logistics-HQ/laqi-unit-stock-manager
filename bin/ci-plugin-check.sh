@@ -81,7 +81,7 @@ import json, os
 
 print(json.dumps({
     "core": os.environ["WP_ZIP"],
-    "phpVersion": "7.4",
+    "phpVersion": "8.3",
     "port": 8880,
     "testsPort": 8881,
     "testsEnvironment": False,
