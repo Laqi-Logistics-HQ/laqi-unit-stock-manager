@@ -142,6 +142,11 @@ Deleting the last installed edition removes the plugin's inventory tables and it
 
 == Changelog ==
 
+= Unreleased =
+* Fix - Orders without pooled-stock movements display "No stock movements" instead of a misleading Reduced or Restored label, including existing orders.
+* Fix - Cancelling a fully restocked order no longer attempts an empty stock movement.
+* Dev - Extension API 1.3 adds shared stock-demand expansion hooks for Pro integrations.
+
 = 1.2.6 =
 * Tweak - Verified compatibility with WordPress 7.1.2 and WooCommerce 11.1.2 on PHP 7.4.33 and PHP 8.5.11.
 * Add - Get PRO link on the Installed Plugins screen opens the product overview, where you can view Pro features and pricing. The link is hidden while the Pro add-on is active.

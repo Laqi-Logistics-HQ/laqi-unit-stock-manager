@@ -187,6 +187,9 @@ final class OrderStockLifecycle {
 	private function apply_demand( WC_Order $order, array $demand, int $direction, string $type, string $event ): void {
 		$commands = array();
 		foreach ( $demand as $pool_id => $amount ) {
+			if ( $amount < 1 ) {
+				continue;
+			}
 			$commands[] = array(
 				'pool_id'         => (int) $pool_id,
 				'delta'           => $direction * (int) $amount,

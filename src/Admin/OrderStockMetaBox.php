@@ -96,6 +96,10 @@ final class OrderStockMetaBox {
 		$movement_rows = $this->movements->for_source( 'order', $order->get_id() );
 		$rows          = array_map( array( $this->presenter, 'present' ), $movement_rows );
 		$state         = (string) $order->get_meta( OrderStockLifecycle::STATE_META, true );
+		// A processed lifecycle event does not prove that any pool was changed.
+		if ( array() === $movement_rows && in_array( $state, array( 'reduced', 'restored' ), true ) ) {
+			$state = 'no-movements';
+		}
 		?>
 		<p class="laqi-lusm-order-stock-state">
 			<strong><?php esc_html_e( 'Pooled stock state:', 'laqi-unit-stock-manager' ); ?></strong>
@@ -137,6 +141,9 @@ final class OrderStockMetaBox {
 	 * @return string
 	 */
 	private function state_label( string $state ): string {
+		if ( 'no-movements' === $state ) {
+			return __( 'No stock movements', 'laqi-unit-stock-manager' );
+		}
 		if ( 'reduced' === $state ) {
 			return __( 'Reduced', 'laqi-unit-stock-manager' );
 		}

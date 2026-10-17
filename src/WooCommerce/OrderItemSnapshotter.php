@@ -69,16 +69,8 @@ final class OrderItemSnapshotter {
 		if ( ! apply_filters( 'laqi_lusm_include_checkout_item_stock_demand', true, $item, $values, $cart_item_key, $order ) ) {
 			return;
 		}
-		$product_id   = isset( $values['product_id'] ) ? (int) $values['product_id'] : $item->get_product_id();
-		$variation_id = isset( $values['variation_id'] ) ? (int) $values['variation_id'] : $item->get_variation_id();
-		$quantity     = isset( $values['quantity'] ) ? (int) $values['quantity'] : $item->get_quantity();
-		$mapping      = $this->mappings->find_for_product( $product_id, $variation_id );
-
-		if ( null === $mapping || $quantity < 1 ) {
-			return;
-		}
-
-		$this->write_snapshot( $item, $mapping->id(), $mapping->version(), $mapping->calculator_type(), $quantity, 'checkout' );
+		$quantity = isset( $values['quantity'] ) ? (int) $values['quantity'] : $item->get_quantity();
+		$this->write_snapshot( $item, $quantity, 'checkout', $values );
 	}
 
 	/**
@@ -93,6 +85,10 @@ final class OrderItemSnapshotter {
 		}
 		$order = wc_get_order( $item->get_order_id() );
 		if ( ! $order || 'reduced' === $order->get_meta( OrderStockLifecycle::STATE_META, true ) ) {
+			return;
+		}
+		if ( ! apply_filters( 'laqi_lusm_include_order_item_stock_demand', true, $item ) ) {
+			$item->delete_meta_data( self::META_KEY );
 			return;
 		}
 		$existing = $item->get_meta( self::META_KEY, true );
@@ -110,6 +106,11 @@ final class OrderItemSnapshotter {
 	 */
 	public function prepare_order( WC_Order $order ): void {
 		foreach ( $order->get_items() as $item ) {
+			if ( ! apply_filters( 'laqi_lusm_include_order_item_stock_demand', true, $item ) ) {
+				$item->delete_meta_data( self::META_KEY );
+				$item->save();
+				continue;
+			}
 			$existing = $item->get_meta( self::META_KEY, true );
 			if ( ! is_array( $existing ) || 'checkout' !== ( $existing['origin'] ?? '' ) ) {
 				$this->snapshot_admin_demand( $item );
@@ -129,38 +130,52 @@ final class OrderItemSnapshotter {
 	 */
 	public function snapshot_admin_demand( WC_Order_Item_Product $item ): ?array {
 		if ( ! apply_filters( 'laqi_lusm_include_order_item_stock_demand', true, $item ) ) {
+			$item->delete_meta_data( self::META_KEY );
 			return null;
 		}
-		$mapping  = $this->mappings->find_for_product( $item->get_product_id(), $item->get_variation_id() );
-		$quantity = $item->get_quantity();
-		if ( null === $mapping || $quantity < 1 ) {
-			return null;
-		}
-		return $this->write_snapshot( $item, $mapping->id(), $mapping->version(), $mapping->calculator_type(), $quantity, 'admin' );
+		return $this->write_snapshot( $item, $item->get_quantity(), 'admin' );
 	}
 
 	/**
 	 * Write one normalized snapshot.
 	 *
 	 * @param WC_Order_Item_Product $item            Order item.
-	 * @param int                   $mapping_id      Mapping ID.
-	 * @param int                   $mapping_version Mapping version.
-	 * @param string                $calculator_type Calculator type.
 	 * @param int                   $quantity        Item quantity.
 	 * @param string                $origin          Snapshot origin.
-	 * @return array<string, mixed> Snapshot data.
+	 * @param array                 $values          Checkout cart values, when available.
+	 * @return array<string, mixed>|null Snapshot data.
 	 */
-	private function write_snapshot( WC_Order_Item_Product $item, int $mapping_id, int $mapping_version, string $calculator_type, int $quantity, string $origin ): array {
-		$mapping = $this->mappings->find_for_product( $item->get_product_id(), $item->get_variation_id() );
-		if ( null === $mapping ) {
-			return array();
+	private function write_snapshot( WC_Order_Item_Product $item, int $quantity, string $origin, array $values = array() ): ?array {
+		if ( $quantity < 1 ) {
+			return null;
 		}
-		$demand   = $this->calculators->get( $calculator_type )->calculate( $mapping, $quantity );
+		/**
+		 * Supply an integration snapshot instead of the native product mapping.
+		 *
+		 * @since 1.3 Extension API version.
+		 * @param array|null            $snapshot Null preserves native mapping resolution.
+		 * @param WC_Order_Item_Product $item Order product line.
+		 * @param int                   $quantity Parent line quantity.
+		 * @param string                $origin Checkout or admin.
+		 * @param array                 $values Original cart values, empty outside checkout.
+		 */
+		$snapshot = apply_filters( 'laqi_lusm_order_item_stock_snapshot', null, $item, $quantity, $origin, $values );
+		if ( is_array( $snapshot ) ) {
+			$item->update_meta_data( self::META_KEY, $snapshot );
+			return $snapshot;
+		}
+		$product_id   = isset( $values['product_id'] ) ? (int) $values['product_id'] : $item->get_product_id();
+		$variation_id = isset( $values['variation_id'] ) ? (int) $values['variation_id'] : $item->get_variation_id();
+		$mapping      = $this->mappings->find_for_product( $product_id, $variation_id );
+		if ( null === $mapping ) {
+			return null;
+		}
+		$demand   = $this->calculators->get( $mapping->calculator_type() )->calculate( $mapping, $quantity );
 		$snapshot = array(
 			'version'         => 1,
 			'origin'          => $origin,
-			'mapping_id'      => $mapping_id,
-			'mapping_version' => $mapping_version,
+			'mapping_id'      => $mapping->id(),
+			'mapping_version' => $mapping->version(),
 			'item_quantity'   => $quantity,
 			'pool_demand'     => $demand,
 		);

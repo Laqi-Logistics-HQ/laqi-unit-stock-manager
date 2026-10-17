@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-27T13:41:50+00:00\n"
+"POT-Creation-Date: 2026-10-17T22:47:08+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: laqi-unit-stock-manager\n"
@@ -221,35 +221,39 @@ msgstr ""
 msgid "Unit Stock"
 msgstr ""
 
-#: src/Admin/OrderStockMetaBox.php:101
+#: src/Admin/OrderStockMetaBox.php:105
 msgid "Pooled stock state:"
 msgstr ""
 
-#: src/Admin/OrderStockMetaBox.php:105
+#: src/Admin/OrderStockMetaBox.php:109
 msgid "No pooled-stock movements have been recorded for this order."
 msgstr ""
 
-#: src/Admin/OrderStockMetaBox.php:113
+#: src/Admin/OrderStockMetaBox.php:117
 msgid "Stock reduced"
 msgstr ""
 
-#: src/Admin/OrderStockMetaBox.php:113
+#: src/Admin/OrderStockMetaBox.php:117
 msgid "Stock restored"
 msgstr ""
 
-#: src/Admin/OrderStockMetaBox.php:117
+#: src/Admin/OrderStockMetaBox.php:121
 msgid "Balance after change:"
 msgstr ""
 
-#: src/Admin/OrderStockMetaBox.php:141
+#: src/Admin/OrderStockMetaBox.php:145
+msgid "No stock movements"
+msgstr ""
+
+#: src/Admin/OrderStockMetaBox.php:148
 msgid "Reduced"
 msgstr ""
 
-#: src/Admin/OrderStockMetaBox.php:144
+#: src/Admin/OrderStockMetaBox.php:151
 msgid "Restored"
 msgstr ""
 
-#: src/Admin/OrderStockMetaBox.php:146
+#: src/Admin/OrderStockMetaBox.php:153
 msgid "Not reduced"
 msgstr ""
 
@@ -1187,6 +1191,6 @@ msgstr ""
 msgid "units"
 msgstr ""
 
-#: src/WooCommerce/CartValidator.php:105
+#: src/WooCommerce/CartValidator.php:113
 msgid "The selected package quantities are no longer available from the shared stock. Please reduce the quantities in your cart."
 msgstr ""

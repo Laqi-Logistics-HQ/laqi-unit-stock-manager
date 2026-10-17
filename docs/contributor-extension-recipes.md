@@ -183,6 +183,32 @@ the public extension context and the normal `OrderStockLifecycle`; do not call
 the mutation service a second time for
 an event core WooCommerce already emits.
 
+API 1.3 adds two shared stock-demand extension points for metadata-based bundles:
+
+| Filter | Arguments | Contract |
+| --- | --- | --- |
+| `laqi_lusm_cart_item_stock_lines` | `array $lines, array $cart_item` | Return product/variation/quantity lines; default is the native cart line. Return unchanged when the adapter does not own the item. Free aggregates all returned lines together with the rest of the cart before validation. |
+| `laqi_lusm_order_item_stock_snapshot` | `?array $snapshot, WC_Order_Item_Product $item, int $quantity, string $origin, array $cart_values` | Return null for native mapping resolution, or the adapter's complete immutable snapshot. Preserve another adapter's non-null answer. Cart values are empty for admin/API orders. |
+
+An integration snapshot must contain `version`, `origin`, `item_quantity`, and
+`pool_demand` (pool ID to exact integer base-unit total for the entire parent
+line). Include a stable `source` and the component mapping IDs/versions for audit.
+Demand must scale exactly by `item_quantity`: refunds and order edits divide by
+that quantity. Capture the selected products, never a bundle's current catalogue
+definition. An empty `pool_demand` intentionally overrides a container mapping
+when none of its components consumes pooled stock.
+
+Use `laqi_lusm_include_order_item_stock_demand` to exclude a parent when the vendor
+creates real child order lines. Free removes an earlier snapshot from an excluded
+parent before reduction, so converting a metadata bundle to itemised lines does
+not charge both structures. Existing inclusion filters still run before expansion.
+
+Keep each vendor's metadata keys and parsing in a separate Pro adapter, registered
+by `GroupedProductModule` using `ExtensionContextInterface`. The reference is
+Pro's `Integrations/BundleBossAdapter.php`. New adapters register these hooks; they
+do not add vendor-name conditions to Free or introduce a second stock lifecycle.
+Ensure the add-on requires API 1.3 before using these hooks.
+
 An adapter test matrix should cover creation and update, classic and Store API
 origins where applicable, idempotent repeated hooks, immutable snapshots,
 reservation conversion/release, reduction/restoration, and absence of duplicate

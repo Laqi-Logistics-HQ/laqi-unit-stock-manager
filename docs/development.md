@@ -128,6 +128,13 @@ container cart/order lines are excluded from pooled demand, while their normal
 quantity-synchronized child lines continue through Free's cart validation,
 immutable snapshots, reductions, restorations, and order edits exactly once.
 
+Free extension API 1.3 additionally exposes cart stock-line expansion and complete
+order-item snapshot filters. Pro's separate BundleBoss adapter uses these to
+translate selections stored on a single bundle line into combined component pool
+demand. Free has no BundleBoss metadata checks. See
+`docs/contributor-extension-recipes.md` for the contracts and another adapter's
+implementation path.
+
 The Pro WooCommerce Subscriptions adapter prepares each renewal as its own stock
 event. Because Subscriptions copies line-item metadata forward, inherited pooled
 snapshots are replaced once at renewal creation using the mapping active at that
@@ -257,4 +264,3 @@ records a `loss_expiry` movement and preserves the batch and pool audit trail.
 Every Action Scheduler hook added by the plugin must also be added to the list in
 `Plugin::on_deactivate()`. Deactivation must cancel all plugin-owned scheduled
 work; uninstall must repeat that cleanup and remove plugin-owned data.
-
