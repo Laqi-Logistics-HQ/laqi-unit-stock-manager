@@ -10,6 +10,13 @@
  */
 class Test_Plugin extends WP_UnitTestCase {
 
+	/** Bundle integrations remain physically owned by the Pro add-on. */
+	public function test_bundleboss_adapter_is_not_bundled(): void {
+		$this->assertFalse( class_exists( '\\LaqiUnitStockManagerPro\\Integrations\\BundleBossAdapter' ) );
+		$this->assertFalse( has_filter( 'laqi_lusm_cart_item_stock_lines' ) );
+		$this->assertFalse( has_filter( 'laqi_lusm_order_item_stock_snapshot' ) );
+	}
+
 	/**
 	 * The main class should be available once the plugin is loaded.
 	 */
@@ -22,7 +29,7 @@ class Test_Plugin extends WP_UnitTestCase {
 	 */
 	public function test_version_constant_defined(): void {
 		$this->assertTrue( defined( 'LAQI_LUSM_VERSION' ) );
-		$this->assertSame( '1.2', LAQI_LUSM_API_VERSION );
+		$this->assertSame( '1.3', LAQI_LUSM_API_VERSION );
 	}
 
 	/**
@@ -65,10 +72,11 @@ class Test_Plugin extends WP_UnitTestCase {
 	public function test_extension_api_compatibility_range(): void {
 		$compatibility = \LaqiUnitStockManager\Extension\ApiCompatibility::class;
 
-		$this->assertTrue( $compatibility::supports( '1.0', '2.0' ), 'An add-on written for 1.0 still runs against 1.2.' );
+		$this->assertTrue( $compatibility::supports( '1.0', '2.0' ), 'An add-on written for 1.0 still runs against 1.3.' );
 		$this->assertTrue( $compatibility::supports( '1.1', '2.0' ), 'Shared dataset filtering is available from 1.1.' );
 		$this->assertTrue( $compatibility::supports( '1.2', '2.0' ), 'The Activity actions hook is available from 1.2.' );
-		$this->assertFalse( $compatibility::supports( '1.3', '2.0' ), 'An add-on needing a later API than this one is refused.' );
+		$this->assertTrue( $compatibility::supports( '1.3', '2.0' ), 'Stock expansion hooks are available from 1.3.' );
+		$this->assertFalse( $compatibility::supports( '1.4', '2.0' ), 'An add-on needing a later API than this one is refused.' );
 		$this->assertFalse( $compatibility::supports( '0.1', '1.0' ), 'An add-on capped below this API is refused.' );
 	}
 

@@ -58,6 +58,9 @@ class Test_Order_Stock_Lifecycle extends WP_UnitTestCase {
 		$this->pool_id = (int) $wpdb->insert_id;
 
 		$this->order = wc_create_order();
+		$this->order->delete_meta_data( OrderStockLifecycle::STATE_META );
+		$this->order->delete_meta_data( OrderStockLifecycle::CYCLE_META );
+		$wpdb->delete( Schema::table( 'movements' ), array( 'source_type' => 'order', 'source_id' => $this->order->get_id() ), array( '%s', '%d' ) );
 		foreach ( array_keys( $this->order->get_items() ) as $existing_item_id ) {
 			$this->order->remove_item( $existing_item_id );
 		}
@@ -103,16 +106,44 @@ class Test_Order_Stock_Lifecycle extends WP_UnitTestCase {
 		$this->assertSame( 0, $this->movement_count() );
 		$this->lifecycle->reduce( $this->order );
 		$this->assertSame( 500, $this->balance() );
+		$this->assertStringContainsString( '>Reduced</span>', $this->render_panel() );
 
 		$this->lifecycle->reduce( $this->order );
 		$this->assertSame( 500, $this->balance() );
 
 		$this->lifecycle->restore( $this->order );
 		$this->assertSame( 1000, $this->balance() );
+		$this->assertStringContainsString( '>Restored</span>', $this->render_panel() );
 
 		$this->lifecycle->reduce( $this->order );
 		$this->assertSame( 500, $this->balance() );
 		$this->assertSame( 2, (int) $this->order->get_meta( '_laqi_lusm_pool_stock_cycle', true ) );
+	}
+
+	/** Empty events keep their lifecycle flags without claiming pool movements. */
+	public function test_empty_stock_events_show_no_movements(): void {
+		foreach ( $this->order->get_items() as $item ) {
+			$item->delete_meta_data( OrderItemSnapshotter::META_KEY );
+			$item->save();
+		}
+		$this->assertStringContainsString( '>Not reduced</span>', $this->render_panel() );
+		$this->lifecycle->reduce( $this->order );
+		$this->assertSame( 'reduced', $this->order->get_meta( OrderStockLifecycle::STATE_META, true ) );
+		$this->assertStringContainsString( '>No stock movements</span>', $this->render_panel() );
+		$this->assertStringNotContainsString( 'value--reduced', $this->render_panel() );
+		$this->lifecycle->restore( $this->order );
+		$this->assertSame( 'restored', $this->order->get_meta( OrderStockLifecycle::STATE_META, true ) );
+		$this->assertStringContainsString( '>No stock movements</span>', $this->render_panel() );
+		$this->assertSame( 0, $this->movement_count() );
+	}
+
+	/** Render the actual audit panel against the order's ledger. */
+	private function render_panel(): string {
+		$container = new \LaqiUnitStockManager\Container();
+		$panel = new \LaqiUnitStockManager\Admin\OrderStockMetaBox( $container->movement_repository(), $container->movement_presenter() );
+		ob_start();
+		$panel->render( $this->order );
+		return ob_get_clean();
 	}
 
 	/**
@@ -136,6 +167,17 @@ class Test_Order_Stock_Lifecycle extends WP_UnitTestCase {
 
 		$this->lifecycle->restock_refund( true, $this->order, array( $item_id => array( 'qty' => 1 ) ) );
 		$this->assertSame( 1000, $this->balance() );
+	}
+
+	/** Cancelling a fully restocked order has no remaining movement to record. */
+	public function test_full_refund_then_restore_has_no_remaining_demand(): void {
+		$this->lifecycle->reduce( $this->order );
+		$item_id = array_key_first( $this->order->get_items() );
+		$this->lifecycle->restock_refund( true, $this->order, array( $item_id => array( 'qty' => 2 ) ) );
+		$this->lifecycle->restore( $this->order );
+		$this->assertSame( 1000, $this->balance() );
+		$this->assertSame( 2, $this->movement_count() );
+		$this->assertSame( 'restored', $this->order->get_meta( OrderStockLifecycle::STATE_META, true ) );
 	}
 
 	/**
