@@ -4,7 +4,7 @@ Tags: woocommerce, inventory, stock management, variable products, units
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.6
+Stable tag: 1.3.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 7.1
@@ -142,7 +142,7 @@ Deleting the last installed edition removes the plugin's inventory tables and it
 
 == Changelog ==
 
-= Unreleased =
+= 1.3.0 =
 * Fix - Orders without pooled-stock movements display "No stock movements" instead of a misleading Reduced or Restored label, including existing orders.
 * Fix - Cancelling a fully restocked order no longer attempts an empty stock movement.
 * Dev - Extension API 1.3 adds shared stock-demand expansion hooks for Pro integrations.
