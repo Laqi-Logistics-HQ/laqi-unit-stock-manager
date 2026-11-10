@@ -4,11 +4,11 @@ Tags: woocommerce, inventory, stock management, variable products, units
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 7.1
-WC tested up to: 11.1
+WC tested up to: 11.2
 
 Manage one bulk stock quantity shared by simple products and variations sold in different package sizes.
 
@@ -141,6 +141,9 @@ The free plugin is the complete shared-stock engine: pools, exact units, product
 Deleting the last installed edition removes the plugin's inventory tables and its stored schema version. If Pro is still installed, your shared inventory data is kept.
 
 == Changelog ==
+
+= 1.3.1 =
+* Tweak - Verified compatibility with WordPress 7.1.4 and WooCommerce 11.2.2 on PHP 7.4.33.
 
 = 1.3.0 =
 * Fix - Orders without pooled-stock movements display "No stock movements" instead of a misleading Reduced or Restored label, including existing orders.
